@@ -159,6 +159,7 @@ en:
   notice_account_register_done: Account was successfully created. An email containing the instructions to activate your account was sent to %{email}.
   notice_account_not_activated_yet: You haven't activated your account yet. If you want to receive a new activation email, please <a href="%{url}">click this link</a>.
   notice_account_locked: Your account is locked.
+  notice_account_unlocked: Your account is unlocked.
   notice_can_t_change_password: This account uses an external authentication source. Impossible to change the password.
   notice_account_lost_email_sent: An email with instructions to choose a new password has been sent to you.
   notice_account_activated: Your account has been activated. You can now log in.
@@ -251,6 +252,8 @@ en:
   mail_body_lost_password_validity: 'Please be aware that you may change the password only once using this link.'
   mail_subject_register: "Your %{value} account activation"
   mail_body_register: 'To activate your account, click on the following link:'
+  mail_subject_locked: "Your %{value} account locked"
+  mail_body_locked: "The account was locked because the number of failed login attempts exceeded a certain number of times.\nIf you are not aware of any login failures, reset your password.\n\nTo unlock your account, click on the following link:"
   mail_body_account_information_external: "You can use your %{value} account to log in."
   mail_body_account_information: Your account information
   mail_subject_account_activation_request: "%{value} account activation request"
@@ -471,6 +474,7 @@ en:
   setting_password_min_length: Minimum password length
   setting_password_required_char_classes : Required character classes for passwords
   setting_lost_password: Allow password reset via email
+  setting_max_login_attempts: Max login attempts
   setting_new_project_user_role_id: Role given to a non-admin user who creates a project
   setting_default_projects_modules: Default enabled modules for new projects
   setting_issue_done_ratio: Calculate the issue done ratio with

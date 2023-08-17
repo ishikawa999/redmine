@@ -52,6 +52,10 @@ password_max_age:
   format: int
   default: 0
   security_notifications: 1
+max_login_attempts:
+  format: int
+  default: 10
+  security_notifications: 1
 # Maximum number of additional email addresses per user
 max_additional_emails:
   format: int

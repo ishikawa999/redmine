@@ -88,6 +88,7 @@ class AccountController < ApplicationController
           @user.must_change_passwd = false
           if @user.save
             @token.destroy
+            @user.reset_failed_login_attempts!
             Mailer.deliver_password_updated(@user, User.current)
             flash[:notice] = l(:notice_account_password_updated)
             redirect_to signin_path
@@ -186,6 +187,20 @@ class AccountController < ApplicationController
     redirect_to signin_path
   end
 
+  # Token based account unlock
+  def unlock
+    token = Token.find_token('unlock', params[:token].to_s)
+    (redirect_to(home_url); return) unless token and !token.expired?
+    user = token.user
+    (redirect_to(home_url); return) unless user.locked?
+    user.reset_failed_login_attempts!
+    if user.save
+      token.destroy
+      flash[:notice] = l(:notice_account_unlocked)
+    end
+    redirect_to signin_path
+  end
+
   # Sends a new account activation email
   def activation_email
     if session[:registered_user_id] && Setting.self_registration == '1'
@@ -229,9 +244,15 @@ class AccountController < ApplicationController
     # prevent brute force attacks on the one-time password
     elsif session[:twofa_tries_counter] > 3
       destroy_twofa_session
+      @user.add_failed_login_attempts!
+      account_locked(@user); return if @user.locked?
+
       flash[:error] = l('twofa_too_many_tries')
       redirect_to home_url
     else
+      @user.add_failed_login_attempts!
+      account_locked(@user); return if @user.locked?
+
       flash[:error] = l('twofa_invalid_code')
       redirect_to account_twofa_confirm_path
     end
@@ -330,6 +351,8 @@ class AccountController < ApplicationController
   end
 
   def successful_authentication(user)
+    user.reset_failed_login_attempts!
+
     logger.info "Successful authentication for '#{user.login}' from #{request.remote_ip} at #{Time.now.utc}"
     # Valid user
     self.logged_user = user
@@ -366,6 +389,10 @@ class AccountController < ApplicationController
   end
 
   def invalid_credentials
+    user = User.find_by_login(params[:username].to_s.strip)
+    user.add_failed_login_attempts! if user
+    account_locked(user); return if user && user.locked?
+
     logger.warn "Failed login for '#{params[:username]}' from #{request.remote_ip} at #{Time.now.utc}"
     flash.now[:error] = l(:notice_account_invalid_credentials)
   end

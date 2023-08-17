@@ -897,6 +897,27 @@ class User < Principal
     User.where("created_on < ? AND status = ?", Time.now - age, STATUS_REGISTERED).destroy_all
   end
 
+  def reset_failed_login_attempts!
+    return if failed_login_attempts.zero?
+
+    self.failed_login_attempts = 0
+    self.activate if self.locked?
+    self.save!
+  end
+
+  def add_failed_login_attempts!
+    self.failed_login_attempts = self.failed_login_attempts + 1
+
+    if Setting.max_login_attempts.present? && self.failed_login_attempts > Setting.max_login_attempts.to_i && self.active?
+      self.lock
+      token = Token.new(user: self, action: 'unlock')
+      self.save! and token.save!
+      Mailer.deliver_locked(self, token)
+    else
+      self.save!
+    end
+  end
+
   protected
 
   def validate_password_length

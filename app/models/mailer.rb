@@ -459,6 +459,22 @@ class Mailer < ActionMailer::Base
     register(user, token).deliver_later
   end
 
+  # Builds a mail to user with account unlock link.
+  def locked(user, token)
+    @token = token
+    @url = url_for(controller: 'account', action: 'unlock', token: token.value)
+    mail :to => user.mail,
+      :subject => l(:mail_subject_locked, Setting.app_title)
+  end
+
+  # Sends an mail to user with account unlock link.
+  #
+  # Exemple:
+  #   Mailer.deliver_locked(user, token)
+  def self.deliver_locked(user, token)
+    locked(user, token).deliver_later
+  end
+
   # Build a mail to user and the additional recipients given in
   # options[:recipients] about a security related event made by sender.
   #
