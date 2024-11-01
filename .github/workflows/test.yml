@@ -70,15 +70,16 @@ jobs:
         run: |
           sudo sed -ri 's/(rights)="none" (pattern="PDF")/\1="read" \2/' /etc/ImageMagick-6/policy.xml
 
-      - name: Configure DATABASE_URL
+      - name: Create config/database.yml
         run: |
-          if [ "${{ matrix.supported_database }}" == "postgresql" ]; then
-            echo "DATABASE_URL=postgresql://user:password@localhost/testdb" >> $GITHUB_ENV
-          elif [ "${{ matrix.supported_database }}" == "mysql2" ]; then
-            echo "DATABASE_URL=mysql2://127.0.0.1:3306/testdb" >> $GITHUB_ENV
-          elif [ "${{ matrix.supported_database }}" == "sqlite3" ]; then
-            echo "DATABASE_URL=sqlite3:tmp/testdb.sqlite3" >> $GITHUB_ENV
-          fi
+          cat > config/database.yml <<EOF
+          test:
+            adapter: ${{ matrix.supported_database }}
+            database: testdb
+            username: user
+            password: password
+            host: 127.0.0.1
+          EOF
 
       - name: Stop Unused Services
         run: |
