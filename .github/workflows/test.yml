@@ -52,7 +52,6 @@ jobs:
           bundler-cache: true
 
       - uses: browser-actions/setup-chrome@v1
-        run: chrome --version
 
       - name: Update apt and install dependencies
         run: |
