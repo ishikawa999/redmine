@@ -81,6 +81,14 @@ jobs:
             docker stop mysql || true
           fi
 
+      - name: Wait for MySQL to be ready
+        if: matrix.database == 'mysql'
+        run: |
+          until mysqladmin ping -h 127.0.0.1 -u user -ppassword --silent; do
+            echo "Waiting for MySQL..."
+            sleep 5
+          done
+
       - name: Install dependencies
         run: bundle install
 
