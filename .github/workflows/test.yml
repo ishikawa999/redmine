@@ -70,17 +70,6 @@ jobs:
         run: |
           sudo sed -ri 's/(rights)="none" (pattern="PDF")/\1="read" \2/' /etc/ImageMagick-6/policy.xml
 
-      - name: Create config/database.yml
-        run: |
-          cat > config/database.yml <<EOF
-          test:
-            adapter: ${{ matrix.supported_database }}
-            database: testdb
-            username: user
-            password: password
-            host: 127.0.0.1
-          EOF
-
       - name: Configure DATABASE_URL
         run: |
           if [ "${{ matrix.supported_database }}" == "postgresql" ]; then
