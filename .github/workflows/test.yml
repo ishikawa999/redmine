@@ -20,7 +20,6 @@ jobs:
           --health-interval 10s
           --health-timeout 5s
           --health-retries 5
-          --name postgres
         ports:
           - 5432:5432
         env:
@@ -35,7 +34,6 @@ jobs:
           --health-interval 10s
           --health-timeout 5s
           --health-retries 5
-          --name mysql
         ports:
           - 3306:3306
         env:
@@ -81,15 +79,6 @@ jobs:
             password: password
             host: 127.0.0.1
           EOF
-
-      - name: Stop Unused Services
-        run: |
-          if [ "${{ matrix.supported_database }}" != "postgresql" ]; then
-            docker stop postgres || true
-          fi
-          if [ "${{ matrix.supported_database }}" != "mysql2" ]; then
-            docker stop mysql || true
-          fi
 
       - name: Install dependencies
         run: bundle install
