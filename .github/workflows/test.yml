@@ -99,15 +99,9 @@ jobs:
           # Disabled Mercurial due to installation difficulties. issue: https://www.redmine.org/issues/33784
           SCMS=subversion,git,filesystem,bazaar,cvs bundle exec rake ci:about ci:setup db:environment:set RAILS_ENV=test
 
-      - name: Run Tests
+      - name: Run tests
         run: |
-          bundle exec rake test RAILS_ENV=test
-
-      - name: Run system tests
-        run: bundle exec rake test:system RAILS_ENV=test
-        env:
-          GOOGLE_CHROME_OPTS_ARGS: "headless,disable-gpu,no-sandbox,disable-dev-shm-usage"
-        if: always()
+          bundle exec rake redmine:plugins:test RAILS_ENV=test
 
       - name: Store system test screenshots Artifacts
         if: failure()
