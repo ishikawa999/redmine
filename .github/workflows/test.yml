@@ -59,7 +59,7 @@ jobs:
             database: testdb
             username: user
             password: password
-            host: localhost
+            host: 127.0.0.1
           EOF
 
       - name: Configure DATABASE_URL
