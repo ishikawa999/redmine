@@ -7,13 +7,13 @@ jobs:
   test:
     strategy:
       matrix:
-        ruby_version: ['3.0', '3.1', '3.2']      # テスト対象のRubyバージョン
+        ruby_version: ['3.1', '3.2', '3.3']      # テスト対象のRubyバージョン
         database: ['postgresql', 'mysql', 'sqlite']  # 使用するデータベース
 
     runs-on: ubuntu-latest
     services:
       postgres:
-        image: postgres:13
+        image: postgres:14
         options: >-
           --health-cmd "pg_isready -U user"
           --health-interval 10s
@@ -72,19 +72,6 @@ jobs:
             echo "DATABASE_URL=mysql2://user:password@localhost:3306/testdb" >> $GITHUB_ENV
           elif [ "${{ matrix.database }}" == "sqlite" ]; then
             echo "DATABASE_URL=sqlite3::memory:" >> $GITHUB_ENV
-          fi
-
-      - name: Wait for Database
-        if: ${{ matrix.database != 'sqlite' }}
-        run: |
-          if [ "${{ matrix.database }}" == "postgresql" ]; then
-            until pg_isready -U user -h localhost; do
-              sleep 1
-            done
-          elif [ "${{ matrix.database }}" == "mysql" ]; then
-            until mysqladmin ping --host=localhost --user=user --password=password --silent; do
-              sleep 1
-            done
           fi
 
       - name: Set up Database
