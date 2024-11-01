@@ -101,7 +101,7 @@ jobs:
 
       - name: Set up Database
         run: |
-          bundle exec rake ci:setup RAILS_ENV=test
+          bundle exec rake ci:setup db:environment:set --trace RAILS_ENV=test
 
       - name: Run Tests
         env:
