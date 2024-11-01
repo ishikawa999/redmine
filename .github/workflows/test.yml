@@ -42,16 +42,10 @@ jobs:
           MYSQL_PASSWORD: password
 
     steps:
+      - uses: browser-actions/setup-chrome@v1
+
       - name: Checkout repository
         uses: actions/checkout@v4
-
-      - name: Set up Ruby
-        uses: ruby/setup-ruby@v1
-        with:
-          ruby-version: ${{ matrix.supported_ruby_version }}
-          bundler-cache: true
-
-      - uses: browser-actions/setup-chrome@v1
 
       - name: Update apt and install dependencies
         run: |
@@ -79,10 +73,13 @@ jobs:
             host: 127.0.0.1
           EOF
 
-      - name: Install dependencies
-        run: bundle install
+      - name: Set up Ruby
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: ${{ matrix.supported_ruby_version }}
+          bundler-cache: true
 
-      - name: Setup Redmine
+      - name: Prepare Test Environment
         run: |
           # Disabled Mercurial due to installation difficulties. issue: https://www.redmine.org/issues/33784
           SCMS=subversion,git,filesystem,bazaar,cvs bundle exec rake ci:about ci:setup db:environment:set RAILS_ENV=test
