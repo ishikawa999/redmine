@@ -26,7 +26,6 @@ jobs:
           POSTGRES_USER: user
           POSTGRES_PASSWORD: password
           POSTGRES_DB: testdb
-
       mysql:
         image: mysql:8
         options: >-
@@ -102,6 +101,6 @@ jobs:
         if: failure()
         uses: actions/upload-artifact@v4
         with:
-          name: my-artifact-${{ github.run_id }}-${{ github.run_number }}
+          name: screenshots-${{ matrix.supported_ruby_version }}-${{ matrix.supported_database }}-${{ github.run_id }}
           path: tmp/screenshots
           if-no-files-found: ignore
