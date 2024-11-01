@@ -84,7 +84,7 @@ jobs:
           elif [ "${{ matrix.database }}" == "mysql2" ]; then
             echo "DATABASE_URL=mysql2://127.0.0.1:3306/testdb" >> $GITHUB_ENV
           elif [ "${{ matrix.database }}" == "sqlite3" ]; then
-            echo "DATABASE_URL=sqlite3::memory:" >> $GITHUB_ENV
+            echo "DATABASE_URL=sqlite3:tmp/testdb.sqlite3" >> $GITHUB_ENV
           fi
 
       - name: Stop Unused Services
