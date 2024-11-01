@@ -62,6 +62,16 @@ jobs:
             host: localhost
           EOF
 
+      - name: Configure DATABASE_URL
+        run: |
+          if [ "${{ matrix.database }}" == "postgresql" ]; then
+            echo "DATABASE_URL=postgresql://user:password@localhost/testdb" >> $GITHUB_ENV
+          elif [ "${{ matrix.database }}" == "mysql" ]; then
+            echo "DATABASE_URL=mysql2://user:password@localhost/testdb" >> $GITHUB_ENV
+          elif [ "${{ matrix.database }}" == "sqlite" ]; then
+            echo "DATABASE_URL=sqlite3::memory:" >> $GITHUB_ENV
+          fi
+
       - name: Stop Unused Services
         run: |
           if [ "${{ matrix.database }}" != "postgresql" ]; then
@@ -77,7 +87,7 @@ jobs:
       - name: Set up Database
         run: |
           bundle exec rake db:create RAILS_ENV=test
-          bundle exec rake db:migrate RAILS_ENV=test
+          bundle exec rake db:create RAILS_ENV=test
 
       - name: Run Tests
         env:
