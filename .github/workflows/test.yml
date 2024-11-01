@@ -25,7 +25,6 @@ jobs:
           POSTGRES_USER: user
           POSTGRES_PASSWORD: password
           POSTGRES_DB: testdb
-        if: ${{ matrix.database == 'postgresql' }}  # PostgreSQLが選択された場合のみ起動
 
       mysql:
         image: mysql:8
@@ -41,7 +40,6 @@ jobs:
           MYSQL_DATABASE: testdb
           MYSQL_USER: user
           MYSQL_PASSWORD: password
-        if: ${{ matrix.database == 'mysql' }}  # MySQLが選択された場合のみ起動
 
     steps:
       - name: Checkout repository
@@ -52,6 +50,15 @@ jobs:
         with:
           ruby-version: ${{ matrix.ruby_version }}
           bundler-cache: true
+
+      - name: Stop Unused Services
+        run: |
+          if [ "${{ matrix.database }}" != "postgresql" ]; then
+            docker stop postgres || true
+          fi
+          if [ "${{ matrix.database }}" != "mysql" ]; then
+            docker stop mysql || true
+          fi
 
       - name: Install dependencies
         run: bundle install
@@ -71,9 +78,13 @@ jobs:
         if: ${{ matrix.database != 'sqlite' }}
         run: |
           if [ "${{ matrix.database }}" == "postgresql" ]; then
-            docker-compose exec -T postgres pg_isready -U user
+            until pg_isready -U user -h localhost; do
+              sleep 1
+            done
           elif [ "${{ matrix.database }}" == "mysql" ]; then
-            docker-compose exec -T mysql mysqladmin ping --silent
+            until mysqladmin ping --host=localhost --user=user --password=password --silent; do
+              sleep 1
+            done
           fi
 
       - name: Set up Database
