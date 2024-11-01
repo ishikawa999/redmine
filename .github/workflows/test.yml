@@ -103,6 +103,12 @@ jobs:
         run: |
           bundle exec rake redmine:plugins:test RAILS_ENV=test
 
+      - name: Run system tests
+        run: bundle exec rake test:system RAILS_ENV=test
+        env:
+          GOOGLE_CHROME_OPTS_ARGS: "headless,disable-gpu,no-sandbox,disable-dev-shm-usage"
+        if: always()
+
       - name: Store system test screenshots Artifacts
         if: failure()
         uses: actions/upload-artifact@v4
