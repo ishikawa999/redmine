@@ -67,7 +67,7 @@ jobs:
           if [ "${{ matrix.database }}" == "postgresql" ]; then
             echo "DATABASE_URL=postgresql://user:password@localhost/testdb" >> $GITHUB_ENV
           elif [ "${{ matrix.database }}" == "mysql2" ]; then
-            echo "DATABASE_URL=mysql2://user:password@localhost/testdb" >> $GITHUB_ENV
+            echo "DATABASE_URL=mysql2://127.0.0.1:3306/testdb" >> $GITHUB_ENV
           elif [ "${{ matrix.database }}" == "sqlite3" ]; then
             echo "DATABASE_URL=sqlite3::memory:" >> $GITHUB_ENV
           fi
