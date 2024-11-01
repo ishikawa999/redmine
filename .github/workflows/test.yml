@@ -100,13 +100,9 @@ jobs:
         run: bundle install
 
       - name: Setup Redmine
-        env:
-          DATABASE_URL: ${{ env.DATABASE_URL }}
         run: |
           bundle exec rake ci:setup db:environment:set --trace RAILS_ENV=test
 
       - name: Run Tests
-        env:
-          DATABASE_URL: ${{ env.DATABASE_URL }}
         run: |
           bundle exec rake test RAILS_ENV=test
