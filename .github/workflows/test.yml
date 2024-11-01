@@ -8,7 +8,7 @@ jobs:
     strategy:
       matrix:
         ruby_version: ['3.1', '3.2', '3.3']      # テスト対象のRubyバージョン
-        database: ['postgresql', 'mysql', 'sqlite']  # 使用するデータベース
+        database: ['postgresql', 'mysql2', 'sqlite3']  # 使用するデータベース
 
     runs-on: ubuntu-latest
     services:
@@ -51,12 +51,23 @@ jobs:
           ruby-version: ${{ matrix.ruby_version }}
           bundler-cache: true
 
+      - name: Create config/database.yml
+        run: |
+          cat > config/database.yml <<EOF
+          test:
+            adapter: ${{ matrix.database }}
+            database: testdb
+            username: user
+            password: password
+            host: localhost
+          EOF
+
       - name: Stop Unused Services
         run: |
           if [ "${{ matrix.database }}" != "postgresql" ]; then
             docker stop postgres || true
           fi
-          if [ "${{ matrix.database }}" != "mysql" ]; then
+          if [ "${{ matrix.database }}" != "mysql2" ]; then
             docker stop mysql || true
           fi
 
@@ -68,9 +79,9 @@ jobs:
         run: |
           if [ "${{ matrix.database }}" == "postgresql" ]; then
             echo "DATABASE_URL=postgresql://user:password@localhost:5432/testdb" >> $GITHUB_ENV
-          elif [ "${{ matrix.database }}" == "mysql" ]; then
+          elif [ "${{ matrix.database }}" == "mysql2" ]; then
             echo "DATABASE_URL=mysql2://user:password@localhost:3306/testdb" >> $GITHUB_ENV
-          elif [ "${{ matrix.database }}" == "sqlite" ]; then
+          elif [ "${{ matrix.database }}" == "sqlite3" ]; then
             echo "DATABASE_URL=sqlite3::memory:" >> $GITHUB_ENV
           fi
 
