@@ -1,4 +1,4 @@
-name: Database Compatibility Tests
+name: Test
 
 on:
   push:
@@ -7,56 +7,81 @@ jobs:
   test:
     strategy:
       matrix:
-        ruby_version: ['3.1', '3.2', '3.3']  # サポートしているRubyのバージョンを指定
-        database: ['postgresql', 'mysql', 'sqlite']
+        ruby_version: ['3.0', '3.1', '3.2']      # テスト対象のRubyバージョン
+        database: ['postgresql', 'mysql', 'sqlite']  # 使用するデータベース
 
     runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:13
+        options: >-
+          --health-cmd "pg_isready -U user"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 5432:5432
+        env:
+          POSTGRES_USER: user
+          POSTGRES_PASSWORD: password
+          POSTGRES_DB: testdb
+        if: ${{ matrix.database == 'postgresql' }}  # PostgreSQLが選択された場合のみ起動
+
+      mysql:
+        image: mysql:8
+        options: >-
+          --health-cmd "mysqladmin ping --silent"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 3306:3306
+        env:
+          MYSQL_ROOT_PASSWORD: password
+          MYSQL_DATABASE: testdb
+          MYSQL_USER: user
+          MYSQL_PASSWORD: password
+        if: ${{ matrix.database == 'mysql' }}  # MySQLが選択された場合のみ起動
 
     steps:
-    - name: Checkout repository
-      uses: actions/checkout@v4
+      - name: Checkout repository
+        uses: actions/checkout@v2
 
-    - name: Set up Ruby
-      uses: ruby/setup-ruby@v1
-      with:
-        ruby-version: ${{ matrix.ruby_version }}
-        bundler-cache: true  # Bundlerのキャッシュを有効化
+      - name: Set up Ruby
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: ${{ matrix.ruby_version }}
+          bundler-cache: true
 
-    - name: Install Dependencies
-      run: |
-        sudo apt-get update
-        if [ "${{ matrix.database }}" == "postgresql" ]; then
-          sudo apt-get install -y postgresql libpq-dev
-        elif [ "${{ matrix.database }}" == "mysql" ]; then
-          sudo apt-get install -y mysql-server libmysqlclient-dev
-        elif [ "${{ matrix.database }}" == "sqlite" ]; then
-          sudo apt-get install -y sqlite3 libsqlite3-dev
-        fi
+      - name: Install dependencies
+        run: bundle install
 
-    - name: Configure Database
-      run: |
-        if [ "${{ matrix.database }}" == "postgresql" ]; then
-          sudo service postgresql start
-          psql -c "CREATE USER myuser WITH PASSWORD 'mypassword';" -U postgres
-          psql -c "CREATE DATABASE mydatabase OWNER myuser;" -U postgres
-          export DATABASE_URL="postgresql://myuser:mypassword@localhost/mydatabase"
-        elif [ "${{ matrix.database }}" == "mysql" ]; then
-          sudo service mysql start
-          mysql -e "CREATE DATABASE mydatabase;"
-          mysql -e "CREATE USER 'myuser'@'localhost' IDENTIFIED BY 'mypassword';"
-          mysql -e "GRANT ALL ON mydatabase.* TO 'myuser'@'localhost';"
-          export DATABASE_URL="mysql2://myuser:mypassword@localhost/mydatabase"
-        elif [ "${{ matrix.database }}" == "sqlite" ]; then
-          export DATABASE_URL="sqlite3::memory:"
-        fi
+      - name: Configure Database URL
+        id: db_url
+        run: |
+          if [ "${{ matrix.database }}" == "postgresql" ]; then
+            echo "DATABASE_URL=postgresql://user:password@localhost:5432/testdb" >> $GITHUB_ENV
+          elif [ "${{ matrix.database }}" == "mysql" ]; then
+            echo "DATABASE_URL=mysql2://user:password@localhost:3306/testdb" >> $GITHUB_ENV
+          elif [ "${{ matrix.database }}" == "sqlite" ]; then
+            echo "DATABASE_URL=sqlite3::memory:" >> $GITHUB_ENV
+          fi
 
-    - name: Install Gems
-      run: |
-        bundle install
+      - name: Wait for Database
+        if: ${{ matrix.database != 'sqlite' }}
+        run: |
+          if [ "${{ matrix.database }}" == "postgresql" ]; then
+            docker-compose exec -T postgres pg_isready -U user
+          elif [ "${{ matrix.database }}" == "mysql" ]; then
+            docker-compose exec -T mysql mysqladmin ping --silent
+          fi
 
-    - name: Run Tests
-      env:
-        DATABASE_URL: ${{ env.DATABASE_URL }}
-      run: |
-        bundle exec rake db:migrate RAILS_ENV=test  # 必要に応じてデータベースのマイグレーション
-        bundle exec rake test RAILS_ENV=test  # テストの実行
+      - name: Set up Database
+        run: |
+          bundle exec rake db:setup RAILS_ENV=test
+
+      - name: Run Tests
+        env:
+          DATABASE_URL: ${{ env.DATABASE_URL }}
+        run: |
+          bundle exec rake test RAILS_ENV=test
