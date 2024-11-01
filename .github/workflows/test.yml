@@ -51,6 +51,9 @@ jobs:
           ruby-version: ${{ matrix.ruby_version }}
           bundler-cache: true
 
+      - uses: browser-actions/setup-chrome@v1
+        run: chrome --version
+
       - name: Update apt and install dependencies
         run: |
           sudo apt-get update
@@ -107,3 +110,16 @@ jobs:
       - name: Run Tests
         run: |
           bundle exec rake test RAILS_ENV=test
+
+      - name: Run system tests
+        run: bin/rails test:system
+        env:
+          GOOGLE_CHROME_OPTS_ARGS: "headless,disable-gpu,no-sandbox,disable-dev-shm-usage"
+
+      - name: Store system test screenshots Artifacts
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: system-test-screenshots
+          path: tmp/screenshots
+          if-no-files-found: ignore
