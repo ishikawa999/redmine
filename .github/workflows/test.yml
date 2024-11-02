@@ -58,6 +58,10 @@ jobs:
             imagemagick libmagick++-dev \
             libnss3-dev
 
+      - name: Configure ImageMagick for PDF support
+        run: |
+          sudo sed -ri 's/(rights)="none" (pattern="PDF")/\1="read" \2/' /etc/ImageMagick-6/policy.xml
+
       - name: Create config/database.yml
         run: |
           cat > config/database.yml <<EOF
