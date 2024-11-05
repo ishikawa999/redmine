@@ -70,6 +70,7 @@ jobs:
           sudo locale-gen en_US
           sudo locale -a
           sudo update-locale LANG=en_US.ISO8859-1 LC_ALL=en_US.ISO8859-1
+          bundle exec rake test TEST=test/unit/repository_bazaar_test.rb RAILS_ENV=test
 
       - name: Run bazaar non ascii test
         run: |
