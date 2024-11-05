@@ -23,17 +23,10 @@ jobs:
           if [ "${{ matrix.supported_database }}" == "postgresql" ]; then
             docker run -d --name postgres -e POSTGRES_USER=user -e POSTGRES_PASSWORD=password -e POSTGRES_DB=testdb -p 5432:5432 postgres:14
             echo "DATABASE_HOST=127.0.0.1" >> $GITHUB_ENV
+            until docker exec postgres pg_isready -U user; do sleep 1; done
           elif [ "${{ matrix.supported_database }}" == "mysql2" ]; then
             docker run -d --name mysql -e MYSQL_ROOT_PASSWORD=password -e MYSQL_DATABASE=testdb -e MYSQL_USER=user -e MYSQL_PASSWORD=password -p 3306:3306 mysql:8
             echo "DATABASE_HOST=127.0.0.1" >> $GITHUB_ENV
-          fi
-
-      - name: Wait for Database
-        if: ${{ matrix.supported_database != 'sqlite3' }}
-        run: |
-          if [ "${{ matrix.supported_database }}" == "postgresql" ]; then
-            until docker exec postgres pg_isready -U user; do sleep 1; done
-          elif [ "${{ matrix.supported_database }}" == "mysql2" ]; then
             until docker exec mysql mysqladmin ping --silent; do sleep 1; done
           fi
 
@@ -73,7 +66,7 @@ jobs:
 
       - name: Prepare Test Environment
         run: |
-          SCMS=subversion,git,filesystem,bazaar,cvs bundle exec rake db:create ci:about ci:setup db:environment:set RAILS_ENV=test
+          SCMS=subversion,git,filesystem,bazaar,cvs bundle exec rake ci:about ci:setup db:environment:set RAILS_ENV=test
 
       - name: Run tests
         run: |
