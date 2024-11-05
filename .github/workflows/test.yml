@@ -13,25 +13,9 @@ jobs:
 
     runs-on: ubuntu-latest
 
-    services:
-      openldap:
-        image: bitnami/openldap:latest
-        volumes:
-          - ${{ github.workspace }}/test/fixtures/ldap:/redmine
-        environment:
-          - LDAP_PORT_NUMBER=389
-          - LDAP_SKIP_DEFAULT_TREE=yes
-          - LDAP_CUSTOM_SCHEMA_FILE=/redmine/test-ldap.ldif
-
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
-
-      - name: Restart openldap container
-        # Restart openldap container after volumes have been checked out
-        uses: docker://docker
-        with:
-          args: docker restart openldap
 
       - name: Set up Database
         if: ${{ matrix.supported_database != 'sqlite3' }}
@@ -43,6 +27,16 @@ jobs:
             docker run -d --name mysql -e MYSQL_ROOT_PASSWORD=password -e MYSQL_DATABASE=testdb -e MYSQL_USER=user -e MYSQL_PASSWORD=password -p 3306:3306 mysql:8
             until docker exec mysql mysqladmin ping --silent; do sleep 1; done
           fi
+
+      - name: Set up LDAP Server
+      run: |
+        docker run -d \
+          --name openldap \
+          -v $(pwd)/test/fixtures/ldap:/redmine \
+          -e LDAP_PORT_NUMBER=389 \
+          -e LDAP_SKIP_DEFAULT_TREE=yes \
+          -e LDAP_CUSTOM_SCHEMA_FILE=/redmine/test-ldap.ldif \
+          bitnami/openldap:latest
 
       - name: Install dependencies and configure environment
         run: |
@@ -83,6 +77,7 @@ jobs:
           bundle exec rake test:all RAILS_ENV=test
         env:
           GOOGLE_CHROME_OPTS_ARGS: "headless,disable-gpu,no-sandbox,disable-dev-shm-usage"
+          REDMINE_TEST_LDAP_SERVER: "openldap"
 
       - name: Run bazaar non ascii test
         run: |
