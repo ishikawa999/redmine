@@ -74,6 +74,7 @@ jobs:
 
       - name: Run tests
         run: |
+          bundle install --with ldap
           ruby -e "require 'net/ldap'; puts Net::LDAP.new(:host => 'openldap', :port => 389).bind"
           bundle exec rake test:all RAILS_ENV=test
         env:
