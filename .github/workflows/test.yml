@@ -16,12 +16,22 @@ jobs:
     services:
       openldap:
         image: bitnami/openldap:latest
-        ports:
-          - 389:389
+        volumes:
+          - ${{ github.workspace }}/test/fixtures/ldap:/redmine
+        environment:
+          - LDAP_PORT_NUMBER=389
+          - LDAP_SKIP_DEFAULT_TREE=yes
+          - LDAP_CUSTOM_SCHEMA_FILE=/redmine/test-ldap.ldif
 
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
+
+      - name: Restart openldap container
+        # Restart openldap container after volumes have been checked out
+        uses: docker://docker
+        with:
+          args: docker restart openldap
 
       - name: Set up Database
         if: ${{ matrix.supported_database != 'sqlite3' }}
