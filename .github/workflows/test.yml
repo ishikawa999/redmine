@@ -83,8 +83,9 @@ jobs:
           # インストールが完了しているか確認
           bundle list
 
-          docker ps
+          docker ps -a
 
+          docker inspect openldap
           # テスト実行
           bundle exec rake test:all RAILS_ENV=test
         env:
