@@ -32,7 +32,7 @@ jobs:
         run: |
           docker run -d \
             --name openldap \
-            -v $(pwd)/test/fixtures/ldap:/redmine \
+            -v ${{ github.workspace }}/test/fixtures/ldap:/redmine \
             -e LDAP_PORT_NUMBER=389 \
             -e LDAP_SKIP_DEFAULT_TREE=yes \
             -e LDAP_CUSTOM_SCHEMA_FILE=/redmine/test-ldap.ldif -p 389:389 \
