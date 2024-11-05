@@ -28,7 +28,7 @@ jobs:
             until docker exec mysql mysqladmin ping --silent; do sleep 1; done
           fi
 
-      - name: Update apt and install dependencies
+      - name: Install dependencies and configure environment
         run: |
           sudo apt-get update
           sudo apt-get install -y --no-install-recommends \
@@ -38,10 +38,8 @@ jobs:
             gsfonts \
             imagemagick libmagick++-dev \
             libnss3-dev locales
-
-      - name: Configure ImageMagick for PDF support
-        run: |
-          sudo sed -ri 's/(rights)="none" (pattern="PDF")/\1="read" \2/' /etc/ImageMagick-6/policy.xml
+          sudo locale-gen en_US # for bazaar non ascii test
+          sudo sed -ri 's/(rights)="none" (pattern="PDF")/\1="read" \2/' /etc/ImageMagick-6/policy.xml # Configure ImageMagick for PDF support
 
       - name: Create config/database.yml
         run: |
@@ -63,7 +61,12 @@ jobs:
       - name: Prepare Test Environment
         run: |
           SCMS=subversion,git,git_utf8,filesystem,bazaar,cvs bundle exec rake ci:about ci:setup db:environment:set RAILS_ENV=test
-          sudo locale-gen en_US # for bazaar non ascii test
+
+      - name: Run tests
+        run: |
+          bundle exec rake test:all RAILS_ENV=test
+        env:
+          GOOGLE_CHROME_OPTS_ARGS: "headless,disable-gpu,no-sandbox,disable-dev-shm-usage"
 
       - name: Run bazaar non ascii test
         run: |
@@ -71,12 +74,6 @@ jobs:
         env:
           LANG: en_US.ISO8859-1
           LC_ALL: en_US.ISO8859-1
-
-      - name: Run tests
-        run: |
-          bundle exec rake test:all RAILS_ENV=test
-        env:
-          GOOGLE_CHROME_OPTS_ARGS: "headless,disable-gpu,no-sandbox,disable-dev-shm-usage"
 
       - name: Store system test screenshots Artifacts
         if: failure()
