@@ -84,13 +84,13 @@ jobs:
           bundle list
 
           # LDAPライブラリが読み込めるか確認
-          ruby -e "require 'bundler/setup'; Bundler.require(:default, :ldap); puts Net::LDAP.new(:host => 'openldap', :port => 389).bind"
+          ruby -e "require 'bundler/setup'; Bundler.require(:default, :ldap); puts Net::LDAP.new(:host => 'localhost', :port => 389).bind"
 
           # テスト実行
           bundle exec rake test:all RAILS_ENV=test
         env:
           GOOGLE_CHROME_OPTS_ARGS: "headless,disable-gpu,no-sandbox,disable-dev-shm-usage"
-          REDMINE_TEST_LDAP_SERVER: "openldap"
+          REDMINE_TEST_LDAP_SERVER: "localhost"
 
       - name: Run bazaar non ascii test
         run: |
