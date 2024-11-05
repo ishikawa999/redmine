@@ -14,6 +14,7 @@ jobs:
     runs-on: ubuntu-latest
     services:
       postgres:
+        if: matrix.supported_database == 'postgresql'
         image: postgres:14
         options: >-
           --health-cmd "pg_isready -U user"
@@ -27,6 +28,7 @@ jobs:
           POSTGRES_PASSWORD: password
           POSTGRES_DB: testdb
       mysql:
+        if: matrix.supported_database == 'mysql2'
         image: mysql:8
         options: >-
           --health-cmd "mysqladmin ping --silent"
@@ -73,27 +75,4 @@ jobs:
             host: 127.0.0.1
           EOF
 
-      - name: Set up Ruby
-        uses: ruby/setup-ruby@v1
-        with:
-          ruby-version: ${{ matrix.supported_ruby_version }}
-          bundler-cache: true
-
-      - name: Prepare Test Environment
-        run: |
-          # Disabled Mercurial due to installation difficulties. issue: https://www.redmine.org/issues/33784
-          SCMS=subversion,git,filesystem,bazaar,cvs bundle exec rake ci:about ci:setup db:environment:set RAILS_ENV=test
-
-      - name: Run tests
-        run: |
-          bundle exec rake test:all RAILS_ENV=test
-        env:
-          GOOGLE_CHROME_OPTS_ARGS: "headless,disable-gpu,no-sandbox,disable-dev-shm-usage"
-
-      - name: Store system test screenshots Artifacts
-        if: failure()
-        uses: actions/upload-artifact@v4
-        with:
-          name: screenshots-${{ matrix.supported_ruby_version }}-${{ matrix.supported_database }}-${{ github.run_id }}
-          path: tmp/screenshots
-          if-no-files-found: ignore
+      - name: Set up Ru
