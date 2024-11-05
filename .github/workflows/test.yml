@@ -22,10 +22,10 @@ jobs:
         run: |
           if [ "${{ matrix.supported_database }}" == "postgresql" ]; then
             docker run -d --name postgres -e POSTGRES_USER=user -e POSTGRES_PASSWORD=password -e POSTGRES_DB=testdb -p 5432:5432 postgres:14
-            export DATABASE_HOST=127.0.0.1
+            echo "DATABASE_HOST=127.0.0.1" >> $GITHUB_ENV
           elif [ "${{ matrix.supported_database }}" == "mysql2" ]; then
             docker run -d --name mysql -e MYSQL_ROOT_PASSWORD=password -e MYSQL_DATABASE=testdb -e MYSQL_USER=user -e MYSQL_PASSWORD=password -p 3306:3306 mysql:8
-            export DATABASE_HOST=$(docker inspect -f '{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}' mysql)
+            echo "DATABASE_HOST=127.0.0.1" >> $GITHUB_ENV
           fi
 
       - name: Wait for Database
@@ -60,8 +60,10 @@ jobs:
             database: testdb
             username: user
             password: password
-            host: $DATABASE_HOST
+            host: ${DATABASE_HOST}
           EOF
+        env:
+          DATABASE_HOST: ${{ env.DATABASE_HOST }}
 
       - name: Set up Ruby
         uses: ruby/setup-ruby@v1
