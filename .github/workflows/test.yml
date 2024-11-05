@@ -71,7 +71,7 @@ jobs:
 
       - name: Prepare Test Environment
         run: |
-          SCMS=subversion,git,filesystem,bazaar,cvs bundle exec rake ci:about ci:setup db:environment:set RAILS_ENV=test
+          SCMS=subversion,git,filesystem,bazaar,cvs bundle exec rake db:create ci:about ci:setup db:environment:set RAILS_ENV=test
 
       - name: Run tests
         run: |
