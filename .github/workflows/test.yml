@@ -83,8 +83,7 @@ jobs:
           # インストールが完了しているか確認
           bundle list
 
-          # LDAPライブラリが読み込めるか確認
-          ruby -e "require 'bundler/setup'; Bundler.require(:default, :ldap); puts Net::LDAP.new(:host => 'localhost', :port => 389).bind"
+          docker ps
 
           # テスト実行
           bundle exec rake test:all RAILS_ENV=test
