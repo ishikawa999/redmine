@@ -70,6 +70,13 @@ jobs:
         env:
           GOOGLE_CHROME_OPTS_ARGS: "headless,disable-gpu,no-sandbox,disable-dev-shm-usage"
 
+      - name: Run bazaar non ascii test
+        run: |
+          bundle exec rake test TEST=test/unit/repository_bazaar_test.rb RAILS_ENV=test
+        env:
+          LANG: en_US.ISO8859-1
+          LC_ALL: en_US.ISO8859-1
+
       - name: Store system test screenshots Artifacts
         if: failure()
         uses: actions/upload-artifact@v4
