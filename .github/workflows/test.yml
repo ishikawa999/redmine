@@ -37,7 +37,7 @@ jobs:
             ghostscript \
             gsfonts \
             imagemagick libmagick++-dev \
-            libnss3-dev
+            libnss3-dev locales
 
       - name: Configure ImageMagick for PDF support
         run: |
@@ -66,8 +66,7 @@ jobs:
 
       - name: Run bazaar non ascii test
         run: |
-          sudo apt-get update
-          sudo apt-get install -y locales
+          locales -a
           sudo locale-gen en_US.ISO8859-1
           sudo update-locale LANG=en_US.ISO8859-1 LC_ALL=en_US.ISO8859-1
           bundle exec rake test TEST=test/unit/repository_bazaar_test.rb RAILS_ENV=test
