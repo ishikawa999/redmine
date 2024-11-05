@@ -86,6 +86,8 @@ jobs:
           docker ps -a
 
           docker logs openldap
+          docker restart openldap
+          docker logs openldap
           # テスト実行
           bundle exec rake test:all RAILS_ENV=test
         env:
