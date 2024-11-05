@@ -13,6 +13,12 @@ jobs:
 
     runs-on: ubuntu-latest
 
+    services:
+      openldap:
+        image: bitnami/openldap:latest
+        ports:
+          - 389:389
+
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
