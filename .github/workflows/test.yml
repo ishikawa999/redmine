@@ -4,93 +4,41 @@ on:
   [push, workflow_dispatch]
 
 jobs:
-  test:
+  postgresql_test:
     strategy:
       fail-fast: false
       matrix:
         supported_ruby_version: ['3.1', '3.2', '3.3']
-        supported_database: ['postgresql', 'mysql2', 'sqlite3']
 
     runs-on: ubuntu-latest
-
+    services:
+      postgres:
+        image: postgres:14
+        options: >-
+          --health-cmd "pg_isready -U user"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 5432:5432
+        env:
+          POSTGRES_USER: user
+          POSTGRES_PASSWORD: password
+          POSTGRES_DB: testdb
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
-
-      - name: Set up Database
-        if: ${{ matrix.supported_database != 'sqlite3' }}
-        run: |
-          if [ "${{ matrix.supported_database }}" == "postgresql" ]; then
-            docker run -d --name postgres -e POSTGRES_USER=user -e POSTGRES_PASSWORD=password -e POSTGRES_DB=testdb -p 5432:5432 postgres:14
-            until docker exec postgres pg_isready -U user; do sleep 1; done
-          elif [ "${{ matrix.supported_database }}" == "mysql2" ]; then
-            docker run -d --name mysql -e MYSQL_ROOT_PASSWORD=password -e MYSQL_DATABASE=testdb -e MYSQL_USER=user -e MYSQL_PASSWORD=password -p 3306:3306 mysql:8
-            until docker exec mysql mysqladmin ping --silent; do sleep 1; done
-          fi
-
-      - name: Set up LDAP Server
-        run: |
-          docker run -d \
-            --name openldap \
-            -v ${{ github.workspace }}/test/fixtures/ldap:/redmine \
-            -e LDAP_PORT_NUMBER=389 \
-            -e LDAP_SKIP_DEFAULT_TREE=yes \
-            -e LDAP_CUSTOM_SCHEMA_FILE=/redmine/test-ldap.ldif -p 389:389 \
-            bitnami/openldap:2.6
-
-      - name: Install dependencies and configure environment
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y --no-install-recommends \
-            build-essential \
-            bzr git mercurial subversion cvs \
-            ghostscript \
-            gsfonts \
-            imagemagick libmagick++-dev \
-            libnss3-dev locales
-          sudo locale-gen en_US # for bazaar non ascii test
-          sudo sed -ri 's/(rights)="none" (pattern="PDF")/\1="read" \2/' /etc/ImageMagick-6/policy.xml # Configure ImageMagick for PDF support
-          docker restart openldap # ?
 
       - name: Create config/database.yml
         run: |
           cat > config/database.yml <<EOF
           test:
-            adapter: ${{ matrix.supported_database }}
+            adapter: postgresql
             database: testdb
             username: user
             password: password
             host: 127.0.0.1
           EOF
 
-      - name: Set up Ruby
-        uses: ruby/setup-ruby@v1
-        with:
-          ruby-version: ${{ matrix.supported_ruby_version }}
-          bundler-cache: true 
-
-      - name: Prepare Test Environment
-        run: |
-          SCMS=subversion,git,git_utf8,filesystem,bazaar,cvs bundle exec rake ci:about ci:setup db:environment:set RAILS_ENV=test
-
-      - name: Run tests
-        run: |
-          bundle exec rake test:all RAILS_ENV=test
-        env:
-          GOOGLE_CHROME_OPTS_ARGS: "headless,disable-gpu,no-sandbox,disable-dev-shm-usage"
-          REDMINE_TEST_LDAP_SERVER: "localhost"
-
-      - name: Run bazaar non ascii test
-        run: |
-          bundle exec rake test TEST=test/unit/repository_bazaar_test.rb RAILS_ENV=test
-        env:
-          LANG: en_US.ISO8859-1
-          LC_ALL: en_US.ISO8859-1
-
-      - name: Store system test screenshots Artifacts
-        if: failure()
-        uses: actions/upload-artifact@v4
-        with:
-          name: screenshots-${{ matrix.supported_ruby_version }}-${{ matrix.supported_database }}-${{ github.run_id }}
-          path: tmp/screenshots
-          if-no-files-found: ignore
+      - name: Build and Test
+        uses: ./build_and_test_steps.yml
