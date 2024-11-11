@@ -35,7 +35,7 @@ jobs:
       - name: Set up Ruby
         uses: ruby/setup-ruby@v1
         with:
-          ruby-version: ${{ inputs.ruby-version }}
+          ruby-version: ${{ matrix.supported_ruby_version }}
 
       - name: Configure Database
         run: echo "DATABASE_URL=${{ inputs.database-config.url }}" >> $GITHUB_ENV
