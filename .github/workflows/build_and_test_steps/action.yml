@@ -32,6 +32,7 @@ runs:
         bundler-cache: true 
 
     - name: Create config/database.yml
+      shell: bash
       run: |
         cat > config/database.yml <<EOF
         test:
