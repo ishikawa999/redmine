@@ -4,6 +4,9 @@ inputs:
   supported_ruby_version:
     required: true
     type: string
+  database:
+    required: true
+    type: string
 
 runs:
   using: composite
@@ -27,6 +30,17 @@ runs:
       with:
         ruby-version: ${{ inputs.supported_ruby_version }}
         bundler-cache: true 
+
+    - name: Create config/database.yml
+      run: |
+        cat > config/database.yml <<EOF
+        test:
+          adapter: ${{ inputs.database }}
+          database: testdb
+          username: user
+          password: password
+          host: 127.0.0.1
+        EOF
 
     - name: Prepare Test Environment
       shell: bash
