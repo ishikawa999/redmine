@@ -1,4 +1,3 @@
-# .github/workflows/build_and_test_steps.yml
 name: Build and Test
 
 inputs:
@@ -22,7 +21,6 @@ runs:
           libnss3-dev locales
         sudo locale-gen en_US # for bazaar non ascii test
         sudo sed -ri 's/(rights)="none" (pattern="PDF")/\1="read" \2/' /etc/ImageMagick-6/policy.xml # Configure ImageMagick for PDF support
-        docker restart openldap # ?
 
     - name: Set up Ruby
       uses: ruby/setup-ruby@v1
