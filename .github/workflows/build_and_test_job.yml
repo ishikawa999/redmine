@@ -4,9 +4,6 @@ name: Test Database Workflow
 on:
   workflow_call:
     inputs:
-      ruby-version:
-        required: true
-        type: string
       database:
         required: true
         type: string
