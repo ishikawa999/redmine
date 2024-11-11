@@ -10,6 +10,7 @@ runs:
   using: composite
   steps:
     - name: Install dependencies and configure environment
+      shell: bash
       run: |
         sudo apt-get update
         sudo apt-get install -y --no-install-recommends \
@@ -30,16 +31,19 @@ runs:
         bundler-cache: true 
 
     - name: Prepare Test Environment
+      shell: bash
       run: |
         SCMS=subversion,git,git_utf8,filesystem,bazaar,cvs bundle exec rake ci:about ci:setup db:environment:set RAILS_ENV=test
 
     - name: Run tests
+      shell: bash
       run: |
         bundle exec rake test:all RAILS_ENV=test
       env:
         GOOGLE_CHROME_OPTS_ARGS: "headless,disable-gpu,no-sandbox,disable-dev-shm-usage"
 
     - name: Run bazaar non ascii test
+      shell: bash
       run: |
         bundle exec rake test TEST=test/unit/repository_bazaar_test.rb RAILS_ENV=test
       env:
