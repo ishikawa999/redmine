@@ -4,7 +4,7 @@ on:
   [push, workflow_dispatch]
 
 jobs:
-  postgresql_test2:
+  postgresql_test:
     strategy:
       fail-fast: false
       matrix:
@@ -33,7 +33,7 @@ jobs:
           supported_ruby_version: ${{ matrix.supported_ruby_version }}
           database: postgresql
 
-  mysql2_test2:
+  mysql2_test:
     strategy:
       fail-fast: false
       matrix:
@@ -63,7 +63,7 @@ jobs:
           supported_ruby_version: ${{ matrix.supported_ruby_version }}
           database: mysql2
 
-  sqlite3_test2:
+  sqlite3_test:
     strategy:
       fail-fast: false
       matrix:
