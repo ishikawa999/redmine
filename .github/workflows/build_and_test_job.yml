@@ -20,7 +20,6 @@ jobs:
 
     services:
       db:
-        name: ${{ inputs.database-config.name }}
         image: ${{ inputs.database-config.image }}
         env: ${{ inputs.database-config.env }}
         ports: ${{ inputs.database-config.ports }}
