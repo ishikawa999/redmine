@@ -25,12 +25,6 @@ runs:
         sudo locale-gen en_US # for bazaar non ascii test
         sudo sed -ri 's/(rights)="none" (pattern="PDF")/\1="read" \2/' /etc/ImageMagick-6/policy.xml # Configure ImageMagick for PDF support
 
-    - name: Set up Ruby
-      uses: ruby/setup-ruby@v1
-      with:
-        ruby-version: ${{ inputs.supported_ruby_version }}
-        bundler-cache: true 
-
     - name: Create config/database.yml
       shell: bash
       run: |
@@ -42,6 +36,12 @@ runs:
           password: password
           host: 127.0.0.1
         EOF
+
+    - name: Set up Ruby
+      uses: ruby/setup-ruby@v1
+      with:
+        ruby-version: ${{ inputs.supported_ruby_version }}
+        bundler-cache: true 
 
     - name: Prepare Test Environment
       shell: bash
