@@ -52,8 +52,6 @@ runs:
       shell: bash
       run: |
         bundle exec rake test:all RAILS_ENV=test
-      env:
-        GOOGLE_CHROME_OPTS_ARGS: "headless,disable-gpu,no-sandbox,disable-dev-shm-usage"
 
     - name: Run bazaar non ascii test
       shell: bash
@@ -62,11 +60,3 @@ runs:
       env:
         LANG: en_US.ISO8859-1
         LC_ALL: en_US.ISO8859-1
-
-    - name: Store system test screenshots Artifacts
-      if: failure()
-      uses: actions/upload-artifact@v4
-      with:
-        name: screenshots-${{ inputs.supported_ruby_version }}-${{ github.job }}-${{ github.run_id }}
-        path: tmp/screenshots
-        if-no-files-found: ignore
