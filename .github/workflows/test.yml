@@ -41,7 +41,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        supported_ruby_version: ${{ fromJson(env.SUPPORTED_RUBY_VERSIONS) }}
+        supported_ruby_version: ${{ fromJson(inputs.supported_ruby_versions) }}
     runs-on: ubuntu-latest
     services:
       mysql:
@@ -71,7 +71,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        supported_ruby_version: ${{ fromJson(env.SUPPORTED_RUBY_VERSIONS) }}
+        supported_ruby_version: ${{ fromJson(inputs.supported_ruby_versions) }}
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
