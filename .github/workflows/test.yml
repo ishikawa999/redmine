@@ -25,6 +25,7 @@ jobs:
           POSTGRES_USER: user
           POSTGRES_PASSWORD: password
           POSTGRES_DB: testdb
+
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -41,4 +42,4 @@ jobs:
           EOF
 
       - name: Build and Test
-        uses: ./github/workflows/build_and_test_steps.yml
+        uses: ./.github/workflows/build_and_test_steps.yml
