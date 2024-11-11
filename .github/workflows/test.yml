@@ -43,3 +43,5 @@ jobs:
 
       - name: Build and Test
         uses: ./.github/workflows/build_and_test_steps.yml
+        with:
+          supported_ruby_version: ${{ matrix.supported_ruby_version }}
