@@ -1,0 +1,64 @@
+name: Build and Test
+
+on:
+  workflow_call:
+    inputs:
+      supported_ruby_version:
+        required: true
+        type: string
+      database:
+        required: true
+        type: string
+
+jobs:
+  build_and_test:
+    steps:
+      - name: Install dependencies and configure environment
+        shell: bash
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends \
+            build-essential \
+            bzr git mercurial subversion cvs \
+            ghostscript \
+            gsfonts \
+            imagemagick libmagick++-dev \
+            libnss3-dev locales
+          sudo locale-gen en_US # for bazaar non ascii test
+          sudo sed -ri 's/(rights)="none" (pattern="PDF")/\1="read" \2/' /etc/ImageMagick-6/policy.xml # Configure ImageMagick for PDF support
+
+      - name: Create config/database.yml
+        shell: bash
+        run: |
+          cat > config/database.yml <<EOF
+          test:
+            adapter: ${{ inputs.database }}
+            database: testdb
+            username: user
+            password: password
+            host: 127.0.0.1
+          EOF
+
+      - name: Set up Ruby
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: ${{ inputs.supported_ruby_version }}
+          bundler-cache: true 
+
+      - name: Prepare Test Environment
+        shell: bash
+        run: |
+          SCMS=subversion,git,git_utf8,filesystem,bazaar,cvs bundle exec rake ci:about ci:setup db:environment:set RAILS_ENV=test
+
+      - name: Run tests
+        shell: bash
+        run: |
+          bundle exec rake test RAILS_ENV=test
+
+      - name: Run bazaar non ascii test
+        shell: bash
+        run: |
+          bundle exec rake test TEST=test/unit/repository_bazaar_test.rb RAILS_ENV=test
+        env:
+          LANG: en_US.ISO8859-1
+          LC_ALL: en_US.ISO8859-1
