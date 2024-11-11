@@ -23,7 +23,7 @@ jobs:
         image: ${{ fromJson(inputs.database-config).image }}
         env: ${{ fromJson(inputs.database-config).env }}
         ports: ${{ fromJson(inputs.database-config).ports }}
-        options: ${{ fromJson(inputs.database-config).objects }}
+        options: ${{ fromJson(inputs.database-config).options }}
 
     steps:
       - name: Checkout code
