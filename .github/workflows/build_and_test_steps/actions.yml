@@ -1,0 +1,55 @@
+# .github/workflows/build_and_test_steps.yml
+name: Build and Test
+
+inputs:
+  supported_ruby_version:
+    required: true
+    type: string
+
+runs:
+  using: composite
+  steps:
+    - name: Install dependencies and configure environment
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y --no-install-recommends \
+          build-essential \
+          bzr git mercurial subversion cvs \
+          ghostscript \
+          gsfonts \
+          imagemagick libmagick++-dev \
+          libnss3-dev locales
+        sudo locale-gen en_US # for bazaar non ascii test
+        sudo sed -ri 's/(rights)="none" (pattern="PDF")/\1="read" \2/' /etc/ImageMagick-6/policy.xml # Configure ImageMagick for PDF support
+        docker restart openldap # ?
+
+    - name: Set up Ruby
+      uses: ruby/setup-ruby@v1
+      with:
+        ruby-version: ${{ inputs.supported_ruby_version }}
+        bundler-cache: true 
+
+    - name: Prepare Test Environment
+      run: |
+        SCMS=subversion,git,git_utf8,filesystem,bazaar,cvs bundle exec rake ci:about ci:setup db:environment:set RAILS_ENV=test
+
+    - name: Run tests
+      run: |
+        bundle exec rake test:all RAILS_ENV=test
+      env:
+        GOOGLE_CHROME_OPTS_ARGS: "headless,disable-gpu,no-sandbox,disable-dev-shm-usage"
+
+    - name: Run bazaar non ascii test
+      run: |
+        bundle exec rake test TEST=test/unit/repository_bazaar_test.rb RAILS_ENV=test
+      env:
+        LANG: en_US.ISO8859-1
+        LC_ALL: en_US.ISO8859-1
+
+    - name: Store system test screenshots Artifacts
+      if: failure()
+      uses: actions/upload-artifact@v4
+      with:
+        name: screenshots-${{ inputs.supported_ruby_version }}-${{ github.job }}-${{ github.run_id }}
+        path: tmp/screenshots
+        if-no-files-found: ignore
