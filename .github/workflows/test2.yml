@@ -48,6 +48,6 @@ jobs:
         {
           "image": "scrach",
           "env": {},
-          "ports": [],
+          "ports": "",
           "options": ""
         }
