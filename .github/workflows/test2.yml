@@ -49,5 +49,5 @@ jobs:
           "image": "hello-world",
           "env": {},
           "ports": [],
-          "options": "# no options needed for sqlite3"
+          "options": "--quiet"
         }
