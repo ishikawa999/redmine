@@ -1,0 +1,52 @@
+name: Test with reusable workflow
+
+on:
+  push:
+  workflow_dispatch:
+
+jobs:
+  postgresql:
+    uses: ./.github/workflows/build_and_test_job.yml
+    with:
+      database: postgresql
+      database-config: |
+        {
+          "image": "postgres:13",
+          "env": {
+            "POSTGRES_USER": "user",
+            "POSTGRES_PASSWORD": "password",
+            "POSTGRES_DB": "testdb"
+          },
+          "ports": ["5432:5432"],
+          "options": "--health-cmd \"pg_isready -U user\" --health-interval 10s --health-timeout 5s --health-retries 5"
+        }
+
+  mysql:
+    uses: ./.github/workflows/build_and_test_job.yml
+    with:
+      database: mysql2
+      database-config: |
+        {
+          "image": "mysql:8",
+          "env": {
+            "MYSQL_ROOT_PASSWORD": "password",
+            "MYSQL_DATABASE": "testdb",
+            "MYSQL_USER": "user",
+            "MYSQL_PASSWORD": "password"
+          },
+          "ports": ["3306:3306"],
+          "options": "--health-cmd=\"mysqladmin ping --silent\" --health-interval=10s --health-timeout=5s --health-retries=5"
+        }
+
+  sqlite:
+    uses: ./.github/workflows/build_and_test_job.yml
+    with:
+      database: sqlite3
+      # sqlite3 is in ubuntu and does not need a container, so use a dummy small image to avoid errors
+      database-config: |
+        {
+          "image": "hello-world",
+          "env": {},
+          "ports": [],
+          "options": "--quiet"
+        }
