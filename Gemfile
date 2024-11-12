@@ -3,7 +3,7 @@ source 'https://rubygems.org'
 ruby '>= 3.1.0', '< 3.4.0'
 
 gem 'rails', '7.2.2'
-gem 'rouge', '~> 4.2'
+gem 'rouge', '~> 4.5'
 gem 'mini_mime', '~> 1.1.0'
 gem "actionpack-xml_parser"
 gem 'roadie-rails', '~> 3.3.0'
@@ -46,7 +46,7 @@ end
 
 # Optional CommonMark support, not for JRuby
 group :common_mark do
-  gem "commonmarker", '~> 0.23.8'
+  gem "commonmarker", '~> 1.1.0'
   gem 'deckar01-task_list', '2.3.2'
 end
 
