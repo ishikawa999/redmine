@@ -43,7 +43,11 @@ jobs:
     uses: ./.github/workflows/build_and_test_job.yml
     with:
       database: sqlite3
+      # sqlite3 is in ubuntu and does not need a container, so we specify the smallest image to avoid errors
       database-config: |
         {
-          "url": "sqlite3:db/development.sqlite3"
+          "image": "scrach",
+          "env": {},
+          "ports": [],
+          "options": ""
         }
