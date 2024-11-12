@@ -13,10 +13,10 @@ jobs:
       database-config: |
         {
           "image": "postgres:13",
-          "url": "postgres://postgres:password@localhost:5432/test_db",
           "env": {
-            "POSTGRES_USER": "postgres",
-            "POSTGRES_PASSWORD": "password"
+            "POSTGRES_USER": "user",
+            "POSTGRES_PASSWORD": "password",
+            "POSTGRES_DB": "testdb"
           },
           "ports": ["5432:5432"],
           "options": "--health-cmd \"pg_isready -U user\" --health-interval 10s --health-timeout 5s --health-retries 5"
@@ -29,9 +29,11 @@ jobs:
       database-config: |
         {
           "image": "mysql:8",
-          "url": "mysql2://root:password@localhost:3306/test_db",
           "env": {
-            "MYSQL_ROOT_PASSWORD": "password"
+            "MYSQL_ROOT_PASSWORD": "password",
+            "MYSQL_DATABASE": "testdb",
+            "MYSQL_USER": "user",
+            "MYSQL_PASSWORD": "password"
           },
           "ports": ["3306:3306"],
           "options": "--health-cmd=\"mysqladmin ping --silent\" --health-interval=10s --health-timeout=5s --health-retries=5"
