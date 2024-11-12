@@ -10,7 +10,7 @@ jobs:
     uses: ./.github/workflows/build_and_test_job.yml
     with:
       database: postgresql
-      database-config: >
+      database-config: |
         {
           "image": "postgres:13",
           "url": "postgres://postgres:password@localhost:5432/test_db",
@@ -26,7 +26,7 @@ jobs:
     uses: ./.github/workflows/build_and_test_job.yml
     with:
       database: mysql2
-      database-config: >
+      database-config: |
         {
           "image": "mysql:8",
           "url": "mysql2://root:password@localhost:3306/test_db",
@@ -41,7 +41,7 @@ jobs:
     uses: ./.github/workflows/build_and_test_job.yml
     with:
       database: sqlite3
-      database-config: >
+      database-config: |
         {
           "url": "sqlite3:db/development.sqlite3"
         }
