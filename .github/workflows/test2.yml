@@ -49,5 +49,5 @@ jobs:
           "image": "scrach",
           "env": {},
           "ports": [],
-          "options": ""
+          "options": "# no options needed for sqlite3"
         }
