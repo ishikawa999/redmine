@@ -46,7 +46,7 @@ jobs:
       # sqlite3 is in ubuntu and does not need a container, so we specify the smallest image to avoid errors
       database-config: |
         {
-          "image": "scrach",
+          "image": "scratch",
           "env": {},
           "ports": [],
           "options": "# no options needed for sqlite3"
