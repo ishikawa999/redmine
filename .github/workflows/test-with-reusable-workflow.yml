@@ -11,7 +11,7 @@ jobs:
       database_adapter: postgresql
       database_container_config: |
         {
-          "image": "postgres:13",
+          "image": "postgres:14",
           "env": {
             "POSTGRES_USER": "user",
             "POSTGRES_PASSWORD": "password",
@@ -29,7 +29,6 @@ jobs:
         {
           "image": "mysql:8",
           "env": {
-            "MYSQL_ROOT_PASSWORD": "password",
             "MYSQL_DATABASE": "testdb",
             "MYSQL_USER": "user",
             "MYSQL_PASSWORD": "password"
@@ -42,11 +41,3 @@ jobs:
     uses: ./.github/workflows/build_and_test_job.yml
     with:
       database_adapter: sqlite3
-      # sqlite3 is in ubuntu and does not need a container, so use a dummy small image to avoid errors
-      database_container_config: |
-        {
-          "image": "hello-world",
-          "env": {},
-          "ports": [],
-          "options": "--quiet"
-        }

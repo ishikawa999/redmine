@@ -1,5 +1,4 @@
-# .github/workflows/test-database.yml
-name: Test Database Workflow
+name: Build and Test job
 
 on:
   workflow_call:
@@ -10,6 +9,14 @@ on:
       database_container_config:
         required: false
         type: string
+        # Default to a dummy small image to avoid errors when don't need a container
+        default: |
+          {
+            "image": "hello-world",
+            "env": {},
+            "ports": [],
+            "options": "--quiet"
+          }
 
 jobs:
   test:
