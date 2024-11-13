@@ -4,10 +4,10 @@ name: Test Database Workflow
 on:
   workflow_call:
     inputs:
-      database:
+      database_adapter:
         required: true
         type: string
-      database-config:
+      database_container_config:
         required: false
         type: string
 
@@ -23,10 +23,10 @@ jobs:
 
     services:
       db:
-        image: ${{ fromJson(inputs.database-config).image }}
-        env: ${{ fromJson(inputs.database-config).env }}
-        ports: ${{ fromJson(inputs.database-config).ports }}
-        options: ${{ fromJson(inputs.database-config).options }}
+        image: ${{ fromJson(inputs.database_container_config).image }}
+        env: ${{ fromJson(inputs.database_container_config).env }}
+        ports: ${{ fromJson(inputs.database_container_config).ports }}
+        options: ${{ fromJson(inputs.database_container_config).options }}
 
     steps:
       - name: Checkout code
@@ -51,7 +51,7 @@ jobs:
         run: |
           cat > config/database.yml <<EOF
           test:
-            adapter: ${{ inputs.database }}
+            adapter: ${{ inputs.database_adapter }}
             database: testdb
             username: user
             password: password

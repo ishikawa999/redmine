@@ -8,8 +8,8 @@ jobs:
   postgresql:
     uses: ./.github/workflows/build_and_test_job.yml
     with:
-      database: postgresql
-      database-config: |
+      database_adapter: postgresql
+      database_container_config: |
         {
           "image": "postgres:13",
           "env": {
@@ -24,8 +24,8 @@ jobs:
   mysql:
     uses: ./.github/workflows/build_and_test_job.yml
     with:
-      database: mysql2
-      database-config: |
+      database_adapter: mysql2
+      database_container_config: |
         {
           "image": "mysql:8",
           "env": {
@@ -41,9 +41,9 @@ jobs:
   sqlite:
     uses: ./.github/workflows/build_and_test_job.yml
     with:
-      database: sqlite3
+      database_adapter: sqlite3
       # sqlite3 is in ubuntu and does not need a container, so use a dummy small image to avoid errors
-      database-config: |
+      database_container_config: |
         {
           "image": "hello-world",
           "env": {},
