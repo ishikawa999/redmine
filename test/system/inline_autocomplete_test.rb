@@ -31,6 +31,7 @@ class InlineAutocompleteSystemTest < ApplicationSystemTestCase
     log_user('jsmith', 'jsmith')
     visit 'issues/new'
 
+    fill_in 'Description', :with => ''
     fill_in 'Description', :with => '#'
 
     within('.tribute-container') do
@@ -47,6 +48,7 @@ class InlineAutocompleteSystemTest < ApplicationSystemTestCase
     log_user('admin', 'admin')
     visit 'projects/ecookbook/issues/new'
 
+    fill_in 'Description', :with => ''
     fill_in 'Description', :with => '##Closed'
 
     within('.tribute-container') do
@@ -64,6 +66,7 @@ class InlineAutocompleteSystemTest < ApplicationSystemTestCase
     log_user('jsmith', 'jsmith')
     visit 'issues/new'
 
+    fill_in 'Description', :with => ''
     fill_in 'Description', :with => '#Closed'
 
     within('.tribute-container') do
@@ -152,6 +155,7 @@ class InlineAutocompleteSystemTest < ApplicationSystemTestCase
     log_user('jsmith', 'jsmith')
     visit 'issues/new'
 
+    fill_in 'Description', :with => ''
     fill_in 'Description', :with => '[['
 
     within('.tribute-container') do
@@ -176,6 +180,7 @@ class InlineAutocompleteSystemTest < ApplicationSystemTestCase
     log_user('jsmith', 'jsmith')
     visit 'projects/1/issues/new'
 
+    fill_in 'Description', :with => ''
     fill_in 'Description', :with => '#This'
 
     within('.tribute-container') do
@@ -188,6 +193,7 @@ class InlineAutocompleteSystemTest < ApplicationSystemTestCase
     visit '/issues/1/edit'
 
     find('#issue_notes').click
+    fill_in 'issue[notes]', :with => ''
     fill_in 'issue[notes]', :with => '@lopper'
 
     within('.tribute-container') do
@@ -209,6 +215,7 @@ class InlineAutocompleteSystemTest < ApplicationSystemTestCase
     visit '/issues/bulk_edit?ids[]=1&ids[]=2'
 
     find('#notes').click
+    fill_in 'notes', :with => ''
     fill_in 'notes', :with => '@lopper'
 
     within('.tribute-container') do
@@ -228,6 +235,7 @@ class InlineAutocompleteSystemTest < ApplicationSystemTestCase
     visit '/issues/4/edit'
 
     find('#issue_notes').click
+    fill_in 'issue[notes]', :with => ''
     fill_in 'issue[notes]', :with => '@'
 
     within('.tribute-container') do

@@ -100,7 +100,29 @@ jobs:
           bundle exec rake test:scm:setup:subversion
           bundle exec rake test:scm:setup:filesystem
 
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 18
+
+      - name: Run playwright install
+        run: |
+          yarn install
+          npx playwright install chromium
+          npx playwright install-deps
+
+      - name: Run system test
+        run: bin/rails test:system
+        env:
+          USE_PLAYWRIGHT: true
+
       - name: Run tests
         run: |
           bin/rails test
           bin/rails test:autoload
+
+      - if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: system-test-screenshots-${{matrix.db}}-ruby-${{ matrix.ruby }}
+          path: /home/runner/work/redmine/redmine/tmp/downloads
+          if-no-files-found: ignore

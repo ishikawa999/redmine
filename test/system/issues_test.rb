@@ -32,15 +32,14 @@ class IssuesSystemTest < ApplicationSystemTestCase
     visit '/projects/ecookbook/issues/new'
     within('form#issue-form') do
       select 'Bug', :from => 'Tracker'
-      select 'Low', :from => 'Priority'
       fill_in 'Subject', :with => 'new test issue'
       fill_in 'Description', :with => 'new issue'
       select '0 %', :from => 'Done'
       fill_in 'Searchable field', :with => 'Value for field 2'
+      select 'Low', :from => 'Priority'
       # click_button 'Create' would match both 'Create' and 'Create and continue' buttons
       find('input[name=commit]').click
     end
-
     # find created issue
     issue = Issue.find_by_subject("new test issue")
     assert_kind_of Issue, issue

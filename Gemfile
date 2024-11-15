@@ -108,6 +108,8 @@ group :test do
   # For running system tests
   gem 'puma'
   gem "capybara", ">= 3.39"
+  gem 'capybara-playwright-driver'
+  gem 'playwright-ruby-client'
   gem 'selenium-webdriver', '>= 4.11.0'
   # RuboCop
   gem 'rubocop', '~> 1.68.0', require: false

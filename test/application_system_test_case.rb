@@ -22,35 +22,50 @@ require_relative 'test_helper'
 class ApplicationSystemTestCase < ActionDispatch::SystemTestCase
   DOWNLOADS_PATH = File.expand_path(File.join(Rails.root, 'tmp', 'downloads'))
 
-  # Allow running Capybara default server on custom IP address and/or port
-  Capybara.server_host = ENV['CAPYBARA_SERVER_HOST'] if ENV['CAPYBARA_SERVER_HOST']
-  Capybara.server_port = ENV['CAPYBARA_SERVER_PORT'] if ENV['CAPYBARA_SERVER_PORT']
+  if ENV['USE_PLAYWRIGHT'] == 'true'
+    puts 'To run the system test using Playwright, the following commands are required in advance.'
+    puts '`yarn install`'
+    puts '`npx playwright install`'
+    puts '`npx playwright install-deps`'
 
-  # Allow defining Google Chrome options arguments based on a comma-delimited string environment variable
-  GOOGLE_CHROME_OPTS_ARGS = ENV['GOOGLE_CHROME_OPTS_ARGS'].present? ? ENV['GOOGLE_CHROME_OPTS_ARGS'].split(",") : []
+    driven_by(:playwright, options: { headless: ENV['PLAYWRIGHT_HEADLESS'] == 'false' ? false : true, browser_type: :chromium })
+    Capybara.default_driver = :playwright
+    Capybara.javascript_driver = :playwright
+    Capybara.save_path = DOWNLOADS_PATH
+    Capybara.default_max_wait_time = 10
+  else # default selenium
+    # Allow running Capybara default server on custom IP address and/or port
+    Capybara.server_host = ENV['CAPYBARA_SERVER_HOST'] if ENV['CAPYBARA_SERVER_HOST']
+    Capybara.server_port = ENV['CAPYBARA_SERVER_PORT'] if ENV['CAPYBARA_SERVER_PORT']
 
-  options = {}
-  if ENV['SELENIUM_REMOTE_URL']
-    options[:url] = ENV['SELENIUM_REMOTE_URL']
-    options[:browser] = :remote
-  end
+    # Allow defining Google Chrome options arguments based on a comma-delimited string environment variable
+    GOOGLE_CHROME_OPTS_ARGS = ENV['GOOGLE_CHROME_OPTS_ARGS'].present? ? ENV['GOOGLE_CHROME_OPTS_ARGS'].split(",") : []
 
-  # Allow running tests using a remote Selenium hub
-  driven_by :selenium, using: :chrome, screen_size: [1024, 900], options: options do |driver_option|
-    GOOGLE_CHROME_OPTS_ARGS.each do |arg|
-      driver_option.add_argument arg
+    options = {}
+    if ENV['SELENIUM_REMOTE_URL']
+      options[:url] = ENV['SELENIUM_REMOTE_URL']
+      options[:browser] = :remote
     end
-    driver_option.add_preference 'download.default_directory',   DOWNLOADS_PATH.gsub(File::SEPARATOR, File::ALT_SEPARATOR || File::SEPARATOR)
-    driver_option.add_preference 'download.prompt_for_download', false
-    driver_option.add_preference 'plugins.plugins_disabled',     ["Chrome PDF Viewer"]
+
+    # Allow running tests using a remote Selenium hub
+    driven_by :selenium, using: :chrome, screen_size: [1024, 900], options: options do |driver_option|
+      GOOGLE_CHROME_OPTS_ARGS.each do |arg|
+        driver_option.add_argument arg
+      end
+      driver_option.add_preference 'download.default_directory',   DOWNLOADS_PATH.gsub(File::SEPARATOR, File::ALT_SEPARATOR || File::SEPARATOR)
+      driver_option.add_preference 'download.prompt_for_download', false
+      driver_option.add_preference 'plugins.plugins_disabled',     ["Chrome PDF Viewer"]
+    end
   end
 
   setup do
-    Capybara.app_host = "http://#{Capybara.server_host}:#{Capybara.server_port}"
-    # Allow defining a custom app host (useful when using a remote Selenium hub)
-    if ENV['CAPYBARA_APP_HOST']
-      Capybara.configure do |config|
-        config.app_host = ENV['CAPYBARA_APP_HOST']
+    unless ENV['USE_PLAYWRIGHT'] == 'true'
+      Capybara.app_host = "http://#{Capybara.server_host}:#{Capybara.server_port}"
+      # Allow defining a custom app host (useful when using a remote Selenium hub)
+      if ENV['CAPYBARA_APP_HOST']
+        Capybara.configure do |config|
+          config.app_host = ENV['CAPYBARA_APP_HOST']
+        end
       end
     end
 
