@@ -119,10 +119,12 @@ jobs:
         run: |
           bin/rails test
           bin/rails test:autoload
+      - if: failure()
+        run: ls -la /home/runner/work/redmine/redmine/tmp/downloads
 
       - if: failure()
         uses: actions/upload-artifact@v4
         with:
           name: system-test-screenshots-${{matrix.db}}-ruby-${{ matrix.ruby }}
-          path: /home/runner/work/redmine/redmine/tmp/downloads
+          path: /home/runner/work/redmine/redmine/tmp/downloads/*
           if-no-files-found: ignore
