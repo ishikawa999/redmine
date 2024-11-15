@@ -111,7 +111,7 @@ jobs:
           npx playwright install-deps
 
       - name: Run system test
-        run: rake test:system
+        run: bundle exec rake test:system
         env:
           USE_PLAYWRIGHT: true
 
