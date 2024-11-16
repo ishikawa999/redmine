@@ -67,6 +67,7 @@ jobs:
           sed -i -e "s/mysql2$/postgresql/g" config/database.yml
           sed -i -e "s/host:.*$/host: localhost/g" config/database.yml
           sed -i -e "s/password:.*$/password: root/g" config/database.yml
+          sed -i -e "s/encoding:.*$/encoding: utf8/g" config/database.yml
           sed -i -e "41,43d" config/database.yml
         if: matrix.db == 'postgresql'
 
@@ -88,7 +89,9 @@ jobs:
           RAILS_ENV: test
           SCMS: subversion,git,git_utf8,filesystem,bazaar,cvs
         run: |
-          bundle exec rake ci:about ci:setup db:environment:set
+          bundle exec rake ci:about
+          bundle exec rake ci:setup
+          bundle exec rake db:environment:set
 
       - name: Run tests
         run: |
