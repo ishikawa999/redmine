@@ -46,10 +46,11 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Install package dependencies
+      - name: Install dependencies and configure environment
         run: |
           sudo apt-get update
-          sudo apt-get install --yes --quiet ghostscript gsfonts
+          sudo apt-get install --yes --quiet ghostscript gsfonts locales
+          sudo locale-gen en_US # for bazaar non ascii test
 
       - name: Allow imagemagick to read PDF files
         run: |
@@ -58,12 +59,6 @@ jobs:
           echo '</policymap>' >> policy.xml
           sudo rm /etc/ImageMagick-6/policy.xml
           sudo mv policy.xml /etc/ImageMagick-6/policy.xml
-
-      - name: Install Ruby and gems
-        uses: ruby/setup-ruby@v1.176.0
-        with:
-          ruby-version: ${{ matrix.ruby }}
-          bundler-cache: true
 
       - name: Prepare Redmine configuration for PostgreSQL
         run: |
@@ -81,26 +76,30 @@ jobs:
           sed -i -e "s/password:.*$/password: root/g" config/database.yml
         if: matrix.db == 'mysql'
 
-      - name: Install dependencies
-        env:
-          RAILS_ENV: test
-        run: bundle install --jobs=4 --retry=3
+      - name: Install Ruby and gems
+        uses: ruby/setup-ruby@v1.176.0
+        with:
+          ruby-version: ${{ matrix.ruby }}
+          bundler-cache: true
 
-      - name: Run DB migration
+      - name: Run prepare test environment
         env:
           RAILS_ENV: test
-        run: bundle exec rake db:migrate
-
-      - name: Run SCM setup for Git, Git UTF8, Subversion and Filesystem
-        env:
-          RAILS_ENV: test
+          SCMS: subversion,git,git_utf8,filesystem,bazaar,cvs
         run: |
-          bundle exec rake test:scm:setup:git
-          bundle exec rake test:scm:setup:git_utf8
-          bundle exec rake test:scm:setup:subversion
-          bundle exec rake test:scm:setup:filesystem
+          bundle exec rake ci:about ci:setup db:environment:set
 
       - name: Run tests
         run: |
           bin/rails test
           bin/rails test:autoload
+
+      - name: Run bazaar non ascii test
+        env:
+          RAILS_ENV: test
+          TEST: test/unit/repository_bazaar_test.rb
+        run: |
+          bin/rails test
+        env:
+          LANG: en_US.ISO8859-1
+          LC_ALL: en_US.ISO8859-1
