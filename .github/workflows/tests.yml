@@ -65,7 +65,7 @@ jobs:
         run: |
           cat > config/database.yml <<EOF
           test:
-            adapter: ${{ inputs.database_adapter }}
+            adapter: ${{ inputs.db }}
             database: redmine_test
             username: root
             password: root
