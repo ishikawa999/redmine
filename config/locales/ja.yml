@@ -744,6 +744,9 @@ ja:
   label_added_time_by: "%{author} さんが%{age}前に追加"
   label_updated_time_by: "%{author} さんが%{age}前に更新"
   label_updated_time: "%{value}前に更新"
+  label_added_absolute_time_by: "%{author} さんが%{age}に追加"
+  label_updated_absolute_time_by: "%{author} さんが%{age}に更新"
+  label_updated_absolute_time: "%{value}に更新"
   label_jump_to_a_project: プロジェクトへ移動...
   label_file_plural: ファイル
   label_changeset_plural: 更新履歴

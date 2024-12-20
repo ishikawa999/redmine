@@ -29,4 +29,13 @@ class SettingsHelperTest < Redmine::HelperTest
     options = date_format_setting_options('en')
     assert_include ["2015-07-14 (yyyy-mm-dd)", "%Y-%m-%d"], options
   end
+
+  def test_timestamp_format_setting_options_should_include_human_readable_format
+    sample_time = Time.now.ago(3.days)
+
+    options = timestamp_format_setting_options
+    assert_include ["3 days (Relative time)", 'relative_time'], options
+    assert_include ["3 days (#{format_time(sample_time)}) (Relative time with absolute time)", 'relative_time_with_absolute_time'], options
+    assert_include ["#{format_time(sample_time)} (Absolute time)", 'absolute_time'], options
+  end
 end
