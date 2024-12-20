@@ -234,7 +234,6 @@ module Redmine
           cmd_args << "-r#{identifier.to_i}" if identifier && identifier.to_i > 0
           cmd_args << bzr_target(path)
           scm_cmd(*cmd_args) do |io|
-            puts $
             author     = nil
             identifier = nil
             io.each_line do |line|
