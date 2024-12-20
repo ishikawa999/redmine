@@ -246,6 +246,7 @@ module Redmine
           def shellout(cmd, options = {}, &block)
             if logger && logger.debug?
               logger.debug "Shelling out: #{strip_credential(cmd)}"
+              puts "Shelling out: #{strip_credential(cmd)}"
               # Capture stderr in a log file
               if stderr_log_file
                 cmd = "#{cmd} 2>>#{shell_quote(stderr_log_file)}"
@@ -268,6 +269,7 @@ module Redmine
               logmsg += "#{strip_credential(cmd)}\n"
               logmsg += "with: #{msg}"
               logger.error(logmsg)
+              puts logmsg
               raise CommandFailed.new(msg)
             end
           end
