@@ -49,10 +49,8 @@ jobs:
       - name: Install dependencies and configure environment
         run: |
           sudo apt-get update
-          sudo apt-get install --yes --quiet ghostscript gsfonts locales bzr=3.3.2 cvs
+          sudo apt-get install --yes --quiet ghostscript gsfonts locales brz cvs
           sudo locale-gen en_US # for bazaar non ascii test
-          echo 'bzr --version'
-          bzr --version
 
       - name: Allow imagemagick to read PDF files
         run: |
