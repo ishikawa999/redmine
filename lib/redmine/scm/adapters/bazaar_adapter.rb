@@ -121,6 +121,8 @@ module Redmine
           end
           entries.sort_by_name
         rescue ScmCommandAborted
+          puts "entries #{path}"
+          puts @path_encoding
           nil
         end
 

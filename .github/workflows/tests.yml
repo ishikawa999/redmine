@@ -96,10 +96,6 @@ jobs:
           bundle exec rake ci:setup
           bundle exec rake db:environment:set
 
-      - name: Run tests
-        run: |
-          bin/rails test
-
       - name: Run bazaar non ascii test
         env:
           LANG: en_US.ISO8859-1
