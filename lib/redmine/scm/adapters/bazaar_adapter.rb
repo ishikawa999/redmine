@@ -121,8 +121,6 @@ module Redmine
           end
           entries.sort_by_name
         rescue ScmCommandAborted
-          puts "entries #{path}"
-          puts @path_encoding
           nil
         end
 
@@ -236,6 +234,7 @@ module Redmine
           cmd_args << "-r#{identifier.to_i}" if identifier && identifier.to_i > 0
           cmd_args << bzr_target(path)
           scm_cmd(*cmd_args) do |io|
+            puts $
             author     = nil
             identifier = nil
             io.each_line do |line|
@@ -313,6 +312,10 @@ module Redmine
               &
             )
           if $? && $?.exitstatus != 0
+            puts "failed #{args}"
+            puts @path_encoding
+            puts $?
+            puts ret rescue nil
             raise ScmCommandAborted, "bzr exited with non-zero status: #{$?.exitstatus}"
           end
 
