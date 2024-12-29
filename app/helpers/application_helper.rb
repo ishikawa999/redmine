@@ -1803,7 +1803,7 @@ module ApplicationHelper
     if Setting.wiki_tablesort_enabled?
       tags << javascript_include_tag('tablesort-5.2.1.min.js', 'tablesort-5.2.1.number.min.js')
     end
-    tags << javascript_include_tag('application', 'responsive')
+    tags << javascript_include_tag('application', 'responsive', 'command_palette')
     unless User.current.pref.warn_on_leaving_unsaved == '0'
       warn_text = escape_javascript(l(:text_warn_on_leaving_unsaved))
       tags <<
@@ -1921,6 +1921,15 @@ module ApplicationHelper
       "rm = window.rm || {};" \
       "rm.AutoComplete = rm.AutoComplete || {};" \
       "rm.AutoComplete.dataSources = JSON.parse('#{data_sources.to_json}');"
+    )
+  end
+
+  def heads_for_command_palette(project, issue)
+    data_sources = { commands: command_palettes_path(project_id: project&.id, issue_id: issue&.id, q: '' ) }
+    javascript_tag(
+      "rm = window.rm || {};" \
+      "rm.CommandPalette = rm.CommandPalette || {};" \
+      "rm.CommandPalette.dataSources = JSON.parse('#{data_sources.to_json}');"
     )
   end
 

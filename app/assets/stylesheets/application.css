@@ -2166,3 +2166,78 @@ th[role=columnheader]:not(.no-sort):hover:after {
 	display: inline;
 	opacity: 1;
 }
+
+.command-palette {
+  display: none;
+  position: fixed;
+  top: 20%;
+  left: 50%;
+  transform: translate(-50%, -20%);
+  width: 50%;
+  background: white;
+  border: 1px solid #ccc;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  z-index: 1000;
+}
+
+/* Command palette */
+.command-palette input {
+  width: 100%;
+  padding: 10px;
+  border: none;
+  border-bottom: 1px solid #ddd;
+  box-sizing: border-box;
+  font-size: 16px;
+}
+
+.command-palette ul {
+  list-style: none; /* リストマーカーを非表示 */
+  margin: 0; /* 外側の余白をリセット */
+  padding: 0; /* 内側の余白をリセット */
+  max-height: 200px; /* 最大高さを200pxに制限 */
+  overflow-y: auto; /* 縦方向のスクロールを有効に */
+  position: relative; /* 子要素の絶対位置指定の基準 */
+}
+
+.command-palette li {
+  position: relative; /* ショートカットキーをリスト内で右揃えする基準 */
+}
+
+.command-palette .shortcut-info {
+  position: absolute; /* リスト項目内で絶対位置指定 */
+  right: 10px; /* 親要素の右端から10px離す */
+  top: 50%; /* 垂直方向の中央に配置 */
+  transform: translateY(-50%); /* 縦方向の中央揃え */
+  color: #888; /* ショートカットキーの文字色を薄める */
+  font-size: 0.9em; /* ショートカットキーのフォントサイズを小さめに */
+  white-space: nowrap; /* 折り返しを防ぐ */
+}
+
+.command-palette li:hover {
+  background: #f0f0f0;
+  border-color: #ddd; /* ホバー時に薄い色を表示 */
+}
+
+.command-palette li {
+  padding-left: 5px;
+  border: 1px solid transparent; /* 初期状態で透明なボーダー */
+  cursor: pointer;
+  transition: border-color 0.2s ease; /* スムーズな変化 */
+}
+
+.command-palette li.selected {
+  border-color: #0078d7; /* 選択された場合の縁の色（青） */
+  background-color: #f0f8ff; /* 任意で背景色も変更可能 */
+  color: #000; /* テキスト色（任意） */
+}
+
+.command-palette a {
+  text-decoration: none; /* 下線を削除（必要に応じて） */
+  color: inherit; /* 元の色を引き継ぐ */
+}
+
+.command-palette a:hover {
+  text-decoration: none; /* ホバー時の下線を削除 */
+  color: inherit; /* 元の色を変更しない */
+  background: none; /* 背景色の変更も防止 */
+}

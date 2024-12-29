@@ -1022,6 +1022,7 @@ en:
   label_import_notifications: Send email notifications during the import
   label_principal_search: "Search for user or group:"
   label_user_search: "Search for user:"
+  label_search_for: "Search for %{object_name}:"
   label_additional_workflow_transitions_for_author: Additional transitions allowed when the user is the author
   label_additional_workflow_transitions_for_assignee: Additional transitions allowed when the user is the assignee
   label_issues_visibility_all: All issues

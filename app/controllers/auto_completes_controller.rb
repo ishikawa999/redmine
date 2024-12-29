@@ -72,11 +72,20 @@ class AutoCompletesController < ApplicationController
 
   def format_issues_json(issues)
     issues.map do |issue|
-      {
-        'id' => issue.id,
-        'label' => "#{issue.tracker} ##{issue.id}: #{issue.subject.to_s.truncate(255)}",
-        'value' => issue.id
-      }
+      if params[:with_url] == 'true'
+        {
+          'id' => issue.id,
+          'label' => "#{issue.tracker} ##{issue.id}: #{issue.subject.to_s.truncate(255)}",
+          'value' => issue.id,
+          'url' => issue_path(issue.id)
+        }
+      else
+        {
+          'id' => issue.id,
+          'label' => "#{issue.tracker} ##{issue.id}: #{issue.subject.to_s.truncate(255)}",
+          'value' => issue.id
+        }
+      end
     end
   end
 
