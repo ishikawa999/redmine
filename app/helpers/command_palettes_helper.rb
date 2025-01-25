@@ -146,7 +146,7 @@ module CommandPalettesHelper
     commands << { link: link_to(sprite_icon('edit', l(:button_edit)), edit_issue_path(issue),
     :onclick => 'showAndScrollTo("update", "issue_notes"); return false;',
     :class => 'icon icon-edit ', :accesskey => accesskey(:edit)), shortcut: shortcuts[:edit_page] } if issue.editable?
-    commands << { link: watcher_link(issue, User.current) }
+    commands << { link: watcher_link(issue, User.current) } if defined?(watcher_link)
     commands << { link: link_to(sprite_icon('copy', l(:button_copy)), project_copy_issue_path(issue.project, issue),
                 :class => 'icon icon-copy ') } if User.current.allowed_to?(:copy_issues, issue.project) && Issue.allowed_target_projects.any?
     commands << { link: copy_object_url_link(issue_url(@issue, only_path: false)) }

@@ -4,9 +4,9 @@ class CommandPalette {
       this.palette = document.getElementById('commandPalette');
       this.input = document.getElementById('commandInput');
       this.list = document.getElementById('commandList');
-      this.items = this.list.querySelectorAll('li'); // 事前定義された `li` 要素を取得
+      this.items = this.list.querySelectorAll('li');
       this.triggerKeyCombo = triggerKeyCombo;
-      this.selectedIndex = -1; // 現在選択中のコマンドのインデックス
+      this.selectedIndex = -1;
 
       if (!this.palette || !this.input || !this.list || !this.items) {
         console.error('Command Palette elements are missing in the DOM.');
@@ -18,7 +18,6 @@ class CommandPalette {
   }
 
   init() {
-    // ショートカットキーで表示トグル
     document.addEventListener('keydown', (event) => {
       if (this.isTriggerKeyCombo(event)) {
         event.preventDefault();
@@ -26,10 +25,8 @@ class CommandPalette {
       }
     });
 
-    // 入力フィルタリング
     this.input.addEventListener('input', () => {
       this.filterCommands();
-      this.selectedIndex = -1; // 入力時は選択解除
     });
 
     // キーボード操作（矢印キーとEnter）
@@ -46,16 +43,14 @@ class CommandPalette {
       }
     });
 
-    // コマンド選択時のアクション実行（クリック時）
     this.list.addEventListener('click', (event) => {
       const clickedItem = event.target.closest('li');
       if (clickedItem) {
-        this.selectCommand(clickedItem);
+        this.selectCommandByItem(clickedItem);
         this.executeSelectedCommand();
       }
     });
 
-    // 外部クリックで非表示
     document.addEventListener('click', (event) => {
       if (this.palette.style.display === 'block' && !this.palette.contains(event.target)) {
         this.closePalette();
@@ -78,55 +73,59 @@ class CommandPalette {
   openPalette() {
     this.palette.style.display = 'block';
     this.input.focus();
-    this.filterCommands(); // 初回表示時にフィルタをリセット
+    this.filterCommands();
   }
 
   closePalette() {
     this.palette.style.display = 'none';
     this.input.value = '';
-    this.items.forEach((item) => (item.style.display = 'block')); // 全アイテムを表示
-    this.selectedIndex = -1; // 選択状態をリセット
+    this.items.forEach((item) => (item.style.display = 'block'));
+    this.selectedIndex = -1;
   }
 
   filterCommands() {
     const query = this.input.value.toLowerCase();
     this.items.forEach((item) => {
       const text = item.textContent.toLowerCase();
-      item.style.display = text.includes(query) ? 'block' : 'none'; // フィルタリング
+      item.style.display = text.includes(query) ? 'block' : 'none';
     });
+    this.selectCommandByIndex(0);
   }
 
   navigateCommands(direction) {
     const visibleItems = Array.from(this.items).filter((item) => item.style.display !== 'none');
     if (visibleItems.length === 0) return;
 
-    // 現在の選択を解除
-    if (this.selectedIndex >= 0) {
-      visibleItems[this.selectedIndex].classList.remove('selected');
-    }
-
-    // 新しい選択位置を計算
-    this.selectedIndex = (this.selectedIndex + direction + visibleItems.length) % visibleItems.length;
-
-    // 新しい選択を適用
-    visibleItems[this.selectedIndex].classList.add('selected');
-    visibleItems[this.selectedIndex].scrollIntoView({ block: 'nearest' });
+    const newIndex = (this.selectedIndex + direction + visibleItems.length) % visibleItems.length;
+    this.selectCommandByIndex(newIndex);
   }
 
-  selectCommand(item) {
+  selectCommandByItem(item) {
     const visibleItems = Array.from(this.items).filter((item) => item.style.display !== 'none');
     const index = visibleItems.indexOf(item);
-
-    if (index !== -1) {
-      // 現在の選択を解除
-      if (this.selectedIndex >= 0) {
-        visibleItems[this.selectedIndex].classList.remove('selected');
-      }
-
-      // 新しい選択を適用
-      this.selectedIndex = index;
-      visibleItems[this.selectedIndex].classList.add('selected');
+  
+    if (index === -1) {
+      return;
     }
+  
+    this._applySelection(visibleItems, index);
+  }
+  
+  selectCommandByIndex(index) {
+    const visibleItems = Array.from(this.items).filter((item) => item.style.display !== 'none');
+  
+    if (index < 0 || index >= visibleItems.length) {
+      return;
+    }
+  
+    this._applySelection(visibleItems, index);
+  }
+
+  _applySelection(visibleItems, index) {
+    this.items.forEach((item) => item.classList.remove('selected'));
+
+    this.selectedIndex = index;
+    visibleItems[this.selectedIndex].classList.add('selected');
   }
 
   executeSelectedCommand() {
@@ -134,14 +133,13 @@ class CommandPalette {
     if (this.selectedIndex >= 0 && visibleItems[this.selectedIndex]) {
       const link = visibleItems[this.selectedIndex].querySelector('a');
       if (link) {
-        link.click(); // 選択されたリンクをクリック
+        link.click();
         this.closePalette();
       }
     }
   }
 }
 
-// コマンドパレットの初期化
 const commandPalette = new CommandPalette({
   triggerKeyCombo: 'KeyP'
 });
