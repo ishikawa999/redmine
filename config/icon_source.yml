@@ -209,3 +209,5 @@
   svg: hand-click
 - name: command-palette-redirect
   svg: arrow-big-right
+- name: command-palette
+  svg: terminal-2

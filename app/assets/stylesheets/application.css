@@ -2241,3 +2241,7 @@ th[role=columnheader]:not(.no-sort):hover:after {
   color: inherit; /* 元の色を変更しない */
   background: none; /* 背景色の変更も防止 */
 }
+
+#open-command-palette svg {
+  stroke: white;
+}

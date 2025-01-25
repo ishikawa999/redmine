@@ -25,6 +25,11 @@ class CommandPalette {
       }
     });
 
+    document.getElementById("open-command-palette").addEventListener("click", (event) => {
+      this.togglePalette();
+      event.preventDefault();
+    });
+
     this.input.addEventListener('input', () => {
       this.filterCommands();
     });
@@ -52,6 +57,10 @@ class CommandPalette {
     });
 
     document.addEventListener('click', (event) => {
+      if (event.target.closest('#open-command-palette')) {
+        return;
+      }
+
       if (this.palette.style.display === 'block' && !this.palette.contains(event.target)) {
         this.closePalette();
       }
