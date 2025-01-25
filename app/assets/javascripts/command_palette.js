@@ -59,7 +59,7 @@ class CommandPalette {
   }
 
   isTriggerKeyCombo(event) {
-    return (event.ctrlKey || event.metaKey) && event.shiftKey && event.code === this.triggerKeyCombo;
+    return (event.ctrlKey || event.metaKey) && event.altKey && event.code === this.triggerKeyCombo;
   }
 
   togglePalette() {
