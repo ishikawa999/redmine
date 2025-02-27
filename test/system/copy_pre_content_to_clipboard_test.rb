@@ -23,10 +23,10 @@ class CopyPreContentToClipboardSystemTest < ApplicationSystemTestCase
     issue.journals.first.update(notes: "```\ntest\n```")
     visit "/issues/#{issue.id}"
     # A button appears when hovering over the <pre> tag
-    find("#journal-#{issue.journals.first.id}-notes pre:first-of-type").hover
-    find("#journal-#{issue.journals.first.id}-notes pre:first-of-type .copy-pre-content-link")
+    find("#journal-#{issue.journals.first.id}-notes div.pre-wrapper:first-of-type").hover
+    find("#journal-#{issue.journals.first.id}-notes div.pre-wrapper:first-of-type .copy-pre-content-link")
     # Copy pre content to Clipboard
-    find("#journal-#{issue.journals.first.id}-notes pre:first-of-type .copy-pre-content-link").click
+    find("#journal-#{issue.journals.first.id}-notes div.pre-wrapper:first-of-type .copy-pre-content-link").click
     # Paste the value copied to the clipboard into the textarea to get and test
     first('.icon-edit').click
     find('textarea#issue_notes').send_keys([modifier_key, 'v'])
@@ -38,10 +38,10 @@ class CopyPreContentToClipboardSystemTest < ApplicationSystemTestCase
     issue.journals.first.update(notes: "```ruby\nputs \"Hello, World.\"\n```")
     visit "/issues/#{issue.id}"
     # A button appears when hovering over the <pre> tag
-    find("#journal-#{issue.journals.first.id}-notes pre:first-of-type").hover
-    find("#journal-#{issue.journals.first.id}-notes pre:first-of-type .copy-pre-content-link")
+    find("#journal-#{issue.journals.first.id}-notes div.pre-wrapper:first-of-type").hover
+    find("#journal-#{issue.journals.first.id}-notes div.pre-wrapper:first-of-type .copy-pre-content-link")
     # Copy pre content to Clipboard
-    find("#journal-#{issue.journals.first.id}-notes pre:first-of-type .copy-pre-content-link").click
+    find("#journal-#{issue.journals.first.id}-notes div.pre-wrapper:first-of-type .copy-pre-content-link").click
     # Paste the value copied to the clipboard into the textarea to get and test
     first('.icon-edit').click
     find('textarea#issue_notes').send_keys([modifier_key, 'v'])
@@ -54,10 +54,10 @@ class CopyPreContentToClipboardSystemTest < ApplicationSystemTestCase
     with_settings text_formatting: :textile do
       visit "/issues/#{issue.id}"
       # A button appears when hovering over the <pre> tag
-      find("#journal-#{issue.journals.first.id}-notes pre:first-of-type").hover
-      find("#journal-#{issue.journals.first.id}-notes pre:first-of-type .copy-pre-content-link")
+      find("#journal-#{issue.journals.first.id}-notes div.pre-wrapper:first-of-type").hover
+      find("#journal-#{issue.journals.first.id}-notes div.pre-wrapper:first-of-type .copy-pre-content-link")
       # Copy pre content to Clipboard
-      find("#journal-#{issue.journals.first.id}-notes pre:first-of-type .copy-pre-content-link").click
+      find("#journal-#{issue.journals.first.id}-notes div.pre-wrapper:first-of-type .copy-pre-content-link").click
       # Paste the value copied to the clipboard into the textarea to get and test
       first('.icon-edit').click
       find('textarea#issue_notes').send_keys([modifier_key, 'v'])
@@ -71,10 +71,10 @@ class CopyPreContentToClipboardSystemTest < ApplicationSystemTestCase
     with_settings text_formatting: :textile do
       visit "/issues/#{issue.id}"
       # A button appears when hovering over the <pre> tag
-      find("#journal-#{issue.journals.first.id}-notes pre:first-of-type").hover
-      find("#journal-#{issue.journals.first.id}-notes pre:first-of-type .copy-pre-content-link")
+      find("#journal-#{issue.journals.first.id}-notes div.pre-wrapper:first-of-type").hover
+      find("#journal-#{issue.journals.first.id}-notes div.pre-wrapper:first-of-type .copy-pre-content-link")
       # Copy pre content to Clipboard
-      find("#journal-#{issue.journals.first.id}-notes pre:first-of-type .copy-pre-content-link").click
+      find("#journal-#{issue.journals.first.id}-notes div.pre-wrapper:first-of-type .copy-pre-content-link").click
       # Paste the value copied to the clipboard into the textarea to get and test
       first('.icon-edit').click
       find('textarea#issue_notes').send_keys([modifier_key, 'v'])

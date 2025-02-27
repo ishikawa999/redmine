@@ -648,7 +648,7 @@ function copyTextToClipboard(target) {
 }
 
 function setupCopyButtonsToPreElements() {
-  document.querySelectorAll("pre:not(.copy-button-added)").forEach((pre) => {
+  document.querySelectorAll('pre:not(.pre-wrapper pre)').forEach((pre) => {
     const wrapper = document.createElement("div");
     wrapper.classList.add("pre-wrapper");
 
@@ -658,7 +658,6 @@ function setupCopyButtonsToPreElements() {
     button.append(createSVGIcon("copy-pre-content"));
 
     wrapper.appendChild(button);
-    wrapper.classList.add("copy-button-added");
     wrapper.append(pre.cloneNode(true));
     pre.replaceWith(wrapper);
 
