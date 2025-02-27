@@ -61,6 +61,12 @@ function updateSVGIcon(element, icon) {
   iconElement.setAttribute('href', iconPath.replace(/#.*$/g, "#icon--" + icon))
 }
 
+function createSVGIcon(icon) {
+  const clonedIcon = document.querySelector('#icon-copy-source svg').cloneNode(true);
+  updateSVGIcon(clonedIcon, icon);
+  return clonedIcon
+}
+
 function collapseAllRowGroups(el) {
   var tbody = $(el).parents('tbody').first();
   tbody.children('tr').each(function(index) {
@@ -210,8 +216,7 @@ function buildFilterRow(field, operator, values) {
   case "list_status":
   case "list_subprojects":
     const iconType = values.length > 1 ? 'toggle-minus' : 'toggle-plus';
-    const clonedIcon = document.querySelector('#icon-copy-source svg').cloneNode(true);
-    updateSVGIcon(clonedIcon, iconType);
+    const iconSvg = createSVGIcon(iconType)
 
     tr.find('.values').append(
       $('<span>', { style: 'display:none;' }).append(
@@ -221,7 +226,7 @@ function buildFilterRow(field, operator, values) {
           name: `v[${field}][]`,
         }),
         '\n',
-        $('<span>', { class: `toggle-multiselect icon-only icon-${iconType}` }).append(clonedIcon)
+        $('<span>', { class: `toggle-multiselect icon-only icon-${iconType}` }).append(iconSvg)
       )
     );
     select = tr.find('.values select');
@@ -640,6 +645,28 @@ function copyTextToClipboard(target) {
     }
   }
   return false;
+}
+
+function setupCopyButtonsToPreElements() {
+  document.querySelectorAll("pre:not(.copy-button-added)").forEach((pre) => {
+    const button = document.createElement("a");
+    button.href = "#";
+    button.title = rm.I18n.buttonCopy;
+    button.classList.add("copy-pre-content-link", "icon-only");
+    button.append(createSVGIcon("copy-pre-content"));
+
+    pre.appendChild(button);
+    pre.classList.add("copy-button-added");
+
+    button.addEventListener("click", (event) => {
+      event.preventDefault();
+      const textToCopy = (pre.querySelector("code") || pre).textContent;
+      navigator.clipboard.writeText(textToCopy).then(() => {
+        updateSVGIcon(button, "checked");
+        setTimeout(() => updateSVGIcon(button, "copy-pre-content"), 2000);
+      });
+    });
+  });
 }
 
 function updateIssueFrom(url, el) {
@@ -1158,7 +1185,7 @@ function setupWikiTableSortableHeader() {
   });
 }
 
-$(function () {
+function setupHoverTooltips() {
   $("[title]:not(.no-tooltip)").tooltip({
     show: {
       delay: 400
@@ -1168,7 +1195,9 @@ $(function () {
       at: "center top"
     }
   });
-});
+}
+
+$(function() { setupHoverTooltips(); });
 
 function inlineAutoComplete(element) {
     'use strict';
@@ -1362,3 +1391,4 @@ $(document).ready(setupWikiTableSortableHeader);
 $(document).on('focus', '[data-auto-complete=true]', function(event) {
   inlineAutoComplete(event.target);
 });
+document.addEventListener("DOMContentLoaded", () => { setupCopyButtonsToPreElements(); });
