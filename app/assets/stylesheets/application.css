@@ -1498,10 +1498,14 @@ div.wiki ul, div.wiki ol {margin-bottom:1em;}
 div.wiki li {line-height: 1.6; margin-bottom: 0.125rem;}
 div.wiki li>ul, div.wiki li>ol {margin-bottom: 0;}
 
-div.wiki pre {
+div.wiki div.pre-wrapper {
   position: relative;
+  padding-right: 10px;
+}
+
+div.wiki pre {
   margin: 1em 1em 1em 1.6em;
-  padding: 8px 8px 8px 17px;
+  padding: 8px;
   background-color: #fafafa;
   border: 1px solid #e2e2e2;
   border-radius: 3px;
@@ -1519,12 +1523,12 @@ div.wiki *:not(pre)>code, div.wiki>code {
 a.copy-pre-content-link {
   position: absolute;
   top: 0px;
-  left: 0px;
-  padding: 8px 5px 0px 0px;
+  right: 8px;
   cursor: pointer;
   display: none;
 }
-pre:hover a.copy-pre-content-link:not(.copied) {
+
+div.pre-wrapper:hover a.copy-pre-content-link {
   display: block;
 }
 
