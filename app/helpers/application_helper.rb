@@ -1919,7 +1919,7 @@ module ApplicationHelper
     javascript_tag(
       "rm = window.rm || {};" \
       "rm.I18n = rm.I18n || {};" \
-      "rm.I18n.buttonCopy = '#{l(:button_copy)}';"
+      "rm.I18n = Object.freeze({buttonCopy: '#{l(:button_copy)}'});"
     )
   end
 

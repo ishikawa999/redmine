@@ -650,7 +650,6 @@ function copyTextToClipboard(target) {
 function setupCopyButtonsToPreElements() {
   document.querySelectorAll("pre:not(.copy-button-added)").forEach((pre) => {
     const button = document.createElement("a");
-    button.href = "#";
     button.title = rm.I18n.buttonCopy;
     button.classList.add("copy-pre-content-link", "icon-only");
     button.append(createSVGIcon("copy-pre-content"));
@@ -660,7 +659,8 @@ function setupCopyButtonsToPreElements() {
 
     button.addEventListener("click", (event) => {
       event.preventDefault();
-      const textToCopy = (pre.querySelector("code") || pre).textContent;
+      let textToCopy = (pre.querySelector("code") || pre).textContent.replace(/\n$/, '');
+      if (pre.querySelector("code.syntaxhl")) { textToCopy = textToCopy.replace(/ $/, ''); }
       navigator.clipboard.writeText(textToCopy).then(() => {
         updateSVGIcon(button, "checked");
         setTimeout(() => updateSVGIcon(button, "copy-pre-content"), 2000);
