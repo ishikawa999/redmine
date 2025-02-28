@@ -649,25 +649,27 @@ function copyTextToClipboard(target) {
 
 function setupCopyButtonsToPreElements() {
   document.querySelectorAll('pre:not(.pre-wrapper pre)').forEach((pre) => {
+    // Wrap the <pre> element with a container and add a copy button
     const wrapper = document.createElement("div");
     wrapper.classList.add("pre-wrapper");
 
-    const button = document.createElement("a");
-    button.title = rm.I18n.buttonCopy;
-    button.classList.add("copy-pre-content-link", "icon-only");
-    button.append(createSVGIcon("copy-pre-content"));
+    const copyButton = document.createElement("a");
+    copyButton.title = rm.I18n.buttonCopy;
+    copyButton.classList.add("copy-pre-content-link", "icon-only");
+    copyButton.append(createSVGIcon("copy-pre-content"));
 
-    wrapper.appendChild(button);
+    wrapper.appendChild(copyButton);
     wrapper.append(pre.cloneNode(true));
     pre.replaceWith(wrapper);
 
-    button.addEventListener("click", (event) => {
+    // Copy the contents of the pre tag when copyButton is clicked
+    copyButton.addEventListener("click", (event) => {
       event.preventDefault();
       let textToCopy = (pre.querySelector("code") || pre).textContent.replace(/\n$/, '');
-      if (pre.querySelector("code.syntaxhl")) { textToCopy = textToCopy.replace(/ $/, ''); }
+      if (pre.querySelector("code.syntaxhl")) { textToCopy = textToCopy.replace(/ $/, ''); } // Workaround for half-width space issue in Textile's highlighted code
       navigator.clipboard.writeText(textToCopy).then(() => {
-        updateSVGIcon(button, "checked");
-        setTimeout(() => updateSVGIcon(button, "copy-pre-content"), 2000);
+        updateSVGIcon(copyButton, "checked");
+        setTimeout(() => updateSVGIcon(copyButton, "copy-pre-content"), 2000);
       });
     });
   });

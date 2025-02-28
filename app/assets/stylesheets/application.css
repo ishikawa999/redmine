@@ -1520,7 +1520,7 @@ div.wiki *:not(pre)>code, div.wiki>code {
   border-radius: 0.1em;
 }
 
-a.copy-pre-content-link {
+div.pre-wrapper a.copy-pre-content-link {
   position: absolute;
   top: 0px;
   right: 8px;
