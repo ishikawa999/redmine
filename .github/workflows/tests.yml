@@ -43,6 +43,8 @@ jobs:
           --health-retries=3
 
     steps:
+      - uses: browser-actions/setup-chrome@v1
+
       - name: Checkout code
         uses: actions/checkout@v4
 
@@ -96,6 +98,12 @@ jobs:
           bundle exec rake ci:setup
           bundle exec rake db:environment:set
 
+      - name: Run system tests
+        run: |
+          bin/rails test TEST=test/system
+        env:
+          GOOGLE_CHROME_OPTS_ARGS: "headless,disable-gpu,no-sandbox,disable-dev-shm-usage"
+
       - name: Run tests
         run: |
           bin/rails test
@@ -110,3 +118,11 @@ jobs:
       - name: Run autoload test
         run: |
           bin/rails test:autoload
+
+      - name: Store system test screenshots Artifacts
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: screenshots-${{ matrix.ruby }}-${{ matrix.db }}-${{ github.run_id }}
+          path: tmp/screenshots
+          if-no-files-found: ignore
