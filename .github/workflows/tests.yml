@@ -100,7 +100,7 @@ jobs:
 
       - name: Run system tests
         run: |
-          rake test
+          bundle exec rake test
         env:
           TEST: "test/system"
           GOOGLE_CHROME_OPTS_ARGS: "headless,disable-gpu,no-sandbox,disable-dev-shm-usage"
