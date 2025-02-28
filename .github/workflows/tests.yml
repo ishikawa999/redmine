@@ -100,9 +100,11 @@ jobs:
 
       - name: Run system tests
         run: |
-          bin/rails test TEST=test/system
+          rake test
         env:
+          TEST: "test/system"
           GOOGLE_CHROME_OPTS_ARGS: "headless,disable-gpu,no-sandbox,disable-dev-shm-usage"
+          RAILS_ENV: 'test'
 
       - name: Run tests
         run: |
