@@ -1,0 +1,26 @@
+<%= tag.span data: { 'reaction-button-id': reaction_id_for(object) } do %>
+  <% if User.current.logged? %>
+    <% if reaction&.persisted? %>
+      <%= link_to(
+            sprite_icon('thumb-up-filled', reaction_count),
+            reaction_path(reaction, object_type: object.class.name, object_id: object),
+            remote: true, method: :delete,
+            class: ['icon', 'reaction-button', 'reacted'],
+            title: reaction_tooltip
+          ) %>
+    <% else %>
+      <%= link_to(
+            sprite_icon('thumb-up', reaction_count),
+            reactions_path(object_type: object.class.name, object_id: object),
+            remote: true, method: :post,
+            class: ['icon', 'reaction-button'],
+            title: reaction_tooltip
+          ) %>
+    <% end %>
+  <% else %>
+    <%# When user is not logged in %>
+    <%= tag.span class: 'icon reaction-button', title: reaction_tooltip do %>
+      <%= sprite_icon 'thumb-up', reaction_count %>
+    <% end %>
+  <% end %>
+<% end %>
