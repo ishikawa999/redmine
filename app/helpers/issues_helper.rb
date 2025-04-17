@@ -750,13 +750,13 @@ module IssuesHelper
     if has_visible_time_entries || @has_changesets
       tabs <<
         {
-          :name => 'history_with_related_info',
-          :label => :label_history_with_related_info,
+          :name => 'timeline',
+          :label => :label_timeline,
           :remote => true,
           :onclick =>
-            "getRemoteTab('history_with_related_info', " \
-            "'#{tab_issue_path(@issue, :name => 'history_with_related_info')}', " \
-            "'#{issue_path(@issue, :tab => 'history_with_related_info')}')"
+            "getRemoteTab('timeline', " \
+            "'#{tab_issue_path(@issue, :name => 'timeline')}', " \
+            "'#{issue_path(@issue, :tab => 'timeline')}')"
         }
     end
     tabs
