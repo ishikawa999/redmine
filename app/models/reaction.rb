@@ -18,8 +18,12 @@
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 class Reaction < ApplicationRecord
+  AVAILABLE_REACTABLE_TYPES = %w(Journal Issue Message News Comment)
+
   belongs_to :reactable, polymorphic: true
   belongs_to :user
+
+  validates :reactable_type, inclusion: { in: AVAILABLE_REACTABLE_TYPES }
 
   scope :by, ->(user) { where(user: user) }
 end

@@ -23,8 +23,6 @@ class ReactionsController < ApplicationController
   before_action :require_login
   before_action :set_object, :authorize_reactable
 
-  REACTABLE_OBJECT_TYPES = %w(Journal Issue Message News Comment)
-
   def create
     @reaction = @object.reactions.find_or_initialize_by(user: User.current)
 
@@ -48,7 +46,7 @@ class ReactionsController < ApplicationController
   def set_object
     object_type = params[:object_type]
 
-    unless REACTABLE_OBJECT_TYPES.include?(object_type)
+    unless Reaction::AVAILABLE_REACTABLE_TYPES.include?(object_type)
       head :forbidden
       return
     end
