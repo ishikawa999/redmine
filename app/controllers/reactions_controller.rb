@@ -33,8 +33,8 @@ class ReactionsController < ApplicationController
   end
 
   def destroy
-    reaction = @object.reactions.by(User.current).find_by(id: params[:id])
-    reaction&.destroy
+    @reaction = @object.reactions.by(User.current).find_by(id: params[:id])
+    @reaction&.destroy
   end
 
   private
@@ -55,6 +55,6 @@ class ReactionsController < ApplicationController
   end
 
   def authorize_reactable
-    head :forbidden unless @object.visible?(User.current)
+    raise Unauthorized unless @object.visible?(User.current)
   end
 end

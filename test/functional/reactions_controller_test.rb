@@ -21,188 +21,314 @@ require_relative '../test_helper'
 
 class ReactionsControllerTest < Redmine::ControllerTest
   def setup
-    User.current = nil
     Setting.reactions_enabled = '1'
-
-    @issue = issues(:issues_001)
-    @journal = journals(:journals_001)
-    @message = messages(:messages_001)
-    @news = news(:news_001)
-    @news_comment = comments(:comments_001)
-    @forum_comment = comments(:comments_002)
-
-    @user = users(:users_002)
-    @request.session[:user_id] = @user.id
+    # jsmith
+    @request.session[:user_id] = users(:users_002).id
   end
 
-  # Test creating reactions for each supported object type
-  def test_create_reaction_for_issue
-    assert_difference 'Reaction.count' do
-      post :create, :params => {
-        :object_type => 'Issue',
-        :object_id => @issue.id
-      }, :xhr => true
+  test 'create for issue' do
+    issue = issues(:issues_002)
+
+    assert_difference(
+      ->{ Reaction.count } => 1,
+      ->{ issue.reactions.by(users(:users_002)).count } => 1
+    ) do
+      post :create, params: {
+        object_type: 'Issue',
+        object_id: issue.id
+      }, xhr: true
     end
 
     assert_response :success
-    assert_equal 1, @issue.reload.reactions.count
-    assert_equal @user.id, @issue.reactions.first.user_id
   end
 
-  def test_create_reaction_for_journal
-    assert_difference 'Reaction.count' do
-      post :create, :params => {
-        :object_type => 'Journal',
-        :object_id => @journal.id
-      }, :xhr => true
+  test 'create for journal' do
+    journal = journals(:journals_005)
+
+    assert_difference(
+      ->{ Reaction.count } => 1,
+      ->{ journal.reactions.by(users(:users_002)).count } => 1
+    ) do
+      post :create, params: {
+        object_type: 'Journal',
+        object_id: journal.id
+      }, xhr: true
     end
 
     assert_response :success
-    assert_equal 1, @journal.reload.reactions.count
-    assert_equal @user.id, @journal.reactions.first.user_id
   end
 
-  def test_create_reaction_for_message
-    assert_difference 'Reaction.count' do
-      post :create, :params => {
-        :object_type => 'Message',
-        :object_id => @message.id
-      }, :xhr => true
+  test 'create for news' do
+    news = news(:news_002)
+
+    assert_difference(
+      ->{ Reaction.count } => 1,
+      ->{ news.reactions.by(users(:users_002)).count } => 1
+    ) do
+      post :create, params: {
+        object_type: 'News',
+        object_id: news.id
+      }, xhr: true
     end
 
     assert_response :success
-    assert_equal 1, @message.reload.reactions.count
-    assert_equal @user.id, @message.reactions.first.user_id
   end
 
-  def test_create_reaction_for_news
-    assert_difference 'Reaction.count' do
-      post :create, :params => {
-        :object_type => 'News',
-        :object_id => @news.id
-      }, :xhr => true
+  test 'create reaction for comment' do
+    comment = comments(:comments_002)
+
+    assert_difference(
+      ->{ Reaction.count } => 1,
+      ->{ comment.reactions.by(users(:users_002)).count } => 1
+    ) do
+      post :create, params: {
+        object_type: 'Comment',
+        object_id: comment.id
+      }, xhr: true
     end
 
     assert_response :success
-    assert_equal 1, @news.reload.reactions.count
-    assert_equal @user.id, @news.reactions.first.user_id
   end
 
-  def test_create_reaction_for_news_comment
-    assert_difference 'Reaction.count' do
-      post :create, :params => {
-        :object_type => 'Comment',
-        :object_id => @news_comment.id
-      }, :xhr => true
+  test 'create for message' do
+    message = messages(:messages_001)
+
+    assert_difference(
+      ->{ Reaction.count } => 1,
+      ->{ message.reactions.by(users(:users_002)).count } => 1
+    ) do
+      post :create, params: {
+        object_type: 'Message',
+        object_id: message.id
+      }, xhr: true
     end
 
     assert_response :success
-    assert_equal 1, @news_comment.reload.reactions.count
-    assert_equal @user.id, @news_comment.reactions.first.user_id
   end
 
-  def test_create_reaction_for_forum_comment
-    assert_difference 'Reaction.count' do
-      post :create, :params => {
-        :object_type => 'Comment',
-        :object_id => @forum_comment.id
-      }, :xhr => true
-    end
+  test 'destroy for issue' do
+    reaction = reactions(:reaction_005)
 
-    assert_response :success
-    assert_equal 1, @forum_comment.reload.reactions.count
-    assert_equal @user.id, @forum_comment.reactions.first.user_id
-  end
-
-  # Test deleting reactions
-  def test_destroy_reaction
-    # First create a reaction
-    post :create, :params => {
-      :object_type => 'Issue',
-      :object_id => @issue.id
-    }, :xhr => true
-
-    reaction = @issue.reactions.first
-
-    # Then delete it
     assert_difference 'Reaction.count', -1 do
-      delete :destroy, :params => {
-        :id => reaction.id,
-        :object_type => 'Issue',
-        :object_id => @issue.id
-      }, :xhr => true
+      delete :destroy, params: {
+        id: reaction.id,
+        # Issue (id=6)
+        object_type: reaction.reactable_type,
+        object_id: reaction.reactable_id
+      }, xhr: true
     end
 
     assert_response :success
-    assert_equal 0, @issue.reload.reactions.count
+    assert_not Reaction.exists?(reaction.id)
   end
 
-  # Test feature toggle
-  def test_feature_disabled
+  test 'destroy for journal' do
+    reaction = reactions(:reaction_006)
+
+    assert_difference 'Reaction.count', -1 do
+      delete :destroy, params: {
+        id: reaction.id,
+        object_type: reaction.reactable_type,
+        object_id: reaction.reactable_id
+      }, xhr: true
+    end
+
+    assert_response :success
+    assert_not Reaction.exists?(reaction.id)
+  end
+
+  test 'destroy for news' do
+    # For News(id=3)
+    reaction = reactions(:reaction_010)
+
+    assert_difference 'Reaction.count', -1 do
+      delete :destroy, params: {
+        id: reaction.id,
+        object_type: reaction.reactable_type,
+        object_id: reaction.reactable_id
+      }, xhr: true
+    end
+
+    assert_response :success
+    assert_not Reaction.exists?(reaction.id)
+  end
+
+  test 'destroy for comment' do
+    # For Comment(id=1)
+    reaction = reactions(:reaction_008)
+
+    assert_difference 'Reaction.count', -1 do
+      delete :destroy, params: {
+        id: reaction.id,
+        object_type: reaction.reactable_type,
+        object_id: reaction.reactable_id
+      }, xhr: true
+    end
+
+    assert_response :success
+    assert_not Reaction.exists?(reaction.id)
+  end
+
+  test 'destroy for message' do
+    reaction = reactions(:reaction_009)
+
+    assert_difference 'Reaction.count', -1 do
+      delete :destroy, params: {
+        id: reaction.id,
+        object_type: reaction.reactable_type,
+        object_id: reaction.reactable_id
+      }, xhr: true
+    end
+
+    assert_response :success
+    assert_not Reaction.exists?(reaction.id)
+  end
+
+  test 'create should respond with 403 when feature is disabled' do
     Setting.reactions_enabled = '0'
+    # admin
+    @request.session[:user_id] = users(:users_001).id
 
-    post :create, :params => {
-      :object_type => 'Issue',
-      :object_id => @issue.id
-    }, :xhr => true
-
+    assert_no_difference 'Reaction.count' do
+      post :create, params: {
+        object_type: 'Issue',
+        object_id: issues(:issues_002).id
+      }, xhr: true
+    end
     assert_response :forbidden
-    assert_equal 0, @issue.reload.reactions.count
   end
 
-  # Test permissions
-  def test_anonymous_cannot_react
+  test 'destroy should respond with 403 when feature is disabled' do
+    Setting.reactions_enabled = '0'
+    # admin
+    @request.session[:user_id] = users(:users_001).id
+
+    reaction = reactions(:reaction_001)
+    assert_no_difference 'Reaction.count' do
+      delete :destroy, params: {
+        id: reaction.id,
+        object_type: reaction.reactable_type,
+        object_id: reaction.reactable_id
+      }, xhr: true
+    end
+    assert_response :forbidden
+  end
+
+  test 'create by anonymous user should respond with 403' do
     @request.session[:user_id] = nil
 
-    post :create, :params => {
-      :object_type => 'Issue',
-      :object_id => @issue.id
-    }, :xhr => true
+    assert_no_difference 'Reaction.count' do
+      post :create, params: {
+        object_type: 'Issue',
+        # Issue(id=1) is an issue in a public project
+        object_id: issues(:issues_001).id
+      }, xhr: true
+    end
 
     assert_response :unauthorized
-    assert_equal 0, @issue.reload.reactions.count
   end
 
-  def test_cannot_react_to_invisible_object
-    # Create a private project where the current user can't see issues
-    project = Project.generate!(:is_public => false)
-    issue = Issue.generate!(:project => project)
+  test 'destroy by anonymous user should respond with 401' do
+    @request.session[:user_id] = nil
 
-    post :create, :params => {
-      :object_type => 'Issue',
-      :object_id => issue.id
-    }, :xhr => true
+    reaction = reactions(:reaction_002)
+    assert_no_difference 'Reaction.count' do
+      delete :destroy, params: {
+        id: reaction.id,
+        object_type: reaction.reactable_type,
+        object_id: reaction.reactable_id
+      }, xhr: true
+    end
 
-    assert_response :forbidden
-    assert_equal 0, issue.reload.reactions.count
+    assert_response :unauthorized
   end
 
-  # Test creating the same reaction twice
-  def test_cannot_react_twice
-    # First reaction
-    post :create, :params => {
-      :object_type => 'Issue',
-      :object_id => @issue.id
-    }, :xhr => true
-
-    assert_equal 1, @issue.reload.reactions.count
-
-    # Second attempt should be ignored
-    post :create, :params => {
-      :object_type => 'Issue',
-      :object_id => @issue.id
-    }, :xhr => true
+  test 'create when reaction already exists should not create a new reaction and succeed' do
+    assert_no_difference 'Reaction.count' do
+      post :create, params: {
+        object_type: 'Comment',
+        # user(jsmith) has already reacted to Comment(id=1)
+        object_id: comments(:comments_001).id
+      }, xhr: true
+    end
 
     assert_response :success
-    assert_equal 1, @issue.reload.reactions.count, "User shouldn't be able to react multiple times"
   end
 
-  # Test invalid object type
-  def test_invalid_object_type
-    post :create, :params => {
-      :object_type => 'InvalidType',
-      :object_id => 1
-    }, :xhr => true
+  test 'destroy another user reaction should not destroy the reaction and succeed' do
+    # admin user's reaction
+    reaction = reactions(:reaction_001)
+
+    assert_no_difference 'Reaction.count' do
+      delete :destroy, params: {
+        id: reaction.id,
+        object_type: reaction.reactable_type,
+        object_id: reaction.reactable_id
+      }, xhr: true
+    end
+
+    assert_response :success
+  end
+
+  test 'destroy nonexistent reaction' do
+    # For Journal(id=4)
+    reaction = reactions(:reaction_006)
+    reaction.destroy!
+
+    assert_not Reaction.exists?(reaction.id)
+
+    assert_no_difference 'Reaction.count' do
+      delete :destroy, params: {
+        id: reaction.id,
+        object_type: reaction.reactable_type,
+        object_id: reaction.reactable_id
+      }, xhr: true
+    end
+
+    assert_response :success
+  end
+
+  test 'create with invalid object type should respond with 403' do
+    # admin
+    @request.session[:user_id] = users(:users_001).id
+
+    post :create, params: {
+      object_type: 'InvalidType',
+      object_id: 1
+    }, xhr: true
+
+    assert_response :forbidden
+  end
+
+  test 'create without permission to view should respond with 403' do
+    # dlopper
+    @request.session[:user_id] = users(:users_003).id
+
+    assert_no_difference('Reaction.count', 1) do
+      post :create, params: {
+        object_type: 'Issue',
+        # dlopper is not a member of the project where the issue (id=4) belongs.
+        object_id: issues(:issues_004).id
+      }, xhr: true
+    end
+
+    assert_response :forbidden
+  end
+
+  test 'destroy without permission to view should respond with 403' do
+    # dlopper
+    @request.session[:user_id] = users(:users_003).id
+
+    # For Issue(id=6)
+    reaction = reactions(:reaction_005)
+
+    assert_no_difference 'Reaction.count' do
+      delete :destroy, params: {
+        id: reaction.id,
+        object_type: reaction.reactable_type,
+        object_id: reaction.reactable_id
+      }, xhr: true
+    end
 
     assert_response :forbidden
   end
