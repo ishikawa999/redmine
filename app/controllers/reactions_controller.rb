@@ -24,12 +24,7 @@ class ReactionsController < ApplicationController
   before_action :set_object, :authorize_reactable
 
   def create
-    @reaction = @object.reactions.find_or_initialize_by(user: User.current)
-
-    # Do nothing if user has already reacted.
-    return if @reaction.persisted?
-
-    @reaction.save!
+    @reaction = @object.reactions.find_or_create_by!(user: User.current)
   end
 
   def destroy
