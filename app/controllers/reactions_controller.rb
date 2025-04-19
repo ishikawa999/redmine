@@ -35,14 +35,14 @@ class ReactionsController < ApplicationController
   private
 
   def check_enabled
-    head :forbidden unless Setting.reactions_enabled?
+    render_403 unless Setting.reactions_enabled?
   end
 
   def set_object
     object_type = params[:object_type]
 
     unless Reaction::REACTABLE_TYPES.include?(object_type)
-      head :forbidden
+      render_403
       return
     end
 
@@ -50,6 +50,6 @@ class ReactionsController < ApplicationController
   end
 
   def authorize_reactable
-    raise Unauthorized unless @object.visible?(User.current)
+    render_403 unless @object.visible?(User.current)
   end
 end
