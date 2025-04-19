@@ -46,7 +46,7 @@ class ReactionsController < ApplicationController
   def set_object
     object_type = params[:object_type]
 
-    unless Reaction::AVAILABLE_REACTABLE_TYPES.include?(object_type)
+    unless Reaction::REACTABLE_TYPES.include?(object_type)
       head :forbidden
       return
     end
