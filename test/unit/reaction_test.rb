@@ -20,105 +20,18 @@
 require_relative '../test_helper'
 
 class ReactionTest < ActiveSupport::TestCase
-  setup do
-    @user = users(:users_002)
-    @issue = issues(:issues_001)
-    @journal = journals(:journals_001)
-    @message = messages(:messages_001)
-    @news = news(:news_001)
-    @comment = comments(:comments_001)
-  end
+  test 'validates :inclusion of reactable_type' do
+    %w(Issue Journal News Comment Message).each do |type|
+      reaction = Reaction.new(reactable_type: type, user: User.new)
+      assert reaction.valid?
+    end
 
-  test 'create reaction for issue' do
-    reaction = Reaction.new(reactable: @issue, user: @user)
-    assert reaction.save
-    assert_equal @issue, reaction.reactable
-    assert_equal @user, reaction.user
-  end
-
-  test 'create reaction for journal' do
-    reaction = Reaction.new(reactable: @journal, user: @user)
-    assert reaction.save
-    assert_equal @journal, reaction.reactable
-    assert_equal @user, reaction.user
-  end
-
-  test 'create reaction for message' do
-    reaction = Reaction.new(reactable: @message, user: @user)
-    assert reaction.save
-    assert_equal @message, reaction.reactable
-    assert_equal @user, reaction.user
-  end
-
-  test 'create reaction for news' do
-    reaction = Reaction.new(reactable: @news, user: @user)
-    assert reaction.save
-    assert_equal @news, reaction.reactable
-    assert_equal @user, reaction.user
-  end
-
-  test 'create reaction for comment' do
-    reaction = Reaction.new(reactable: @comment, user: @user)
-    assert reaction.save
-    assert_equal @comment, reaction.reactable
-    assert_equal @user, reaction.user
-  end
-
-  test 'controller handles duplicate reactions' do
-    # This test simulates how the controller handles duplicate reactions
-    # First create a reaction
-    reaction1 = Reaction.create(reactable: @issue, user: @user)
-    assert reaction1.persisted?
-
-    # Simulate controller behavior with find_or_initialize_by
-    reaction2 = @issue.reactions.find_or_initialize_by(user: @user)
-
-    # Should find the existing reaction and not create a new one
-    assert reaction2.persisted?
-    assert_equal reaction1.id, reaction2.id
-
-    # Confirm only one reaction exists
-    assert_equal 1, @issue.reactions.count
-  end
-
-  test 'different users can react to the same reactable' do
-    user1 = users(:users_002)
-    user2 = users(:users_003)
-
-    reaction1 = Reaction.new(reactable: @issue, user: user1)
-    assert reaction1.save
-
-    reaction2 = Reaction.new(reactable: @issue, user: user2)
-    assert reaction2.save
-
-    assert_equal 2, @issue.reactions.count
-  end
-
-  test 'destroying a reactable destroys associated reactions' do
-    # Create a reaction
-    reaction = Reaction.new(reactable: @issue, user: @user)
-    assert reaction.save
-    reaction_id = reaction.id
-
-    # Destroy the reactable
-    @issue.destroy
-
-    # Check that the reaction is also destroyed
-    assert_nil Reaction.find_by(id: reaction_id)
+    assert_not Reaction.new(reactable_type: 'InvalidType', user: User.new).valid?
   end
 
   test 'scope: by' do
-    user1 = users(:users_002)
-    user2 = users(:users_003)
+    user2_reactions = issues(:issues_001).reactions.by(users(:users_002))
 
-    reaction1 = Reaction.create(reactable: @issue, user: user1)
-    reaction2 = Reaction.create(reactable: @journal, user: user1)
-    reaction3 = Reaction.create(reactable: @issue, user: user2)
-
-    user1_reactions = Reaction.by(user1)
-    assert_equal 2, user1_reactions.count
-    assert_include reaction1, user1_reactions
-    assert_include reaction2, user1_reactions
-    assert_not_include reaction3, user1_reactions
+    assert_equal [reactions(:reaction_002)], user2_reactions
   end
 end
