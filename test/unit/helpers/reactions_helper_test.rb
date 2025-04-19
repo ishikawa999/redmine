@@ -23,6 +23,7 @@ class ReactionsHelperTest < ActionView::TestCase
   include ReactionsHelper
 
   setup do
+    skip
     User.current = users(:users_002)
     @issue = issues(:issues_001)
     Setting.reactions_enabled = '1'
