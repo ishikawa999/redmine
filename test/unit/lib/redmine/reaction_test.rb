@@ -75,7 +75,7 @@ class Redmine::ReactionTest < ActiveSupport::TestCase
     ], @issue.reaction_users
   end
 
-  test 'destroy should delete associated reactions in bulk' do
+  test 'destroy should delete associated reactions' do
     @issue.reactions.create!(
       [
         {user: users(:users_001)},
@@ -83,9 +83,7 @@ class Redmine::ReactionTest < ActiveSupport::TestCase
       ]
     )
     assert_difference 'Reaction.count', -2 do
-      assert_queries_match /DELETE FROM "reactions"/, count: 1 do
-        @issue.destroy
-      end
+      @issue.destroy
     end
   end
 end

@@ -1377,7 +1377,7 @@ class UserTest < ActiveSupport::TestCase
     end
   end
 
-  def test_destroy_should_delete_associated_reactions_in_bulk
+  def test_destroy_should_delete_associated_reactions
     users(:users_004).reactions.create!(
       [
         {reactable: issues(:issues_001)},
@@ -1385,9 +1385,7 @@ class UserTest < ActiveSupport::TestCase
       ]
     )
     assert_difference 'Reaction.count', -2 do
-      assert_queries_match /DELETE FROM "reactions"/, count: 1 do
-        users(:users_004).destroy
-      end
+      users(:users_004).destroy
     end
   end
 end

@@ -304,7 +304,7 @@ class ReactionsControllerTest < Redmine::ControllerTest
     # dlopper
     @request.session[:user_id] = users(:users_003).id
 
-    assert_no_difference('Reaction.count', 1) do
+    assert_no_difference 'Reaction.count' do
       post :create, params: {
         object_type: 'Issue',
         # dlopper is not a member of the project where the issue (id=4) belongs.
