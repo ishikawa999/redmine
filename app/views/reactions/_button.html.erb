@@ -1,5 +1,6 @@
 <%= tag.span data: { 'reaction-button-id': reaction_id_for(object) } do %>
   <% if User.current.logged? %>
+    <%# When the user has reacted to this object %>
     <% if reaction&.persisted? %>
       <%= link_to(
             sprite_icon('thumb-up-filled', reaction_count),
@@ -8,6 +9,7 @@
             class: ['icon', 'reaction-button', 'reacted'],
             title: reaction_tooltip
           ) %>
+    <%# When the user has not yet reacted to this object %>
     <% else %>
       <%= link_to(
             sprite_icon('thumb-up', reaction_count),
@@ -17,8 +19,8 @@
             title: reaction_tooltip
           ) %>
     <% end %>
+  <%# When the user is not logged in %>
   <% else %>
-    <%# When the user is not logged in %>
     <%= tag.span class: 'icon reaction-button', title: reaction_tooltip do %>
       <%= sprite_icon 'thumb-up', reaction_count %>
     <% end %>

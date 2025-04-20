@@ -48,7 +48,7 @@ module ReactionsHelper
 
     if reaction_count > DISPLAY_REACTION_USERS_LIMIT
       others = reaction_count - DISPLAY_REACTION_USERS_LIMIT
-      user_names << I18n.t(:reaction_text_other_users, others: others)
+      user_names << I18n.t(:reaction_text_x_reaction_users, count: others)
     end
 
     user_names.to_sentence(locale: I18n.locale)
