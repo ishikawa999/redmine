@@ -34,4 +34,39 @@ class ReactionTest < ActiveSupport::TestCase
 
     assert_equal [reactions(:reaction_002)], user2_reactions
   end
+
+  test "should prevent duplicate reactions with unique constraint under concurrent creation" do
+    user = users(:users_001)
+    issue = issues(:issues_004)
+
+    threads = []
+    results = []
+
+    # Ensure both threads start at the same time
+    barrier = Concurrent::CyclicBarrier.new(2)
+
+    # Create two threads to simulate concurrent creation
+    2.times do
+      threads << Thread.new do
+        barrier.wait # Wait for both threads to be ready
+        begin
+          reaction = Reaction.create(
+            reactable: issue,
+            user: user
+          )
+          results << reaction.persisted?
+        rescue ActiveRecord::RecordNotUnique
+          results << false
+        end
+      end
+    end
+
+    # Wait for both threads to finish
+    threads.each(&:join)
+
+    # Ensure only one reaction was created
+    assert_equal 1, Reaction.where(reactable: issue, user: user).count
+    assert_includes results, true
+    assert_equal 1, results.count(true)
+  end
 end
