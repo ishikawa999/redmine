@@ -19,6 +19,7 @@
 
 module JournalsHelper
   include Redmine::QuoteReply::Helper
+  include ReactionsHelper
 
   # Returns the attachments of a journal that are displayed as thumbnails
   def journal_thumbnail_attachments(journal)
