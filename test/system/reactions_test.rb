@@ -20,103 +20,103 @@
 require_relative '../application_system_test_case'
 
 class ReactionsSystemTest < ApplicationSystemTestCase
-  setup do
-    Setting.reactions_enabled = '1'
-    log_user('jsmith', 'jsmith')
-  end
-
   def test_react_to_issue
-    visit '/issues/1'
-
-    # Initial state - should show reaction button
-    # Using an exact path to avoid ambiguity
-    assert_selector('[data-reaction-button-id="reaction_issue_1"]')
-
-    # Find the issue reaction button specifically at the issue details section
-    # Using first to handle the case where multiple elements match
-    reaction_button = first('[data-reaction-button-id="reaction_issue_1"]', match: :first)
-
-    # Find the link inside the reaction button and click it
-    within(reaction_button) do
-      find('a.reaction').click
+    log_user('jsmith', 'jsmith')
+    with_settings(reactions_enabled: '1') do
+      visit '/issues/1'
+      reaction_button = find('div.issue.details [data-reaction-button-id="reaction_issue_1"]')
+      assert_reaction_add_and_remove(reaction_button, issues(:issues_001))
     end
-
-    # Wait for AJAX to complete and verify the button shows as reacted
-    wait_for_ajax
-    within(reaction_button) do
-      assert_selector('a.reacted')
-    end
-
-    # Verify reaction was created in the database
-    assert_equal 1, issues(:issues_001).reactions.count
-
-    # Click again to remove reaction
-    within(reaction_button) do
-      find('a.reacted').click
-    end
-
-    # Wait for AJAX to complete
-    wait_for_ajax
-    within(reaction_button) do
-      assert_selector('a.reaction:not(.reacted)')
-    end
-
-    # Verify reaction was removed from database
-    assert_equal 0, issues(:issues_001).reactions.count
   end
 
   def test_react_to_journal
-    # Add a journal entry first
-    visit '/issues/1'
-    find('a.icon-edit', text: 'Edit', match: :first).click
-    fill_in 'issue[notes]', with: 'This is a new journal note'
-    click_on 'Submit'
-
-    # Wait for page to reload
-    assert_text 'This is a new journal note'
-
-    # Get the latest journal id
-    journal = Journal.where(journalized_id: issues(:issues_001).id, journalized_type: 'Issue')
-                    .order(created_on: :desc).first
-
-    # Find the reaction button for the journal
-    reaction_button = first("[data-reaction-button-id=\"reaction_journal_#{journal.id}\"]")
-
-    # Click the reaction link
-    within(reaction_button) do
-      find('a.reaction').click
+    log_user('jsmith', 'jsmith')
+    journal = Journal.where(journalized_id: 1, journalized_type: 'Issue').first
+    with_settings(reactions_enabled: '1') do
+      visit '/issues/1'
+      reaction_button = find("[data-reaction-button-id=\"reaction_journal_#{journal.id}\"]")
+      assert_reaction_add_and_remove(reaction_button, journal.reload)
     end
+  end
 
-    # Wait for AJAX to complete
-    wait_for_ajax
-
-    # Verify the button now shows as reacted
-    within(reaction_button) do
-      assert_selector('a.reacted')
+  def test_react_to_forum_message
+    log_user('jsmith', 'jsmith')
+    reply_message = Message.find(1).last_reply
+    with_settings(reactions_enabled: '1') do
+      visit 'boards/1/topics/1'
+      reaction_button = find("[data-reaction-button-id=\"reaction_message_#{reply_message.id}\"]")
+      assert_reaction_add_and_remove(reaction_button, reply_message)
     end
+  end
 
-    # Verify reaction was created in the database
-    assert_equal 1, journal.reload.reactions.count
+  def test_react_to_forum_reply
+    log_user('jsmith', 'jsmith')
+    with_settings(reactions_enabled: '1') do
+      visit 'boards/1/topics/1'
+      reaction_button = find("[data-reaction-button-id=\"reaction_message_1\"]")
+      assert_reaction_add_and_remove(reaction_button, Message.find(1))
+    end
+  end
+
+  def test_react_to_news
+    log_user('jsmith', 'jsmith')
+    with_settings(reactions_enabled: '1') do
+      visit '/news/1'
+      reaction_button = find("[data-reaction-button-id=\"reaction_news_1\"]")
+      assert_reaction_add_and_remove(reaction_button, News.find(1))
+    end
+  end
+
+  def test_react_to_comment
+    log_user('jsmith', 'jsmith')
+    comment = News.find(1).comments.first
+    with_settings(reactions_enabled: '1') do
+      visit '/news/1'
+      reaction_button = find("[data-reaction-button-id=\"reaction_comment_#{comment.id}\"]")
+      assert_reaction_add_and_remove(reaction_button, comment)
+    end
   end
 
   def test_reactions_disabled
-    Setting.reactions_enabled = '0'
+    log_user('jsmith', 'jsmith')
 
-    visit '/issues/1'
-
-    # No reaction button should be visible
-    assert_no_selector('[data-reaction-button-id="reaction_issue_1"]')
+    with_settings(reactions_enabled: '0') do
+      visit '/issues/1'
+      assert_no_selector('[data-reaction-button-id="reaction_issue_1"]')
+    end
   end
 
-  def test_reactions_for_anonymous_users
-    # Use sign out link instead of logout method
-    visit '/logout'
+  def test_reaction_button_is_visible_but_not_clickable_for_not_logged_in_user
+    with_settings(reactions_enabled: '1') do
+      Reaction.create(reactable: Issue.find(1), user: User.first)
+      visit '/issues/1'
 
-    visit '/issues/1'
+      # visible
+      reaction_button = find('div.issue.details [data-reaction-button-id="reaction_issue_1"]')
+      within(reaction_button) { assert_selector('span.reaction-button[title="Redmine Admin"]') }
+      assert_equal "1", reaction_button.text
 
-    # For anonymous users, we only check that the page loads without errors
-    # The specific UI behavior would need more direct inspection
-    assert_selector('#content')
-    assert page.has_content?('Bug #1')
+      # not clickable
+      within(reaction_button) { assert_no_selector('a.reaction-button') }
+    end
+  end
+
+  private
+
+  def assert_reaction_add_and_remove(reaction_button, expected_subject)
+    # Add a reaction
+    within(reaction_button) { find('a.reaction-button').click }
+    wait_for_ajax
+    find('body').hover # Hide tooltip
+    within(reaction_button) { assert_selector('a.reaction-button.reacted[title="John Smith"]') }
+    assert_equal "1", reaction_button.text
+    assert_equal 1, expected_subject.reactions.count
+
+    # Remove the reaction
+    within(reaction_button) { find('a.reacted').click }
+    wait_for_ajax
+    within(reaction_button) { assert_selector('a.reaction-button:not(.reacted)') }
+    assert_equal "0", reaction_button.text
+    assert_equal 0, expected_subject.reactions.count
   end
 end
