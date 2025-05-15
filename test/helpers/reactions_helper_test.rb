@@ -108,7 +108,6 @@ class ReactionsHelperTest < ActionView::TestCase
 
   test 'reaction_button should be label less when no reactions' do
     issue = issues(:issues_002)
-    issue.reactions.destroy_all
 
     result = with_locale('en') do
       reaction_button(issue)
