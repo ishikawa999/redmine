@@ -106,6 +106,20 @@ class ReactionsHelperTest < ActionView::TestCase
     assert_select_in result, 'a.reaction-button[title=?]', expected_tooltip
   end
 
+  test 'reaction_button should be icon only when no reactions' do
+    issue = issues(:issues_002)
+    issue.reactions.destroy_all
+
+    result = with_locale('en') do
+      reaction_button(issue)
+    end
+
+    # The .icon-label element is hidden by the .icon-only class.
+    assert_select_in result, 'a.reaction-button.icon-only' do
+      assert_select 'span.icon-label', text: '0'
+    end
+  end
+
   test 'reaction_button should not count and display non-visible users' do
     issue2 = issues(:issues_002)
 

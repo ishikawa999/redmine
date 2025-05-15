@@ -67,7 +67,7 @@ module ReactionsHelper
         sprite_icon('thumb-up', count),
         reactions_path(object_type: object.class.name, object_id: object),
         remote: true, method: :post,
-        class: 'icon reaction-button',
+        class: [count.zero? ? 'icon-only' : 'icon', 'reaction-button'],
         title: tooltip
       )
     end
