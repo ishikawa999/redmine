@@ -119,13 +119,13 @@ class ReactionsSystemTest < ApplicationSystemTestCase
     # Add a reaction
     within(reaction_button) { find('a.reaction-button').click }
     find('body').hover # Hide tooltip
-    within(reaction_button) { assert_selector('a.reaction-button.icon.reacted[title="John Smith"]') }
+    within(reaction_button) { assert_selector('a.reaction-button.reacted[title="John Smith"]') }
     assert_equal "1", reaction_button.text
     assert_equal 1, expected_subject.reactions.count
 
     # Remove the reaction
     within(reaction_button) { find('a.reacted').click }
-    within(reaction_button) { assert_selector('a.reaction-button.icon-only:not(.reacted)') }
+    within(reaction_button) { assert_selector('a.reaction-button:not(.reacted)') }
     assert_equal "", reaction_button.text
     assert_equal 0, expected_subject.reactions.count
   end
