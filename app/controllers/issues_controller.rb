@@ -255,6 +255,14 @@ class IssuesController < ApplicationController
       @changesets = @issue.changesets.visible.preload(:repository, :user).to_a
       @changesets.reverse! if User.current.wants_comments_in_reverse_order?
       render :partial => 'issues/tabs/changesets', :locals => {:changesets => @changesets, :project => @project}
+    when 'timeline'
+      journals = @issue.visible_journals_with_index
+      time_entries = @issue.time_entries.visible.preload(:activity, :user).to_a
+      changesets = @issue.changesets.visible.preload(:repository, :user).to_a
+
+      @timeline_objects = (journals.to_a + time_entries.to_a + changesets.to_a).sort_by{|o| o.is_a?(Changeset) ? o.committed_on : o.created_on}
+      @timeline_objects.reverse! if User.current.wants_comments_in_reverse_order?
+      render :partial => 'issues/tabs/timeline', :locals => { timeline_objects: @timeline_objects, :project => @project, :issue => @issue }
     end
   end
 
