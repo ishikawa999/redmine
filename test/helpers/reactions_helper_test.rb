@@ -151,7 +151,7 @@ class ReactionsHelperTest < ActionView::TestCase
 
     assert_select_in result, 'a.reaction-button[title]', false
     assert_select_in result, 'a.reaction-button' do
-      assert_select 'span.icon-label', '0'
+      assert_select 'span.icon-label', false
     end
   end
 
