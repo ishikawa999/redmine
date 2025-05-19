@@ -42,8 +42,8 @@
 <ul>
 <% @activity.event_types.each do |t| %>
   <li>
-    <%= check_box_tag "show_#{t}", 1, @activity.scope.include?(t) %>
     <label for="show_<%=t%>">
+      <%= check_box_tag "show_#{t}", 1, @activity.scope.include?(t) %>
       <%= link_to(l("label_#{t.singularize}_plural"),
                   {"show_#{t}" => 1, :user_id => params[:user_id], :from => params[:from]})%>
     </label>

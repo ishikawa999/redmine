@@ -319,64 +319,20 @@
   .flyout-menu > p,
   .flyout-menu > a,
   .flyout-menu ul li a,
+  .flyout-menu ul li label,
   .flyout-menu__search,
-  .flyout-menu__sidebar > div,
   .flyout-menu__sidebar > p,
   .flyout-menu__sidebar > a,
   .flyout-menu__sidebar > form,
+  .flyout-menu__sidebar form p,
   .flyout-menu > div,
   .flyout-menu > form {
     padding-left: 8px;
   }
 
-  .flyout-menu .flyout-menu__avatar {
-    margin-top: -1px; /* move avatar up 1px */
-    padding-left: 0;
-  }
-
-  .flyout-menu__sidebar > form {
-    display: block;
-  }
-
-  .flyout-menu__sidebar > form h3 {
-    margin-left: -8px;
-  }
-
-  .flyout-menu__sidebar > form label {
-    display: inline-block;
-    margin: 8px 0;
-  }
-
-  .flyout-menu__sidebar > form br  br {
-    display: none;
-  }
-
-  /* Targets list containing checkboxes (e.g. activities sidebar) in flyout menu */
-  .flyout-menu__sidebar form > ul {
-    margin-left: -8px;
-    padding-left: 0;
-  }
-
-  .flyout-menu__sidebar form > ul li {
-    line-height: 39px;
-    display: block;
-    padding-left: 8px;
-    border-top: 1px solid rgba(255,255,255,.1);
-  }
-
-  .flyout-menu__sidebar form > ul li:first-child {
-    border-top: none;
-  }
-
-  .flyout-menu__sidebar form > ul li label {
-    margin: 0;
-  }
-
-  .flyout-menu__sidebar form > ul li label a {
-    line-height: 1;
-    display: inline;
-    padding-left: 0;
-    border: none;
+  .flyout-menu #watchers ul li img,
+  .flyout-menu form input[type="submit"] {
+    margin-left: 8px;
   }
 
   .flyout-menu ul {
@@ -385,7 +341,8 @@
     list-style: none;
   }
 
-  .flyout-menu #watchers {
+  .flyout-menu #watchers,
+  .flyout-menu ul.queries {
     display: -webkit-flex;
     display: -webkit-box;
     display: flex;
@@ -402,11 +359,8 @@
     order: 3;
   }
 
-  .flyout-menu #watchers h3 {
-    margin-left: -8px;
-  }
-
-  .flyout-menu #watchers ul li {
+  .flyout-menu #watchers ul li,
+  .flyout-menu ul.queries li {
     display: -webkit-flex;
     display: -webkit-box;
     display: flex;
@@ -420,27 +374,27 @@
     align-items: center;
   }
 
-  .flyout-menu ul li a {
-    line-height: 40px;
+  .flyout-menu ul li {
     display: block;
-    overflow: hidden;
-    height: 40px;
-    white-space: nowrap;
-    text-overflow: ellipsis;
     border-top: 1px solid rgba(255,255,255,.1);
   }
-
-  .flyout-menu ul li:first-child a {
-    line-height: 39px;
-    height: 39px;
+  .flyout-menu ul li:first-child, .flyout-menu form > ul li {
     border-top: none;
+  }
+
+  .flyout-menu ul li a {
+    display: block;
+    padding: 8px;
+  }
+
+  .flyout-menu ul li label a {
+    display: inline;
   }
 
   .flyout-menu a {
     color: white;
   }
-
-  .flyout-menu .icon svg {
+  .flyout-menu .icon svg, .flyout-menu .icon-only svg {
     stroke: white;
   }
 
@@ -520,7 +474,6 @@
   /* user link when no avatar is present */
   .flyout-menu__avatar--no-avatar a.user {
     line-height: 40px;
-    padding-left: 8px;
   }
 
   .flyout-is-active body {
@@ -560,8 +513,8 @@
     padding-bottom: 0;
   }
 
-  #admin-menu a,
-  #admin-menu a.selected {
+  #admin-index #admin-menu a,
+  #admin-index #admin-menu a.selected {
     line-height: 40px;
     padding: 0;
   }
