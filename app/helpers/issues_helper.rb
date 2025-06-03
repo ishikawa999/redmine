@@ -723,7 +723,8 @@ module IssuesHelper
           }
       end
     end
-    if User.current.allowed_to?(:view_time_entries, @project) && @issue.spent_hours > 0
+    has_visible_time_entries = User.current.allowed_to?(:view_time_entries, @project) && @issue.spent_hours > 0
+    if has_visible_time_entries
       tabs <<
         {
           :name => 'time_entries',
@@ -745,6 +746,18 @@ module IssuesHelper
             "getRemoteTab('changesets', " \
             "'#{tab_issue_path(@issue, :name => 'changesets')}', " \
             "'#{issue_path(@issue, :tab => 'changesets')}')"
+        }
+    end
+    if has_visible_time_entries || @has_changesets
+      tabs <<
+        {
+          :name => 'timeline',
+          :label => :label_timeline,
+          :remote => true,
+          :onclick =>
+            "getRemoteTab('timeline', " \
+            "'#{tab_issue_path(@issue, :name => 'timeline')}', " \
+            "'#{issue_path(@issue, :tab => 'timeline')}')"
         }
     end
     tabs
