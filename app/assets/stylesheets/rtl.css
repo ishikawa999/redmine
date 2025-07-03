@@ -230,8 +230,6 @@ fieldset#notified_events .parent {padding-left:0px; padding-right:20px; }
 .attachments_fields input.description {margin-left:0px; margin-right:4px;}
 
 .attachments_fields input.filename {background:url(/attachment.png) no-repeat right 1px top 50%; padding-left:0px; padding-right:18px;}
-.attachments_fields .ajax-waiting input.filename {background:url(/hourglass-empty.svg) no-repeat right top 50%;}
-.attachments_fields .ajax-loading input.filename {background:url(/loading.gif) no-repeat right top 50%;}
 .attachments_fields div.ui-progressbar {margin: 2px 8px -5px 0;}
 
 a.remove-upload {background: url(/delete.png) no-repeat right 1px top 50%; padding-left:0px; padding-right:16px;}
@@ -246,10 +244,6 @@ em.info.error {padding-left:0; padding-right:20px; background:url(/exclamation.p
 
 table.members td.name {padding-right: 20px; padding-left:0; }
 table.members td.group, table.members td.groupnonmember, table.members td.groupanonymous {background: url(/group.png) no-repeat right 50%;}
-
-input.autocomplete {
-  background: #fff url(/search.svg) no-repeat right 2px top 50%; padding-left:0px !important; padding-right:20px !important;
-}
 
 .role-visibility {padding-right:2em; padding-left:0;}
 

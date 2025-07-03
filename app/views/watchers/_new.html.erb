@@ -21,7 +21,10 @@ title =
   <% end %>
   <%= hidden_field_tag 'project_id', @project.id if @project %>
 
-  <p><%= label_tag 'user_search', l(:label_user_search) %><%= text_field_tag 'user_search', nil %></p>
+  <p>
+    <%= label_tag 'user_search', l(:label_user_search) %><br>
+    <%= sprite_icon 'search', icon_only: true, css_class: 'svg-search' %><%= text_field_tag 'user_search', nil %>
+  </p>
   <%= javascript_tag(
         "observeSearchfield(
           'user_search',

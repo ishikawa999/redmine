@@ -11,7 +11,9 @@
   </div>
 <% end %>
 <p><%= f.select :relation_type, collection_for_relation_type_select, {}, :onchange => "setPredecessorFieldsVisibility();" %>
-<%= l(:label_issue) %> #<%= f.text_field :issue_to_id, :value => unsaved_relations_ids, :size => 10 %>
+<span>
+<%= l(:label_issue) %> #<%= sprite_icon 'search', icon_only: true, css_class: 'svg-search' %><%= f.text_field :issue_to_id, :value => unsaved_relations_ids, :size => 10 %>
+</span>
 <span id="predecessor_fields" style="display:none;">
 <%= l(:field_delay) %>: <%= f.text_field :delay, :size => 3 %> <%= l(:label_day_plural) %>
 </span>

@@ -146,7 +146,8 @@
 <% if @safe_attributes.include?('parent_issue_id') && @project %>
 <p>
   <label for='issue_parent_issue_id'><%= l(:field_parent_issue) %></label>
-  <%= text_field_tag 'issue[parent_issue_id]', '', :size => 10, :value => @issue_params[:parent_issue_id] %>
+  <%= sprite_icon 'search', icon_only: true, css_class: 'svg-search' %>
+  <%= text_field_tag 'issue[parent_issue_id]', '', :size => 9, :value => @issue_params[:parent_issue_id] %>
   <label class="inline"><%= check_box_tag 'issue[parent_issue_id]', 'none', (@issue_params[:parent_issue_id] == 'none'), :id => nil, :data => {:disables => '#issue_parent_issue_id'} %><%= l(:button_clear) %></label>
 </p>
 <%= javascript_tag "observeAutocompleteField('issue_parent_issue_id', '#{escape_javascript auto_complete_issues_path(:project_id => @project, :scope => Setting.cross_project_subtasks)}')" %>
