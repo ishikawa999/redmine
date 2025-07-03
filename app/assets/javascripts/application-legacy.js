@@ -748,11 +748,43 @@ function observeAutocompleteField(fieldId, url, options) {
       source: url,
       minLength: 2,
       position: {collision: "flipfit"},
-      search: function(){$('#'+fieldId).addClass('ajax-loading');},
-      response: function(){$('#'+fieldId).removeClass('ajax-loading');}
+      search: function(){showAutocompleteLoadingIcon(fieldId)},
+      response: function(){restoreAutocompleteSearchIcon(fieldId)}
     }, options));
     $('#'+fieldId).addClass('autocomplete');
   });
+}
+
+function showAutocompleteLoadingIcon(fieldId) {
+  const input = document.getElementById(fieldId);
+  if (!input) return;
+
+  const container = input.closest('p');
+  if (!container) return;
+
+  const svg = container.querySelector('svg.svg-search');
+  if (!svg) return;
+
+  updateSVGIcon(svg, 'loader');
+  svg.classList.remove('svg-search');
+  svg.classList.add('svg-loader');
+  input.classList.add('ajax-loading');
+}
+
+function restoreAutocompleteSearchIcon(fieldId) {
+  const input = document.getElementById(fieldId);
+  if (!input) return;
+
+  const container = input.closest('p');
+  if (!container) return;
+
+  const svg = container.querySelector('svg.svg-loader');
+  if (!svg) return;
+
+  updateSVGIcon(svg, 'search');
+  svg.classList.remove('svg-loader');
+  svg.classList.add('svg-search');
+  input.classList.remove('ajax-loading');
 }
 
 function multipleAutocompleteField(fieldId, url, options) {
@@ -774,10 +806,10 @@ function multipleAutocompleteField(fieldId, url, options) {
       minLength: 2,
       position: {collision: "flipfit"},
       search: function () {
-        $('#' + fieldId).addClass('ajax-loading');
+        showAutocompleteLoadingIcon(fieldId);
       },
       response: function () {
-        $('#' + fieldId).removeClass('ajax-loading');
+        restoreAutocompleteSearchIcon(fieldId);
       },
       select: function (event, ui) {
         var terms = split(this.value);
@@ -809,8 +841,8 @@ function observeSearchfield(fieldId, targetId, url) {
           type: 'get',
           data: {q: $this.val()},
           success: function(data){ if(targetId) $('#'+targetId).html(data); },
-          beforeSend: function(){ $this.addClass('ajax-loading'); },
-          complete: function(){ $this.removeClass('ajax-loading'); }
+          beforeSend: function(){ showAutocompleteLoadingIcon(fieldId); },
+          complete: function(){ restoreAutocompleteSearchIcon(fieldId); }
         });
       }
     };
