@@ -32,7 +32,11 @@
        :remote => true,
        :method => :post,
        :id => 'new-relation-form', :style => (@issue ? '' : 'display: none;')) do |f| %>
-  <%= l(:label_issue) %> #<%= text_field_tag 'issue_id', '', :size => 10 %>
+  <p>
+    <%= l(:label_issue) %> #
+    <%= sprite_icon 'search', icon_only: true, css_class: 'svg-search' %>
+    <%= text_field_tag 'issue_id', '', :size => 10 %>
+  </p>
   <%= submit_tag l(:button_add) %>
   <%= toggle_link l(:button_cancel), 'new-relation-form'%>
   <% end %>

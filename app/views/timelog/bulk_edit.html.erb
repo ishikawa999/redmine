@@ -40,6 +40,7 @@
         :onchange => "updateBulkEditFrom('#{escape_javascript url_for(:action => 'bulk_edit', :format => 'js')}')" ) %>
     </p>
     <p>
+      <%= sprite_icon 'search', icon_only: true, css_class: 'svg-search' %>
       <label for="time_entry_issue_id"><%= l(:field_issue) %></label>
       <%= text_field :time_entry, :issue_id, :size => 6 %>
       <label class="inline"><%= check_box_tag 'time_entry[issue_id]', 'none', (@time_entry_params[:issue_id] == 'none'), :id => nil, :data => {:disables => '#time_entry_issue_id'} %><%= l(:button_clear) %></label>

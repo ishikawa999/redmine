@@ -6,7 +6,7 @@
 <div class="splitcontentleft">
 <fieldset class="box tabular">
   <legend><%=l(:label_information_plural)%></legend>
-  <p><%= f.text_field :login, :required => true, :size => 25  %></p>
+  <p><%= sprite_icon 'search', icon_only: true, css_class: 'svg-search' %><%= f.text_field :login, :required => true, :size => 25  %></p>
   <p><%= f.text_field :firstname, :required => true %></p>
   <p><%= f.text_field :lastname, :required => true %></p>
   <p><%= f.text_field :mail, :required => true %></p>
