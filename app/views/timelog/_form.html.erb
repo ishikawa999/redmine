@@ -11,6 +11,7 @@
   <% end %>
 
   <p>
+    <%= sprite_icon 'search', icon_only: true, css_class: 'svg-search' %>
     <%= f.text_field :issue_id, :size => 6, :required => Setting.timelog_required_fields.include?('issue_id') %>
     <span id="time_entry_issue">
       <%=  link_to_issue(@time_entry.issue) if @time_entry.issue.try(:visible?) %>

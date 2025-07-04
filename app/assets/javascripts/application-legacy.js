@@ -748,11 +748,43 @@ function observeAutocompleteField(fieldId, url, options) {
       source: url,
       minLength: 2,
       position: {collision: "flipfit"},
-      search: function(){$('#'+fieldId).addClass('ajax-loading');},
-      response: function(){$('#'+fieldId).removeClass('ajax-loading');}
+      search: function(){showAutocompleteLoadingIcon(fieldId)},
+      response: function(){restoreAutocompleteSearchIcon(fieldId)}
     }, options));
     $('#'+fieldId).addClass('autocomplete');
   });
+}
+
+function showAutocompleteLoadingIcon(fieldId) {
+  const input = document.getElementById(fieldId);
+  if (!input) return;
+
+  const container = input.closest('p');
+  if (!container) return;
+
+  const svg = container.querySelector('svg.svg-search');
+  if (!svg) return;
+
+  updateSVGIcon(svg, 'loader');
+  svg.classList.remove('svg-search');
+  svg.classList.add('svg-loader');
+  input.classList.add('ajax-loading');
+}
+
+function restoreAutocompleteSearchIcon(fieldId) {
+  const input = document.getElementById(fieldId);
+  if (!input) return;
+
+  const container = input.closest('p');
+  if (!container) return;
+
+  const svg = container.querySelector('svg.svg-loader');
+  if (!svg) return;
+
+  updateSVGIcon(svg, 'search');
+  svg.classList.remove('svg-loader');
+  svg.classList.add('svg-search');
+  input.classList.remove('ajax-loading');
 }
 
 function multipleAutocompleteField(fieldId, url, options) {
@@ -774,10 +806,10 @@ function multipleAutocompleteField(fieldId, url, options) {
       minLength: 2,
       position: {collision: "flipfit"},
       search: function () {
-        $('#' + fieldId).addClass('ajax-loading');
+        showAutocompleteLoadingIcon(fieldId);
       },
       response: function () {
-        $('#' + fieldId).removeClass('ajax-loading');
+        restoreAutocompleteSearchIcon(fieldId);
       },
       select: function (event, ui) {
         var terms = split(this.value);
@@ -809,8 +841,8 @@ function observeSearchfield(fieldId, targetId, url) {
           type: 'get',
           data: {q: $this.val()},
           success: function(data){ if(targetId) $('#'+targetId).html(data); },
-          beforeSend: function(){ $this.addClass('ajax-loading'); },
-          complete: function(){ $this.removeClass('ajax-loading'); }
+          beforeSend: function(){ showAutocompleteLoadingIcon(fieldId); },
+          complete: function(){ restoreAutocompleteSearchIcon(fieldId); }
         });
       }
     };
@@ -931,6 +963,24 @@ function beforeShowDatePicker(input, inst) {
       firstPosition: 1
     }, options );
 
+    function showReorderLoadingIcon(handle) {
+      const svg = handle.querySelector('svg');
+      if (!svg) return;
+
+      updateSVGIcon(svg, 'loader');
+      svg.classList.add('svg-loader');
+      handle.classList.add('ajax-loading');
+    }
+
+    function restoreReorderIcon(handle) {
+      const svg = handle.querySelector('svg.svg-loader');
+      if (!svg) return;
+
+      updateSVGIcon(svg, 'reorder');
+      svg.classList.remove('svg-loader');
+      handle.classList.remove('ajax-loading');
+    }
+
     return this.sortable($.extend({
       axis: 'y',
       handle: ".sort-handle",
@@ -942,10 +992,12 @@ function beforeShowDatePicker(input, inst) {
       },
       update: function(event, ui) {
         var sortable = $(this);
-        var handle = ui.item.find(".sort-handle").addClass("ajax-loading");
+        var handle = ui.item.find(".sort-handle")
         var url = handle.data("reorder-url");
         var param = handle.data("reorder-param");
         var data = {};
+
+        showReorderLoadingIcon(handle[0]);
         data[param] = {position: ui.item.index() + settings['firstPosition']};
         $.ajax({
           url: url,
@@ -957,7 +1009,7 @@ function beforeShowDatePicker(input, inst) {
             sortable.sortable("cancel");
           },
           complete: function(jqXHR, textStatus, errorThrown){
-            handle.removeClass("ajax-loading");
+            restoreReorderIcon(handle[0]);
           }
         });
       },

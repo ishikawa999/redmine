@@ -1,6 +1,9 @@
 <fieldset class="box">
   <legend><%= label_tag("principal_search", l(:label_principal_search)) %></legend>
-  <p><%= text_field_tag('principal_search', nil) %></p>
+  <p>
+    <%= sprite_icon 'search', icon_only: true, css_class: 'svg-search' %>
+    <%= text_field_tag('principal_search', nil) %>
+  </p>
   <%= javascript_tag "observeSearchfield('principal_search', null, '#{ escape_javascript autocomplete_project_memberships_path(@project, :format => 'js') }')" %>
   <div id="principals_for_new_member">
     <%= render_principals_for_new_members(@project) %>
