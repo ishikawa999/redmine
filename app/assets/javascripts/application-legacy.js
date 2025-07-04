@@ -963,6 +963,24 @@ function beforeShowDatePicker(input, inst) {
       firstPosition: 1
     }, options );
 
+    function showReorderLoadingIcon(handle) {
+      const svg = handle.querySelector('svg');
+      if (!svg) return;
+
+      updateSVGIcon(svg, 'loader');
+      svg.classList.add('svg-loader');
+      handle.classList.add('ajax-loading');
+    }
+
+    function restoreReorderIcon(handle) {
+      const svg = handle.querySelector('svg.svg-loader');
+      if (!svg) return;
+
+      updateSVGIcon(svg, 'reorder');
+      svg.classList.remove('svg-loader');
+      handle.classList.remove('ajax-loading');
+    }
+
     return this.sortable($.extend({
       axis: 'y',
       handle: ".sort-handle",
@@ -974,10 +992,12 @@ function beforeShowDatePicker(input, inst) {
       },
       update: function(event, ui) {
         var sortable = $(this);
-        var handle = ui.item.find(".sort-handle").addClass("ajax-loading");
+        var handle = ui.item.find(".sort-handle")
         var url = handle.data("reorder-url");
         var param = handle.data("reorder-param");
         var data = {};
+
+        showReorderLoadingIcon(handle[0]);
         data[param] = {position: ui.item.index() + settings['firstPosition']};
         $.ajax({
           url: url,
@@ -989,7 +1009,7 @@ function beforeShowDatePicker(input, inst) {
             sortable.sortable("cancel");
           },
           complete: function(jqXHR, textStatus, errorThrown){
-            handle.removeClass("ajax-loading");
+            restoreReorderIcon(handle[0]);
           }
         });
       },
