@@ -1,6 +1,7 @@
 <h2><%= import_title %></h2>
 
 <div id="import-details">
+  <%= sprite_icon 'loader', icon_only: true, css_class: 'svg-loader' %>
   <div id="import-progress"><div id="progress-label">0 / <%= @import.total_items.to_i %></div></div>
 </div>
 
@@ -8,9 +9,5 @@
 $(document).ready(function() {
   $('#import-details').addClass('ajax-loading');
   $('#import-progress').progressbar({value: 0, max: <%= @import.total_items.to_i %>});
-  $.ajax({
-    url: '<%= import_run_path(@import, :format => 'js') %>',
-    type: 'post'
-  });
 });
 <% end %>
