@@ -30,6 +30,7 @@ class Changeset < ApplicationRecord
                           :class_name => "Changeset",
                           :join_table => "#{table_name_prefix}changeset_parents#{table_name_suffix}",
                           :association_foreign_key => 'changeset_id', :foreign_key => 'parent_id'
+  alias_attribute :created_on, :committed_on
 
   acts_as_event(
     :title => proc {|o| o.title},

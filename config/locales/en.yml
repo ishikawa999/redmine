@@ -725,6 +725,7 @@ en:
   label_no_preview_download: Download
   label_change_status: Change status
   label_history: History
+  label_timeline: Timeline
   label_attachment: File
   label_attachment_new: New file
   label_attachment_delete: Delete file
