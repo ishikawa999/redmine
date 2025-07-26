@@ -54,42 +54,33 @@ jsToolBar.prototype.elements.code = {
   }
 }
 
-// spacer
-jsToolBar.prototype.elements.space1 = {type: 'space'}
 
 // headings
-jsToolBar.prototype.elements.h1 = {
+jsToolBar.prototype.elements.heading = {
   type: 'button',
-  title: 'Heading 1',
+  title: 'Heading',
   fn: {
     wiki: function() {
-      this.encloseLineSelection('# ', '',function(str) {
-        str = str.replace(/^#+\s+/, '')
-        return str;
-      });
-    }
-  }
-}
-jsToolBar.prototype.elements.h2 = {
-  type: 'button',
-  title: 'Heading 2',
-  fn: {
-    wiki: function() {
-      this.encloseLineSelection('## ', '',function(str) {
-        str = str.replace(/^#+\s+/, '')
-        return str;
-      });
-    }
-  }
-}
-jsToolBar.prototype.elements.h3 = {
-  type: 'button',
-  title: 'Heading 3',
-  fn: {
-    wiki: function() {
-      this.encloseLineSelection('### ', '',function(str) {
-        str = str.replace(/^#+\s+/, '')
-        return str;
+      var This = this;
+      this.headingMenu(function(level){
+        var prefix = '';
+
+        switch(level) {
+          case 'h1':
+            prefix = '# ';
+            break;
+          case 'h2':
+            prefix = '## ';
+            break;
+          case 'h3':
+            prefix = '### ';
+            break;
+        }
+
+        This.encloseLineSelection(prefix, '', function(str) {
+          str = str.replace(/^#+\s+/, '');
+          return str;
+        });
       });
     }
   }

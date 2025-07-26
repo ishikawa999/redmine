@@ -112,6 +112,92 @@ class KeyboardShortcutsTest < ApplicationSystemTestCase
       assert_equal "Italic (#{modifier_key_title}I)", find('button.jstb_em')['title']
       # assert button without shortcut
       assert_equal "Deleted", find('button.jstb_del')['title']
+      # assert heading button
+      assert_equal "Heading", find('button.jstb_heading')['title']
+    end
+  end
+
+  def test_heading_button_shows_menu_with_options
+    log_user('jsmith', 'jsmith')
+    visit 'issues/new'
+
+    # Click heading button to open menu
+    find('button.jstb_heading').click
+
+    # Wait for menu to appear and verify options are present
+    assert page.has_content?('Heading 1')
+    assert page.has_content?('Heading 2')
+    assert page.has_content?('Heading 3')
+  end
+
+  def test_heading_menu_inserts_correct_markup_for_textile
+    with_settings :text_formatting => 'textile' do
+      log_user('jsmith', 'jsmith')
+      visit 'issues/new'
+
+      # Click heading button and select H1
+      find('button.jstb_heading').click
+      page.find(:xpath, "//div[contains(text(), 'Heading 1')]").click
+
+      # Verify H1 markup is inserted
+      assert_equal 'h1. ', find('#issue_description').value
+
+      # Clear and test H2
+      fill_in 'Description', :with => ''
+      find('button.jstb_heading').click
+      page.find(:xpath, "//div[contains(text(), 'Heading 2')]").click
+      assert_equal 'h2. ', find('#issue_description').value
+
+      # Clear and test H3
+      fill_in 'Description', :with => ''
+      find('button.jstb_heading').click
+      page.find(:xpath, "//div[contains(text(), 'Heading 3')]").click
+      assert_equal 'h3. ', find('#issue_description').value
+    end
+  end
+
+  def test_heading_menu_inserts_correct_markup_for_common_mark
+    with_settings :text_formatting => 'common_mark' do
+      log_user('jsmith', 'jsmith')
+      visit 'issues/new'
+
+      # Click heading button and select H1
+      find('button.jstb_heading').click
+      page.find(:xpath, "//div[contains(text(), 'Heading 1')]").click
+
+      # Verify H1 markup is inserted
+      assert_equal '# ', find('#issue_description').value
+
+      # Clear and test H2
+      fill_in 'Description', :with => ''
+      find('button.jstb_heading').click
+      page.find(:xpath, "//div[contains(text(), 'Heading 2')]").click
+      assert_equal '## ', find('#issue_description').value
+
+      # Clear and test H3
+      fill_in 'Description', :with => ''
+      find('button.jstb_heading').click
+      page.find(:xpath, "//div[contains(text(), 'Heading 3')]").click
+      assert_equal '### ', find('#issue_description').value
+    end
+  end
+
+  def test_heading_menu_removes_existing_heading_markup
+    with_settings :text_formatting => 'common_mark' do
+      log_user('jsmith', 'jsmith')
+      visit 'issues/new'
+
+      # Insert text with existing heading markup
+      fill_in 'Description', :with => '## Existing Heading'
+      find('#issue_description').click
+
+      # Select all text and apply H1
+      find('#issue_description').send_keys([:control, 'a'])
+      find('button.jstb_heading').click
+      page.find(:xpath, "//div[contains(text(), 'Heading 1')]").click
+
+      # Verify old markup is removed and new is applied
+      assert_equal '# Existing Heading', find('#issue_description').value
     end
   end
 
