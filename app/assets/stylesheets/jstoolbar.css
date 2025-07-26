@@ -128,6 +128,9 @@
 .jstb_h3 {
     background-image: url(/jstoolbar/h3.svg);
 }
+.jstb_heading {
+    background-image: url(/jstoolbar/heading.svg);
+}
 .jstb_ul {
     background-image: url(/jstoolbar/list.svg);
 }
