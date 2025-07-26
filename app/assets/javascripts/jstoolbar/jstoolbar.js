@@ -504,6 +504,32 @@ jsToolBar.prototype.precodeMenu = function(fn){
   return false;
 };
 
+/* Heading menu */
+jsToolBar.prototype.headingMenu = function(fn){
+  var headings = [
+    {key: 'h1', label: 'Heading 1'},
+    {key: 'h2', label: 'Heading 2'},
+    {key: 'h3', label: 'Heading 3'}
+  ];
+  var menu = $("<ul style='position:absolute;'></ul>");
+  for (var i = 0; i < headings.length; i++) {
+    var headingItem = $('<div></div>').text(headings[i].label);
+    $("<li></li>").html(headingItem).appendTo(menu).data('heading-key', headings[i].key).mousedown(function(){
+      fn($(this).data('heading-key'));
+    });
+  }
+  $("body").append(menu);
+  menu.menu().width(150).position({
+    my: "left top",
+    at: "left bottom",
+    of: this.toolNodes['heading']
+  });
+  $(document).on("mousedown", function() {
+    menu.remove();
+  });
+  return false;
+};
+
 /* Table generator */
 jsToolBar.prototype.tableMenu = function(fn){
   var alphabets = "ABCDEFGHIJ".split('');
