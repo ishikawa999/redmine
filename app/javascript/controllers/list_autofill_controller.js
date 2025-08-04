@@ -33,19 +33,23 @@ class ListAutofillHandler {
 
     event.preventDefault()
 
-    if (result.action === "remove") {
-      const beforeLine = value.slice(0, lineStartPos)
-      const afterCursor = value.slice(selectionStart)
-      this.input.value = beforeLine + afterCursor
-      this.input.setSelectionRange(lineStartPos, lineStartPos)
-    }
+    switch (result.action) {
+      case "remove":
+        const beforeLine = value.slice(0, lineStartPos)
+        const afterCursor = value.slice(selectionStart)
+        this.input.value = beforeLine + afterCursor
+        this.input.setSelectionRange(lineStartPos, lineStartPos)
+        break
 
-    if (result.action === "insert") {
-      const insertText = "\n" + result.text
-      const newValue = value.slice(0, selectionStart) + insertText + value.slice(selectionStart)
-      const newCursor = selectionStart + insertText.length
-      this.input.value = newValue
-      this.input.setSelectionRange(newCursor, newCursor)
+      case "insert":
+        const insertText = "\n" + result.text
+        const newValue = value.slice(0, selectionStart) + insertText + value.slice(selectionStart)
+        const newCursor = selectionStart + insertText.length
+        this.input.value = newValue
+        this.input.setSelectionRange(newCursor, newCursor)
+        break
+      default:
+        return
     }
   }
 }
