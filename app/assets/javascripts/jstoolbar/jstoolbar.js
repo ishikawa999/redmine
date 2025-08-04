@@ -509,7 +509,9 @@ jsToolBar.prototype.headingMenu = function(fn){
   var headings = [
     {key: 'h1', label: 'Heading 1'},
     {key: 'h2', label: 'Heading 2'},
-    {key: 'h3', label: 'Heading 3'}
+    {key: 'h3', label: 'Heading 3'},
+    {key: 'h4', label: 'Heading 4'},
+    {key: 'h5', label: 'Heading 5'},
   ];
   var menu = $("<ul style='position:absolute;'></ul>");
   for (var i = 0; i < headings.length; i++) {

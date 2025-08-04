@@ -75,6 +75,12 @@ jsToolBar.prototype.elements.heading = {
           case 'h3':
             prefix = 'h3. ';
             break;
+          case 'h4':
+            prefix = 'h4. ';
+            break;
+          case 'h5':
+            prefix = 'h5. ';
+            break;
         }
 
         This.encloseLineSelection(prefix, '', function(str) {
