@@ -52,7 +52,15 @@ module ApplicationHelper
 
   # Displays a link to user's account page if active
   def link_to_user(user, options={})
-    user.is_a?(User) ? link_to_principal(user, options) : h(user.to_s)
+    if user.is_a?(User)
+      if options.delete(:with_icon)
+        # Add user icon explicitly instead of using principal_icon
+        options[:prepend_icon] = 'user'
+      end
+      link_to_principal(user, options)
+    else
+      h(user.to_s)
+    end
   end
 
   # Displays a link to user's account page or group page
@@ -76,7 +84,14 @@ module ApplicationHelper
     end
 
     css_classes += " #{options[:class]}" if css_classes && options[:class].present?
-    url ? link_to(principal_icon(principal).to_s + name, url, :class => css_classes) : h(name)
+
+    icon = if options[:prepend_icon]
+      sprite_icon(options[:prepend_icon]).html_safe + " ".html_safe
+    else
+      principal_icon(principal).to_s
+    end
+
+    url ? link_to(icon + name, url, :class => css_classes) : h(name)
   end
 
   # Displays a link to edit group page if current user is admin
@@ -115,7 +130,7 @@ module ApplicationHelper
       end
     end
     only_path = options[:only_path].nil? ? true : options[:only_path]
-    s = link_to(text, issue_url(issue, :only_path => only_path),
+    s = link_to(sprite_icon('issue').html_safe + " ".html_safe + text, issue_url(issue, :only_path => only_path),
                 :class => issue.css_classes, :title => title)
     s << h(": #{subject}") if subject
     s = h("#{issue.project} - ") + s if options[:project]
@@ -168,8 +183,12 @@ module ApplicationHelper
 
   # Generates a link to a message
   def link_to_message(message, options={}, html_options = nil)
+    text = message.subject.truncate(60)
+    if html_options && html_options.delete(:with_icon)
+      text = sprite_icon('comment').html_safe + " ".html_safe + text
+    end
     link_to(
-      message.subject.truncate(60),
+      text,
       board_message_url(message.board_id, message.parent_id || message.id, {
         :r => (message.parent_id && message.id),
         :anchor => (message.parent_id ? "message-#{message.id}" : nil),
@@ -187,10 +206,14 @@ module ApplicationHelper
   #   link_to_project(project, {}, :class => "project") # => html options with default url (project overview)
   #
   def link_to_project(project, options={}, html_options = nil)
+    text = project.name
+    if html_options && html_options.delete(:with_icon)
+      text = sprite_icon('projects').html_safe + " ".html_safe + text
+    end
     if project.archived?
-      h(project.name)
+      h(text)
     else
-      link_to project.name,
+      link_to text,
               project_url(project, {:only_path => true}.merge(options)),
               html_options
     end
@@ -1002,7 +1025,7 @@ module ApplicationHelper
       title_and_alt_re = /\s+(title|alt)="([^"]*)"/i
 
       text.gsub!(/src="([^\/"]+\.(bmp|gif|jpg|jpe|jpeg|png|webp))"([^>]*)/i) do |m|
-        filename, ext, other_attrs = $1, $2, $3
+        filename, _ext, other_attrs = $1, $2, $3
 
         # search for the picture in attachments
         if found = Attachment.latest_attach(attachments, CGI.unescape(filename))
@@ -1206,12 +1229,12 @@ module ApplicationHelper
                 url = issue_url(issue, :only_path => only_path, :anchor => anchor)
                 link =
                   if sep == '##'
-                    link_to("#{issue.tracker.name} ##{oid}#{comment_suffix}: #{issue.subject}",
+                    link_to(sprite_icon('issue').html_safe + " ".html_safe + "#{issue.tracker.name} ##{oid}#{comment_suffix}: #{issue.subject}",
                             url,
                             :class => issue.css_classes,
                             :title => "#{l(:field_status)}: #{issue.status.name}")
                   else
-                    link_to("##{oid}#{comment_suffix}",
+                    link_to(sprite_icon('issue').html_safe + " ".html_safe + "##{oid}#{comment_suffix}",
                             url,
                             :class => issue.css_classes,
                             :title => "#{issue.tracker.name}: #{issue.subject.truncate(100)} (#{issue.status.name})")
@@ -1221,58 +1244,60 @@ module ApplicationHelper
               end
             when 'document'
               if document = Document.visible.find_by_id(oid)
-                link = link_to(document.title,
+                link = link_to(sprite_icon('document').html_safe + " ".html_safe + document.title,
                                document_url(document, :only_path => only_path),
                                :class => 'document')
               end
             when 'version'
               if version = Version.visible.find_by_id(oid)
-                link = link_to(version.name, version_url(version, :only_path => only_path), :class => 'version')
+                link = link_to(sprite_icon('package').html_safe + " ".html_safe + version.name, version_url(version, :only_path => only_path), :class => 'version')
               end
             when 'message'
               if message = Message.visible.find_by_id(oid)
-                link = link_to_message(message, {:only_path => only_path}, :class => 'message')
+                # Since link_to_message is a helper method, we need to modify it separately
+                link = link_to_message(message, {:only_path => only_path}, :class => 'message', :with_icon => true)
               end
             when 'forum'
               if board = Board.visible.find_by_id(oid)
-                link = link_to(board.name,
+                link = link_to(sprite_icon('message').html_safe + " ".html_safe + board.name,
                                project_board_url(board.project, board, :only_path => only_path),
                                :class => 'board')
               end
             when 'news'
               if news = News.visible.find_by_id(oid)
-                link = link_to(news.title, news_url(news, :only_path => only_path), :class => 'news')
+                link = link_to(sprite_icon('news').html_safe + " ".html_safe + news.title, news_url(news, :only_path => only_path), :class => 'news')
               end
             when 'project'
               if p = Project.visible.find_by_id(oid)
-                link = link_to_project(p, {:only_path => only_path}, :class => 'project')
+                # Since link_to_project is a helper method, we need to modify it separately
+                link = link_to_project(p, {:only_path => only_path}, :class => 'project', :with_icon => true)
               end
             when 'user'
               u = User.visible.find_by(:id => oid, :type => 'User')
-              link = link_to_user(u, :only_path => only_path) if u
+              link = link_to_user(u, :only_path => only_path, :with_icon => true) if u
             end
           elsif sep == ':'
             name = remove_double_quotes(identifier)
             case prefix
             when 'document'
               if project && document = project.documents.visible.find_by_title(name)
-                link = link_to(document.title,
+                link = link_to(sprite_icon('document').html_safe + " ".html_safe + document.title,
                                document_url(document, :only_path => only_path),
                                :class => 'document')
               end
             when 'version'
               if project && version = project.versions.visible.find_by_name(name)
-                link = link_to(version.name, version_url(version, :only_path => only_path), :class => 'version')
+                link = link_to(sprite_icon('milestone').html_safe + " ".html_safe + version.name, version_url(version, :only_path => only_path), :class => 'version')
               end
             when 'forum'
               if project && board = project.boards.visible.find_by_name(name)
-                link = link_to(board.name,
+                link = link_to(sprite_icon('message').html_safe + " ".html_safe + board.name,
                                project_board_url(board.project, board, :only_path => only_path),
                                :class => 'board')
               end
             when 'news'
               if project && news = project.news.visible.find_by_title(name)
-                link = link_to(news.title, news_url(news, :only_path => only_path), :class => 'news')
+                link = link_to(sprite_icon('news').html_safe + " ".html_safe + news.title, news_url(news, :only_path => only_path), :class => 'news')
               end
             when 'commit', 'source', 'export'
               if project
@@ -1332,11 +1357,11 @@ module ApplicationHelper
               end
             when 'project'
               if p = Project.visible.where("identifier = :s OR LOWER(name) = :s", :s => name.downcase).first
-                link = link_to_project(p, {:only_path => only_path}, :class => 'project')
+                link = link_to_project(p, {:only_path => only_path}, :class => 'project', :with_icon => true)
               end
             when 'user'
               u = User.visible.find_by("LOWER(login) = :s AND type = 'User'", :s => name.downcase)
-              link = link_to_user(u, :only_path => only_path) if u
+              link = link_to_user(u, :only_path => only_path, :with_icon => true) if u
             end
           elsif sep == "@"
             name = remove_double_quotes(identifier)
