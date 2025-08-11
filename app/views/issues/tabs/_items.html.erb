@@ -1,0 +1,105 @@
+<% items.each do |item| %>
+  <% if item.is_a?(Journal) %>
+    <% journal = item %>
+    <div id="change-<%= journal.id %>" class="<%= journal.css_classes %>" data-controller="quote-reply">
+      <div id="note-<%= journal.indice %>" class="note">
+        <h4 class="journal-header">
+          <span class="journal-info">
+            <%= avatar(journal.user) %>
+            <%= authoring journal.created_on, journal.user, :label => :label_updated_time_by %>
+            <%= render_private_notes_indicator(journal) %>
+            <%= render_journal_update_info(journal) %>
+          </span>
+          <span class="journal-meta">
+            <span class="journal-actions">
+              <%= render_journal_actions(issue, journal, :reply_links => reply_links) %>
+            </span>
+            <a href="#note-<%= journal.indice %>" class="journal-link">#<%= journal.indice %></a>
+          </span>
+        </h4>
+        <div class="journal-content">
+          <% if journal.details.any? %>
+            <ul class="journal-details">
+              <% details_to_strings(journal.visible_details).each do |string| %>
+                <li><%= string %></li>
+              <% end %>
+            </ul>
+            <% if Setting.thumbnails_enabled? && (thumbnail_attachments = journal_thumbnail_attachments(journal)).any? %>
+              <div class="thumbnails">
+                <% thumbnail_attachments.each do |attachment| %>
+                  <%= thumbnail_tag(attachment) %>
+                <% end %>
+              </div>
+            <% end %>
+          <% end %>
+          <%= render_notes(issue, journal, :reply_links => reply_links) unless journal.notes.blank? %>
+        </div>
+      </div>
+    </div>
+    <%= call_hook(:view_issues_history_journal_bottom, { :journal => journal }) %>
+  <% elsif item.is_a?(TimeEntry) %>
+    <% time_entry = item %>
+    <div id="time-entry-<%= time_entry.id %>" class="time_entry journal">
+      <h4 class="journal-header">
+          <span class="journal-info">
+            <%= avatar(time_entry.user, :size => "24") %>
+            <%= authoring time_entry.created_on, time_entry.user, :label => :label_added_time_by %>
+          </span>
+        <% if time_entry.editable_by?(User.current) -%>
+            <span class="journal-meta">
+              <%= link_to sprite_icon('edit', l(:button_edit)), edit_time_entry_path(time_entry),
+                          :title => l(:button_edit),
+                          :class => 'icon-only icon-edit' %>
+              <%= link_to sprite_icon('del', l(:button_delete)), time_entry_path(time_entry),
+                          :data => { :confirm => l(:text_are_you_sure) },
+                          :method => :delete,
+                          :title => l(:button_delete),
+                          :class => 'icon-only icon-del' %>
+            </span>
+        <% end -%>
+      </h4>
+      <div class="journal-content">
+        <ul class="journal-details">
+          <li>
+            <strong><%= l(:label_time_entry_plural) %></strong>:
+            <%= l_hours_short time_entry.hours %>
+          </li>
+        </ul>
+        <div class="journal-note">
+          <%= time_entry.comments %>
+        </div>
+      </div>
+    </div>
+    <%= call_hook(:view_issues_history_time_entry_bottom, { :time_entry => time_entry }) %>
+  <% elsif item.is_a?(Changeset) %>
+    <% changeset = item %>
+    <div id="changeset-<%= changeset.id %>" class="changeset journal">
+      <h4 class="journal-header">
+          <span class="journal-info">
+            <%= avatar(changeset.user, :size => "24") %>
+            <%= authoring changeset.committed_on, changeset.author, :label => :label_added_time_by %>
+          </span>
+      </h4>
+      <div class="journal-content">
+        <p>
+          <%= "#{changeset.project.name} - " unless changeset.project == project %>
+          <%= link_to_revision(changeset, changeset.repository,
+                              :text => "#{l(:label_revision)} #{changeset.format_identifier}") %>
+          <% if changeset.filechanges.any? && User.current.allowed_to?(:browse_repository, changeset.project) %>
+            (<%= link_to(l(:label_diff),
+                        :controller => 'repositories',
+                        :action => 'diff',
+                        :id => changeset.project,
+                        :repository_id => changeset.repository.identifier_param,
+                        :path => "",
+                        :rev => changeset.identifier) %>)
+          <% end %>
+        </p>
+        <div class="wiki changeset-comments">
+          <%= format_changeset_comments changeset %>
+        </div>
+      </div>
+    </div>
+    <%= call_hook(:view_issues_history_changeset_bottom, { :changeset => changeset }) %>
+  <% end %>
+<% end %>
