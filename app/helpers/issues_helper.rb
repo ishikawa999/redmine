@@ -108,7 +108,7 @@ module IssuesHelper
 
     table_classes = 'list issues odd-even'
     table_classes += ' with-headers' if Setting.display_related_issues_table_headers?
-    s = +"<table class=\"#{table_classes}\">"
+    s = "<table class=\"#{table_classes}\">".html_safe
 
     if Setting.display_related_issues_table_headers?
       headers = [l(:field_subject)]
