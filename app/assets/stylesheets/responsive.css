@@ -764,33 +764,38 @@
     text-align: left;
   }
 
-  /* subtasks and related issues list on issue show */
-  #issue_tree .issues, #relations .issues {
+  /* subtasks and related issues list on issue show (without headers) */
+  #issue_tree table:not(.with-headers) .issues,
+  #relations table:not(.with-headers) .issues {
     border-collapse: separate;
     border-spacing: 0 1em; /* vertical space between tasks */
   }
 
-  #issue_tree table:not(.with-headers) .issue > td:not(.checkbox), #relations table:not(.with-headers) .issue > td:not(.checkbox) {
+  #issue_tree table:not(.with-headers) .issue > td:not(.checkbox),
+  #relations table:not(.with-headers) .issue > td:not(.checkbox) {
     display: block;
     float: left;
     text-align: left;
     padding-right: 5px;
   }
 
-  #issue_tree table:not(.with-headers) .issue > td.subject, #relations table:not(.with-headers) .issue > td.subject {
+  #issue_tree table:not(.with-headers) .issue > td.subject,
+  #relations table:not(.with-headers) .issue > td.subject {
     width: 100%; /* let subject have one full width column */
   }
 
-  #issue_tree table:not(.with-headers) .issue:has(.buttons a) > td.subject, #relations table:not(.with-headers) .issue:has(.buttons a) > td.subject {
+  #issue_tree table:not(.with-headers) .issue:has(.buttons a) > td.subject,
+  #relations table:not(.with-headers) .issue:has(.buttons a) > td.subject {
     padding-right: 40px;
   }
 
-  #issue_tree table:not(.with-headers) .issue > td:not(.subject), #relations table:not(.with-headers) .issue > td:not(.subject) {
+  #issue_tree table:not(.with-headers) .issue > td:not(.subject),
+  #relations table:not(.with-headers) .issue > td:not(.subject) {
     width: 20%; /* three columns for all cells that are not subject */
   }
 
-  #issue_tree .issues, #issue_tree .issue,
-  #relations .issues, #relations .issue {
+  #issue_tree table:not(.with-headers) .issues, #issue_tree .issue,
+  #relations table:not(.with-headers) .issues, #relations .issue {
     position: relative; /* needed for .buttons positioning */
   }
 
@@ -809,17 +814,15 @@
     vertical-align: middle;
   }
 
-  #issue_tree .issue > td.subject, #relations .issue > td.subject {
-    min-width: 15rem;
-  }
-
-  #issue_tree .subtasks-wrapper:has(table.with-headers), #relations .relation-issues-wrapper:has(table.with-headers) {
+  /* subtasks and related issues list on issue show (with headers) */
+  #issue_tree .subtasks-wrapper:has(table.with-headers),
+  #relations .relation-issues-wrapper:has(table.with-headers) {
     overflow: scroll;
   }
 
-  #issue_tree table.with-headers td, #relations table.with-headers td {
-    white-space: normal;
-    word-break: normal;
+  #issue_tree table.with-headers .issue > td.subject,
+  #relations table.with-headers .issue > td.subject {
+    min-width: 15rem;
   }
 
   /* attachment upload form */
