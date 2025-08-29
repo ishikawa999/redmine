@@ -105,7 +105,10 @@ module IssuesHelper
     columns_list = get_related_issues_columns_for_project(issue)
 
     manage_relations = User.current.allowed_to?(:manage_subtasks, issue.project)
-    s = +'<table class="list issues odd-even">'
+
+    table_classes = 'list issues odd-even'
+    table_classes += ' with-headers' if Setting.display_related_issues_table_headers?
+    s = "<table class=\"#{table_classes}\">"
 
     if Setting.display_related_issues_table_headers?
       headers = [l(:field_subject)]
@@ -251,7 +254,10 @@ module IssuesHelper
       row_content << content_tag('td', buttons, class: 'buttons')
       s << content_tag('tr', row_content, id: "relation-#{relation.id}", class: css)
     end
-    content_tag('table', s, :class => 'list issues odd-even')
+
+    table_classes = 'list issues odd-even'
+    table_classes += ' with-headers' if Setting.display_related_issues_table_headers?
+    content_tag('table', s, :class => table_classes)
   end
 
   def issue_estimated_hours_details(issue)
