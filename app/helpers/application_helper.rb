@@ -1950,6 +1950,23 @@ module ApplicationHelper
     )
   end
 
+  def copy_object_text(issue, journal = nil)
+    raise ArgumentError, "issue must be provided" unless issue.is_a?(Issue)
+
+    data_attributes = {
+      controller: "copy-text",
+      "copy-text-issue-id-value": issue.id,
+      action: "click->copy-text#fetch"
+    }
+
+    data_attributes["copy-text-journal-id-value"] = journal.id if journal
+
+    link_to sprite_icon('copy-text', l(:button_copy_text)),
+            "#",
+            class: "icon icon-copy-text",
+            data: data_attributes
+  end
+
   private
 
   def wiki_helper
