@@ -58,7 +58,8 @@ module UsersHelper
      [l('label_issue_history_properties'), 'properties'],
      [l('label_time_entry_plural'), 'time_entries'],
      [l('label_associated_revisions'), 'changesets'],
-     [l('label_last_tab_visited'), 'last_tab_visited']]
+     [l('label_last_tab_visited'), 'last_tab_visited'],
+     [l('label_timeline'), 'timeline']]
   end
 
   def auto_watch_on_options
