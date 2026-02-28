@@ -54,42 +54,39 @@ jsToolBar.prototype.elements.code = {
   }
 }
 
-// spacer
-jsToolBar.prototype.elements.space1 = {type: 'space'}
 
 // headings
-jsToolBar.prototype.elements.h1 = {
+jsToolBar.prototype.elements.heading = {
   type: 'button',
-  title: 'Heading 1',
+  title: 'Heading',
   fn: {
     wiki: function() {
-      this.encloseLineSelection('h1. ', '',function(str) {
-        str = str.replace(/^h\d+\.\s+/, '')
-        return str;
-      });
-    }
-  }
-}
-jsToolBar.prototype.elements.h2 = {
-  type: 'button',
-  title: 'Heading 2',
-  fn: {
-    wiki: function() {
-      this.encloseLineSelection('h2. ', '',function(str) {
-        str = str.replace(/^h\d+\.\s+/, '')
-        return str;
-      });
-    }
-  }
-}
-jsToolBar.prototype.elements.h3 = {
-  type: 'button',
-  title: 'Heading 3',
-  fn: {
-    wiki: function() {
-      this.encloseLineSelection('h3. ', '',function(str) {
-        str = str.replace(/^h\d+\.\s+/, '')
-        return str;
+      var This = this;
+      this.headingMenu(function(level){
+        var prefix = '';
+
+        switch(level) {
+          case 'h1':
+            prefix = 'h1. ';
+            break;
+          case 'h2':
+            prefix = 'h2. ';
+            break;
+          case 'h3':
+            prefix = 'h3. ';
+            break;
+          case 'h4':
+            prefix = 'h4. ';
+            break;
+          case 'h5':
+            prefix = 'h5. ';
+            break;
+        }
+
+        This.encloseLineSelection(prefix, '', function(str) {
+          str = str.replace(/^h\d+\.\s+/, '');
+          return str;
+        });
       });
     }
   }

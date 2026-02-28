@@ -86,13 +86,17 @@ function jsToolBar(textarea) {
                        // de raccourcis vers les éléments DOM correspondants aux outils.
 }
 
+function getLocalizedString(name) {
+  if (typeof jsToolBar === 'undefined' || typeof jsToolBar.strings === 'undefined') {
+    return name || null;
+  } else {
+    return jsToolBar.strings[name] || name || null;
+  }
+}
+
 function jsTab(name, selected) {
   selected = selected || false;
-  if(typeof jsToolBar.strings == 'undefined') {
-    var tabName = name || null;
-  } else {
-    var tabName = jsToolBar.strings[name] || name || null;
-  }
+  var tabName = getLocalizedString(name);
 
   var tab = document.createElement('li');
   var link = document.createElement('a');
@@ -108,11 +112,7 @@ function jsTab(name, selected) {
   return tab;
 }
 function jsButton(title, fn, scope, className) {
-  if(typeof jsToolBar.strings == 'undefined') {
-    this.title = title || null;
-  } else {
-      this.title = jsToolBar.strings[title] || title || null;
-  }
+  this.title = getLocalizedString(title);
   this.fn = fn || function(){};
   this.scope = scope || null;
   this.className = className || null;
@@ -234,11 +234,7 @@ jsToolBar.prototype = {
     return b;
   },
   buttonTitleWithShortcut: function(title, shortcutKey) {
-    if(typeof jsToolBar.strings == 'undefined') {
-      var i18nTitle = title || null;
-    } else {
-      var i18nTitle = jsToolBar.strings[title] || title || null;
-    }
+    var i18nTitle = getLocalizedString(title);
 
     if (isMac) {
       return i18nTitle + " (⌘" + shortcutKey.toUpperCase() + ")";
@@ -497,6 +493,34 @@ jsToolBar.prototype.precodeMenu = function(fn){
     my: "left top",
     at: "left bottom",
     of: this.toolNodes['precode']
+  });
+  $(document).on("mousedown", function() {
+    menu.remove();
+  });
+  return false;
+};
+
+/* Heading menu */
+jsToolBar.prototype.headingMenu = function(fn){
+  var headings = [
+    {key: 'h1', label: getLocalizedString('Heading 1')},
+    {key: 'h2', label: getLocalizedString('Heading 2')},
+    {key: 'h3', label: getLocalizedString('Heading 3')},
+    {key: 'h4', label: getLocalizedString('Heading 4')},
+    {key: 'h5', label: getLocalizedString('Heading 5')},
+  ];
+  var menu = $("<ul style='position:absolute;'></ul>");
+  for (var i = 0; i < headings.length; i++) {
+    var headingItem = $('<div></div>').text(headings[i].label);
+    $("<li></li>").html(headingItem).appendTo(menu).data('heading-key', headings[i].key).mousedown(function(){
+      fn($(this).data('heading-key'));
+    });
+  }
+  $("body").append(menu);
+  menu.menu().width(150).position({
+    my: "left top",
+    at: "left bottom",
+    of: this.toolNodes['heading']
   });
   $(document).on("mousedown", function() {
     menu.remove();
