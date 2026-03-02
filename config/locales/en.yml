@@ -729,6 +729,7 @@ en:
   label_open_in_full_view: Open in full view
   label_change_status: Change status
   label_history: History
+  label_timeline: Timeline
   label_attachment: File
   label_attachment_new: New file
   label_attachment_delete: Delete file
