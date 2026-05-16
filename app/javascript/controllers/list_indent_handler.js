@@ -1,51 +1,44 @@
 export default class ListIndentHandler {
+  #bulletPattern = /^\s*[*+\-] /
+  #orderedPattern = /^\s*\d+[.)] /
+
   constructor(inputElement, format) {
     this.input = inputElement
     this.format = format
   }
 
   run(event) {
-    if (event.key !== 'Tab') return
+    if (event.key !== 'Tab' || this.format !== 'common_mark') return
 
     const { selectionStart, value } = this.input
-    const beforeCursor = value.slice(0, selectionStart)
-    const lineStart = beforeCursor.lastIndexOf("\n") + 1
-    const currentLine = beforeCursor.slice(lineStart)
-
-    if (!this.#isListLine(currentLine)) return
+    const lineStart = value.lastIndexOf("\n", selectionStart - 1) + 1
+    const currentLine = value.slice(lineStart, selectionStart)
+    const spaces = this.#indentSize(currentLine)
+    if (!spaces) return
 
     event.preventDefault()
-
-    if (event.shiftKey) {
-      this.#unindent(lineStart, currentLine, selectionStart)
-    } else {
-      this.#indent(lineStart, selectionStart)
-    }
+    event.shiftKey
+      ? this.#unindent(lineStart, currentLine, selectionStart, spaces)
+      : this.#indent(lineStart, selectionStart, spaces)
   }
 
-  #isListLine(line) {
-    switch (this.format) {
-      case 'common_mark':
-        return /^\s*[*+\-] /.test(line) || /^\s*\d+[.)] /.test(line)
-      case 'textile':
-        return /^[*#]+ /.test(line)
-      default:
-        return false
-    }
+  #indentSize(line) {
+    if (this.#bulletPattern.test(line)) return 2
+    if (this.#orderedPattern.test(line)) return 4
+    return 0
   }
 
-  #indent(lineStart, cursorPos) {
-    this.input.setRangeText('  ', lineStart, lineStart, 'preserve')
-    this.input.setSelectionRange(cursorPos + 2, cursorPos + 2)
+  #indent(lineStart, cursorPos, spaces) {
+    this.input.setRangeText(' '.repeat(spaces), lineStart, lineStart, 'preserve')
+    this.input.setSelectionRange(cursorPos + spaces, cursorPos + spaces)
   }
 
-  #unindent(lineStart, currentLine, cursorPos) {
-    const match = currentLine.match(/^( {1,2})/)
-    if (!match) return
-
-    const spacesToRemove = match[1].length
-    this.input.setRangeText('', lineStart, lineStart + spacesToRemove, 'preserve')
-    const newCursor = Math.max(lineStart, cursorPos - spacesToRemove)
+  #unindent(lineStart, currentLine, cursorPos, spaces) {
+    const currentIndent = currentLine.match(/^(\s*)/)[1].length
+    const remove = Math.min(spaces, currentIndent)
+    if (remove === 0) return
+    this.input.setRangeText('', lineStart, lineStart + remove, 'preserve')
+    const newCursor = Math.max(lineStart, cursorPos - remove)
     this.input.setSelectionRange(newCursor, newCursor)
   }
 }
