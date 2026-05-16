@@ -1434,7 +1434,7 @@ module ApplicationHelper
 
     {
       controller: 'list-autofill table-paste',
-      action: 'beforeinput->list-autofill#handleBeforeInput paste->table-paste#handlePaste',
+      action: 'beforeinput->list-autofill#handleBeforeInput keydown->list-autofill#handleKeydown paste->table-paste#handlePaste',
       list_autofill_text_formatting_param: Setting.text_formatting,
       table_paste_text_formatting_param: Setting.text_formatting
     }
