@@ -1,5 +1,4 @@
 import { Controller } from '@hotwired/stimulus'
-import ListIndentHandler from 'controllers/list_indent_handler'
 
 class ListAutofillHandler {
   constructor(inputElement, format) {
@@ -139,10 +138,5 @@ export default class extends Controller {
 
     const format = event.params.textFormatting
     new ListAutofillHandler(event.currentTarget, format).run(event)
-  }
-
-  handleKeydown(event) {
-    const format = event.params.textFormatting
-    new ListIndentHandler(event.currentTarget, format).run(event)
   }
 }
