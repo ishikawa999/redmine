@@ -33,6 +33,7 @@ module JournalsHelper
     indice = journal.indice || @journal.issue.visible_journals_with_index.find{|j| j.id == @journal.id}.indice
 
     dropbown_links << copy_object_url_link(issue_url(issue, anchor: "note-#{indice}", only_path: false))
+    dropbown_links << copy_object_text(issue, journal)
     if journal.attachments.size > 1
       dropbown_links << link_to(sprite_icon('download', l(:label_download_all_attachments)),
                                 container_attachments_download_path(journal),
