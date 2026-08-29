@@ -44,6 +44,7 @@ class Issue < ApplicationRecord
 
   has_many :relations_from, :class_name => 'IssueRelation', :foreign_key => 'issue_from_id', :dependent => :delete_all
   has_many :relations_to, :class_name => 'IssueRelation', :foreign_key => 'issue_to_id', :dependent => :delete_all
+  has_many :pins, :as => :pinnable, :dependent => :delete_all
 
   acts_as_attachable :after_add => :attachment_added, :after_remove => :attachment_removed
   acts_as_customizable

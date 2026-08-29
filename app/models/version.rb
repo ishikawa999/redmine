@@ -125,6 +125,7 @@ class Version < ApplicationRecord
 
   belongs_to :project
   has_many :fixed_issues, :class_name => 'Issue', :foreign_key => 'fixed_version_id', :dependent => :nullify, :extend => FixedIssuesExtension
+  has_many :pins, :as => :pinnable, :dependent => :delete_all
 
   acts_as_customizable
   acts_as_attachable :view_permission => :view_files,

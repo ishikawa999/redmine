@@ -53,4 +53,44 @@ class PinTest < ActiveSupport::TestCase
     issue.reload
     assert_equal state_before, [issue.watcher_user_ids.sort, issue.priority_id, issue.assigned_to_id]
   end
+
+  test 'users and supported targets expose their pins' do
+    assert_includes users(:users_002).pins, pins(:issue_pin)
+    assert_includes issues(:issues_002).pins, pins(:issue_pin)
+    assert_includes wiki_pages(:wiki_pages_001).pins, pins(:wiki_page_pin)
+    assert_includes versions(:versions_001).pins, pins(:version_pin)
+  end
+
+  test 'destroying an issue deletes only its pins' do
+    issue_pin_id = pins(:issue_pin).id
+    assert_difference('Pin.count', -1) do
+      issues(:issues_002).destroy!
+    end
+
+    assert_not Pin.exists?(issue_pin_id)
+    assert Pin.exists?(pins(:wiki_page_pin).id)
+    assert Pin.exists?(pins(:version_pin).id)
+  end
+
+  test 'destroying a wiki page deletes only its pins' do
+    wiki_page_pin_id = pins(:wiki_page_pin).id
+    assert_difference('Pin.count', -1) do
+      wiki_pages(:wiki_pages_001).destroy!
+    end
+
+    assert Pin.exists?(pins(:issue_pin).id)
+    assert_not Pin.exists?(wiki_page_pin_id)
+    assert Pin.exists?(pins(:version_pin).id)
+  end
+
+  test 'destroying a version deletes only its pins' do
+    version_pin_id = pins(:version_pin).id
+    assert_difference('Pin.count', -1) do
+      versions(:versions_001).destroy!
+    end
+
+    assert Pin.exists?(pins(:issue_pin).id)
+    assert Pin.exists?(pins(:wiki_page_pin).id)
+    assert_not Pin.exists?(version_pin_id)
+  end
 end
