@@ -11,6 +11,101 @@ class PinsControllerTest < Redmine::ControllerTest
     @request.session[:user_id] = 2
   end
 
+  test 'routes index and preview through separate read endpoints' do
+    assert_routing({method: :get, path: '/pins'},
+                   {controller: 'pins', action: 'index'})
+    assert_routing({method: :get, path: '/pins/preview'},
+                   {controller: 'pins', action: 'preview'})
+  end
+
+  test 'login is required for read actions' do
+    @request.session[:user_id] = nil
+
+    get :index
+    assert_redirected_to signin_url(back_url: pins_url)
+
+    get :preview
+    assert_redirected_to signin_url(back_url: pins_url)
+  end
+
+  test 'index assigns all pins returned by the visible reader' do
+    visible_pins = [pins(:issue_pin), pins(:wiki_page_pin), pins(:version_pin)]
+    Pin::VisibleReader.any_instance.expects(:call).with(limit: nil).returns(visible_pins)
+    @controller.stubs(:default_render)
+
+    get :index
+
+    assert_response :success
+    assert_equal visible_pins, @controller.instance_variable_get(:@pins)
+  end
+
+  test 'index assigns an empty collection when no pin is visible' do
+    Pin::VisibleReader.any_instance.expects(:call).with(limit: nil).returns([])
+
+    get :index
+
+    assert_response :success
+    assert_empty @controller.instance_variable_get(:@pins)
+  end
+
+  test 'preview renders the localized empty state when no pin is visible' do
+    Pin::VisibleReader.any_instance.expects(:call).with(limit: 5).returns([])
+
+    get :preview
+
+    assert_response :success
+    assert_select 'p.nodata', text: I18n.t(:label_no_pinned_items)
+  end
+
+  test 'index excludes invisible and orphaned pins without deleting them' do
+    issue_pin = pins(:issue_pin)
+    orphaned_pin = pins(:wiki_page_pin)
+    Issue.any_instance.stubs(:visible?).with(User.find(2)).returns(false)
+    orphaned_pin.update_columns(pinnable_id: 999_999)
+    @controller.stubs(:default_render)
+
+    assert_no_difference 'Pin.count' do
+      get :index
+    end
+
+    assert_response :success
+    assert_equal [pins(:version_pin)], @controller.instance_variable_get(:@pins)
+    assert Pin.exists?(issue_pin.id)
+    assert Pin.exists?(orphaned_pin.id)
+  end
+
+  test 'preview assigns at most five pins in reader order and returns an html fragment' do
+    ordered_pins = Array.new(5) do |offset|
+      Pin.new(id: 100 + offset, user_id: 2, pinnable_type: 'Issue', pinnable_id: 200 + offset)
+    end
+    Pin::VisibleReader.any_instance.expects(:call).with(limit: 5).returns(ordered_pins)
+
+    get :preview
+
+    assert_response :success
+    assert_equal 'text/html', response.media_type
+    assert_equal ordered_pins, @controller.instance_variable_get(:@pins)
+    assert_not response.body.include?('<html')
+    assert_select 'ul.pin-preview-items' do
+      assert_select 'li.pin-preview-item', count: 5
+    end
+    rendered_items = css_select('li.pin-preview-item')
+    rendered_ids = rendered_items.map {|element| element['data-pin-id'].to_i}
+    assert_equal ordered_pins.map(&:id), rendered_ids
+    assert_equal ordered_pins.map {|pin| "Issue ##{pin.pinnable_id}"}, rendered_items.map(&:text)
+  end
+
+  test 'a preview reader failure is isolated from the full page endpoint' do
+    Pin::VisibleReader.any_instance.stubs(:call).with(limit: 5).raises('preview failed')
+    Pin::VisibleReader.any_instance.stubs(:call).with(limit: nil).returns([])
+
+    assert_raises(RuntimeError) { get :preview }
+
+    get :index
+    assert_response :success
+    assert_empty @controller.instance_variable_get(:@pins)
+  end
+
   test 'routes destroy only through the target identity collection endpoint' do
     assert_routing({method: :delete, path: '/pins'},
                    {controller: 'pins', action: 'destroy'})
