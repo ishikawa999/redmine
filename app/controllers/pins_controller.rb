@@ -12,7 +12,12 @@ class PinsController < ApplicationController
   before_action :find_pinnable, only: :create
 
   def index
-    @pins = visible_pins
+    @pins = visible_pins(limit: nil)
+  end
+
+  def preview
+    @pins = visible_pins(limit: 5)
+    render partial: "preview", layout: false
   end
 
   def create
@@ -40,8 +45,8 @@ class PinsController < ApplicationController
 
   private
 
-  def visible_pins
-    User.current.pins.recent_first.includes(:pinnable).select {|pin| pin.visible?(User.current)}
+  def visible_pins(limit:)
+    Pin::VisibleReader.new(User.current).call(limit: limit)
   end
 
   def set_pinnable_identity
