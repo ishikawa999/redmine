@@ -48,13 +48,50 @@ class PinsControllerTest < Redmine::ControllerTest
     assert_empty @controller.instance_variable_get(:@pins)
   end
 
-  test 'preview renders the localized empty state when no pin is visible' do
-    Pin::VisibleReader.any_instance.expects(:call).with(limit: 5).returns([])
+  test 'preview renders the localized empty state in English and Japanese' do
+    Pin::VisibleReader.any_instance.expects(:call).with(limit: 5).twice.returns([])
+
+    [:en, :ja].each do |locale|
+      I18n.with_locale(locale) do
+        get :preview
+
+        assert_response :success
+        assert_select 'p.nodata', text: I18n.t(:label_no_pinned_items)
+      end
+    end
+  end
+
+  test 'index renders direct escaped links and current project for all target types' do
+    pins = [pins(:issue_pin), pins(:wiki_page_pin), pins(:version_pin)]
+    pins.first.pinnable.subject = '<script>issue</script>'
+    Pin::VisibleReader.any_instance.expects(:call).with(limit: nil).returns(pins)
+
+    get :index
+
+    assert_response :success
+    assert_select 'table.pinned-items tbody tr', count: 3
+    assert_select "a[href='#{issue_path(pins[0].pinnable)}']", text: /<script>issue<\/script>/
+    assert_select "a[href='#{project_wiki_page_path(pins[1].pinnable.project, pins[1].pinnable.title)}']"
+    assert_select "a[href='#{version_path(pins[2].pinnable)}']"
+    assert_not_includes response.body, '<script>issue</script>'
+    pins.each do |pin|
+      assert_select "a[href='#{project_path(pin.pinnable.project)}']", text: pin.pinnable.project.name
+    end
+  end
+
+  test 'preview renders direct escaped links for all target types' do
+    pins = [pins(:issue_pin), pins(:wiki_page_pin), pins(:version_pin)]
+    pins[1].pinnable.title = '<script>wiki</script>'
+    Pin::VisibleReader.any_instance.expects(:call).with(limit: 5).returns(pins)
 
     get :preview
 
     assert_response :success
-    assert_select 'p.nodata', text: I18n.t(:label_no_pinned_items)
+    assert_select 'ul.pin-preview-items li.pin-preview-item', count: 3
+    assert_select "a[href='#{issue_path(pins[0].pinnable)}']"
+    assert_select "a[href='#{project_wiki_page_path(pins[1].pinnable.project, pins[1].pinnable.title)}']"
+    assert_select "a[href='#{version_path(pins[2].pinnable)}']"
+    assert_not_includes response.body, '<script>wiki</script>'
   end
 
   test 'index excludes invisible and orphaned pins without deleting them' do
@@ -75,9 +112,7 @@ class PinsControllerTest < Redmine::ControllerTest
   end
 
   test 'preview assigns at most five pins in reader order and returns an html fragment' do
-    ordered_pins = Array.new(5) do |offset|
-      Pin.new(id: 100 + offset, user_id: 2, pinnable_type: 'Issue', pinnable_id: 200 + offset)
-    end
+    ordered_pins = [pins(:issue_pin), pins(:wiki_page_pin), pins(:version_pin)]
     Pin::VisibleReader.any_instance.expects(:call).with(limit: 5).returns(ordered_pins)
 
     get :preview
@@ -87,12 +122,13 @@ class PinsControllerTest < Redmine::ControllerTest
     assert_equal ordered_pins, @controller.instance_variable_get(:@pins)
     assert_not response.body.include?('<html')
     assert_select 'ul.pin-preview-items' do
-      assert_select 'li.pin-preview-item', count: 5
+      assert_select 'li.pin-preview-item', count: 3
     end
     rendered_items = css_select('li.pin-preview-item')
     rendered_ids = rendered_items.map {|element| element['data-pin-id'].to_i}
     assert_equal ordered_pins.map(&:id), rendered_ids
-    assert_equal ordered_pins.map {|pin| "Issue ##{pin.pinnable_id}"}, rendered_items.map(&:text)
+    assert_equal ordered_pins.map {|pin| @controller.helpers.pin_label(pin.pinnable)},
+                 rendered_items.map {|item| item.at_css('a').text}
   end
 
   test 'a preview reader failure is isolated from the full page endpoint' do

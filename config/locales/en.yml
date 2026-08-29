@@ -1258,6 +1258,13 @@ en:
   button_import: Import
   button_project_bookmark: Add bookmark
   button_project_bookmark_delete: Remove bookmark
+  button_pin: Pin
+  button_unpin: Unpin
+  label_pinned_items: Pinned items
+  label_view_all_pinned_items: View all pinned items
+  label_no_pinned_items: You have not pinned anything yet.
+  label_loading_pinned_items: Loading pinned items…
+  label_pinned_items_load_error: Could not load pinned items.
   button_filter: Filter
   button_actions: Actions
   button_add_subtask: Add subtask

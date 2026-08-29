@@ -1,0 +1,23 @@
+<h2><%= l(:label_pinned_items) %></h2>
+
+<% if @pins.any? %>
+  <div class="autoscroll">
+    <table class="list pinned-items">
+      <thead><tr><th><%= l(:field_type) %></th><th><%= l(:field_name) %></th><th><%= l(:label_project) %></th><th></th></tr></thead>
+      <tbody>
+      <% @pins.each do |pin| %>
+        <tr>
+          <td><%= pin_type_label(pin.pinnable) %></td>
+          <td><%= pin_target_link(pin.pinnable) %></td>
+          <td><%= link_to_project(pin_project(pin.pinnable)) %></td>
+          <td class="buttons"><%= link_to sprite_icon('bookmark-delete', l(:button_unpin)), pins_path(pinnable_type: pin.pinnable_type, pinnable_id: pin.pinnable_id), method: :delete, class: 'icon icon-bookmark' %></td>
+        </tr>
+      <% end %>
+      </tbody>
+    </table>
+  </div>
+<% else %>
+  <p class="nodata"><%= l(:label_no_pinned_items) %></p>
+<% end %>
+
+<% html_title l(:label_pinned_items) %>
