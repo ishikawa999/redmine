@@ -164,6 +164,8 @@ class PinsControllerTest < Redmine::ControllerTest
     end
     assert_response :success
     assert_equal 1, Pin.where(user_id: 2, pinnable_type: 'Issue', pinnable_id: 1).count
+    assert_includes response.body, 'pin-toggle-issue-1'
+    assert_includes response.body, "pin-preview:invalidate"
   end
 
   test 'create redirects HTML back to a safe referring page' do
@@ -251,6 +253,8 @@ class PinsControllerTest < Redmine::ControllerTest
     end
     assert_response :success
     assert_equal 0, Pin.where(user_id: 2, pinnable_type: 'Issue', pinnable_id: 2).count
+    assert_includes response.body, 'pin-toggle-issue-2'
+    assert_includes response.body, "pin-preview:invalidate"
   end
 
   test 'destroy does not reveal or remove another users pin' do

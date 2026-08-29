@@ -80,7 +80,7 @@ class PinsController < ApplicationController
 
   def respond_after_write
     respond_to do |format|
-      format.js { head :ok }
+      format.js
       format.html { redirect_back_or_to pins_path, allow_other_host: false }
     end
   end

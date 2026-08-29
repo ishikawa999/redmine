@@ -5,15 +5,19 @@ module PinsHelper
     return ''.html_safe unless User.current.logged?
 
     pin = User.current.pins.find_by(pinnable: pinnable)
+    identity = {
+      pinnable_type: pinnable.class.base_class.name,
+      pinnable_id: pinnable.id
+    }
+
     if pin
-      link_to sprite_icon('bookmark-delete', l(:button_unpin)), pins_path(
-        pinnable_type: pinnable.class.base_class.name, pinnable_id: pinnable.id
-      ),
-              remote: true, method: :delete, class: 'icon icon-bookmark pin-toggle'
+      button_to sprite_icon('bookmark-delete', l(:button_unpin)), pins_path,
+                method: :delete, params: identity, remote: true,
+                class: 'icon icon-bookmark pin-toggle', form: {class: 'pin-toggle-form inline-block'}
     else
-      link_to sprite_icon('bookmark-add', l(:button_pin)), pins_path(
-        pinnable_type: pinnable.class.base_class.name, pinnable_id: pinnable.id
-      ), remote: true, method: :post, class: 'icon icon-bookmark-off pin-toggle'
+      button_to sprite_icon('bookmark-add', l(:button_pin)), pins_path,
+                method: :post, params: identity, remote: true,
+                class: 'icon icon-bookmark-off pin-toggle', form: {class: 'pin-toggle-form inline-block'}
     end
   end
 

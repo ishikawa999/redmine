@@ -5,8 +5,35 @@ require_relative '../test_helper'
 class PinsHelperTest < Redmine::HelperTest
   include PinsHelper
 
-  fixtures :issues, :projects, :trackers, :issue_statuses, :enumerations,
+  fixtures :pins, :users, :issues, :projects, :members, :member_roles, :roles,
+           :trackers, :issue_statuses, :enumerations,
            :wikis, :wiki_pages, :versions
+
+  test 'renders progressively enhanced create and identity delete forms for every target type' do
+    User.current = users(:users_002)
+    targets = [issues(:issues_001), wiki_pages(:wiki_pages_001), versions(:versions_001)]
+
+    targets.each do |target|
+      type = target.class.base_class.name
+      User.current.pins.where(pinnable: target).delete_all
+
+      assert_select_in pin_link(target), "form[action='#{pins_path}'][method='post'][data-remote='true']" do
+        assert_select "input[name='pinnable_type'][value='#{type}']"
+        assert_select "input[name='pinnable_id'][value='#{target.id}']"
+        assert_select '.pin-toggle.icon-bookmark-off'
+      end
+
+      User.current.pins.create!(pinnable: target)
+      assert_select_in pin_link(target), "form[action='#{pins_path}'][method='post'][data-remote='true']" do
+        assert_select "input[name='_method'][value='delete']"
+        assert_select "input[name='pinnable_type'][value='#{type}']"
+        assert_select "input[name='pinnable_id'][value='#{target.id}']"
+        assert_select '.pin-toggle.icon-bookmark'
+      end
+    end
+  ensure
+    User.current = nil
+  end
 
   test 'resolves current display information for every supported target type' do
     issue = issues(:issues_001)

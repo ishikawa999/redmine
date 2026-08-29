@@ -129,16 +129,26 @@ class VersionsControllerTest < Redmine::ControllerTest
   end
 
   def test_show
+    @request.session[:user_id] = 2
     with_settings :gravatar_enabled => '0' do
       get :show, :params => {:id => 2}
       assert_response :success
 
       assert_select 'h2', :text => /1.0/
       assert_select 'span[class=?]', 'badge badge-status-locked', :text => 'locked'
+      assert_select '#pin-toggle-version-2 form[action="/pins"]', :count => 1
 
       # no issue avatar when gravatar is disabled
       assert_select 'img.gravatar', :count => 0
     end
+  end
+
+  def test_roadmap_does_not_show_version_pin_controls
+    @request.session[:user_id] = 2
+    get :index, :params => {:project_id => 1}
+
+    assert_response :success
+    assert_select '[id^="pin-toggle-version-"]', :count => 0
   end
 
   def test_show_should_show_issue_assignee

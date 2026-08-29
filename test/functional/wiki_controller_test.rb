@@ -63,6 +63,14 @@ class WikiControllerTest < Redmine::ControllerTest
     end
   end
 
+  def test_show_page_displays_pin_form_only_on_the_detail
+    @request.session[:user_id] = 2
+    get :show, :params => {:project_id => 1, :id => 'Another_page'}
+
+    assert_response :success
+    assert_select '[id^="pin-toggle-wiki-page-"] form[action="/pins"][method="post"]', :count => 1
+  end
+
   def test_show_old_version
     with_settings :default_language => 'en' do
       get :show, :params => {:project_id => 'ecookbook', :id => 'CookBook_documentation', :version => '2'}
