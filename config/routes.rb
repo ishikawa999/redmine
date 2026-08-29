@@ -69,6 +69,9 @@ Rails.application.routes.draw do
   end
 
   resources :reactions, only: [:create, :destroy]
+  resources :pins, only: [:index, :create] do
+    delete :destroy, on: :collection, path: ''
+  end
 
   get '/projects/:project_id/issues/gantt', :to => 'gantts#show', :as => 'project_gantt'
   get '/issues/gantt', :to => 'gantts#show'
