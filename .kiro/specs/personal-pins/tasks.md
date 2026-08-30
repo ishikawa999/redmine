@@ -114,7 +114,7 @@
   - _Requirements: 4.8, 4.9, 4.10, 4.11, 4.12, 4.13, 6.6, 6.7_
   - _Boundary: System Validation Preview_
 
-- [ ] 5.3 mobile・権限変化・性能境界をE2E検証する
+- [x] 5.3 mobile・権限変化・性能境界をE2E検証する
   - 小画面flyoutではpreview取得なしで一覧へ直接遷移することを検証する
   - 通常画面初期表示にpreview requestとPin内容queryがなく、preview障害時も通常操作できることを検証する
   - 権限喪失・回復、対象削除、終了・ロック状態、閉鎖project、共有Version所有project不可視を検証する
