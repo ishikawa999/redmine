@@ -105,7 +105,7 @@
   - _Requirements: 1.1, 1.2, 1.3, 1.4, 2.1, 2.2, 2.3, 2.4, 2.5, 2.6, 3.1, 3.2, 3.3, 3.4, 4.2, 4.3, 4.4, 4.5, 4.6, 4.7, 5.5, 6.3, 6.4_
   - _Boundary: System Validation Detail and List_
 
-- [ ] 5.2 desktopプレビューの操作性と障害耐性をE2E検証する
+- [x] 5.2 desktopプレビューの操作性と障害耐性をE2E検証する
   - pointerとkeyboard focusによるloadingからsuccess/empty/errorへの遷移を検証する
   - 最新5件の順序、対象への直接遷移、Escapeと離脱、親一覧リンクを検証する
   - 同一ページでの再表示が再取得せず、Pin変更後だけ再取得することを検証する

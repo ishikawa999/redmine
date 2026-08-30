@@ -45,7 +45,7 @@ export default class extends Controller {
     this.previewTarget.classList.add("is-open")
 
     if (this.cachedHTML !== null) {
-      this.previewTarget.innerHTML = this.cachedHTML
+      // Keep existing links intact when focus moves inside the preview.
       this.renderState(this.cachedHTMLHasItems() ? "loaded" : "empty")
     } else if (this.state === "idle") {
       this.load()
