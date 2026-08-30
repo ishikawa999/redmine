@@ -76,7 +76,7 @@
   - _Requirements: 4.1, 4.7, 6.5, 6.6_
   - _Boundary: Navigation Integration_
 
-- [ ] 4.2 hover・focus対応のプレビュー状態管理を実装する
+- [x] 4.2 hover・focus対応のプレビュー状態管理を実装する
   - pointer enterとfocus inでdesktopだけpreviewを開き、idle時だけ取得を開始する
   - loading、loaded、empty、errorを領域内で切り替え、取得済み内容は同じページで再利用する
   - pointer/focus離脱とEscapeで閉じ、内部移動では閉じず、親リンクとpreview内リンクの通常遷移を妨げない
