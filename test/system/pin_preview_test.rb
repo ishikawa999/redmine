@@ -31,6 +31,18 @@ class PinPreviewTest < ApplicationSystemTestCase
     assert_equal 2, fetch_count
   end
 
+  def test_desktop_hover_loads_server_fragment_and_preview_link_navigates_to_target
+    preview_menu.hover
+
+    assert_selector '.pin-preview.is-open[data-state="loaded"] .pin-preview-item'
+    target_link = find('.pin-preview-item a', match: :first, visible: :all)
+    first_target_path = target_link[:href]
+    page.execute_script('arguments[0].click()', target_link)
+
+    assert_current_path URI(first_target_path).path
+    assert_no_current_path '/pins'
+  end
+
   def test_focus_escape_and_error_keep_parent_link_available
     install_fetch_stub('', ok: false)
 
@@ -63,6 +75,27 @@ class PinPreviewTest < ApplicationSystemTestCase
     assert_equal 0, fetch_count
     assert_selector '.pin-preview:not(.is-open)', visible: :all
     assert parent_link[:href].end_with?('/pins')
+  end
+
+  def test_mobile_parent_click_navigates_to_list_without_preview_request
+    page.current_window.resize_to(500, 800)
+    find('.mobile-toggle-button').click
+    page.execute_script(<<~JS)
+      window.sessionStorage.setItem('pinPreviewFetchCount', '0');
+      const originalFetch = window.fetch;
+      window.fetch = function(...args) {
+        if (String(args[0]).includes('/pins/preview')) {
+          const count = Number(window.sessionStorage.getItem('pinPreviewFetchCount'));
+          window.sessionStorage.setItem('pinPreviewFetchCount', String(count + 1));
+        }
+        return originalFetch.apply(this, args);
+      };
+    JS
+
+    find('.flyout-menu a.pinned-items').click
+
+    assert_current_path '/pins'
+    assert_equal 0, page.evaluate_script("Number(window.sessionStorage.getItem('pinPreviewFetchCount'))")
   end
 
   private
