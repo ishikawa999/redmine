@@ -67,7 +67,7 @@
   - _Boundary: Detail Integration_
 
 - [ ] 4. トップナビゲーションと遅延プレビューを統合する
-- [ ] 4.1 ピン導線をトップメニューのマイページ直後へ配置する
+- [x] 4.1 ピン導線をトップメニューのマイページ直後へ配置する
   - account menuから既存導線を除き、ログイン時だけtop menuのMy page直後へ登録する
   - ピン項目だけに専用wrapperとpreview領域を与え、標準MenuManagerの他項目へ影響させない
   - 既存responsive移送後も一般flyout内で通常の一覧リンクとして機能するDOM契約にする

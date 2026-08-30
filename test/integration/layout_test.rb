@@ -53,6 +53,41 @@ class LayoutTest < Redmine::IntegrationTest
     end
   end
 
+  def test_logged_in_top_menu_contains_pinned_items_after_my_page_but_account_menu_does_not
+    log_user('jsmith', 'jsmith')
+    get '/'
+
+    assert_select '#top-menu .general-menu > .top-menu__links > ul' do
+      assert_select 'li:has(> a.my-page) + li.pinned-items-menu[data-pin-preview-url-value="/pins/preview"]' do
+        assert_select 'a.pinned-items[href="/pins"]', count: 1
+        assert_select '.pin-preview', count: 1
+      end
+    end
+    assert_select '#account a.pinned-items', count: 0
+  end
+
+  def test_guest_top_menu_does_not_contain_pinned_items
+    with_settings login_required: '0' do
+      get '/'
+      assert_select '#top-menu a.pinned-items', count: 0
+    end
+  end
+
+  def test_initial_layout_does_not_query_pin_content
+    log_user('jsmith', 'jsmith')
+    pin_queries = []
+    subscriber = ActiveSupport::Notifications.subscribe('sql.active_record') do |*, payload|
+      pin_queries << payload[:sql] if payload[:sql].match?(/\bFROM\s+["`]?pins["`]?/i)
+    end
+
+    get '/'
+
+    assert_response :success
+    assert_empty pin_queries
+  ensure
+    ActiveSupport::Notifications.unsubscribe(subscriber) if subscriber
+  end
+
   def test_wiki_formatter_header_tags
     Role.anonymous.add_permission! :add_issues
 

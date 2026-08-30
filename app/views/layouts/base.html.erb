@@ -59,7 +59,7 @@
 <nav class="top-menu" id="top-menu">
   <div class="general-menu">
     <div class="top-menu__links">
-        <%= render_menu :top_menu if User.current.logged? || !Setting.login_required? -%>
+        <%= render_top_menu if User.current.logged? || !Setting.login_required? -%>
     </div>
   </div>
 

@@ -21,6 +21,7 @@ require 'forwardable'
 require 'cgi'
 
 module ApplicationHelper
+  include PinMenuHelper
   include Redmine::WikiFormatting::Macros::Definitions
   include Redmine::I18n
   include Redmine::Pagination::Helper
