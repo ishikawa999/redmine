@@ -86,7 +86,7 @@
   - _Requirements: 4.8, 4.9, 4.10, 4.11, 4.12, 4.13, 6.5, 6.6, 6.7_
   - _Boundary: PinPreviewController_
 
-- [ ] 4.3 ナビゲーションとpreviewの各境界を結合する
+- [x] 4.3 ナビゲーションとpreviewの各境界を結合する
   - menu wrapper、遅延取得endpoint、fragment、クライアント状態、専用styleを接続する
   - desktopの親導線は一覧へ、preview項目は対象へ直接遷移し、mobileの導線はpreviewなしで一覧へ遷移させる
   - 通常ページ初期描画はPin内容を問い合わせず、preview取得失敗時も現在ページを維持する
