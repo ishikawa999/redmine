@@ -77,13 +77,17 @@ class LayoutTest < Redmine::IntegrationTest
     log_user('jsmith', 'jsmith')
     pin_queries = []
     subscriber = ActiveSupport::Notifications.subscribe('sql.active_record') do |*, payload|
-      pin_queries << payload[:sql] if payload[:sql].match?(/\bFROM\s+["`]?pins["`]?/i)
+      pin_queries << payload[:sql] if payload[:sql].match?(/\b(?:FROM|JOIN)\s+["`]?pins["`]?\b/i)
     end
 
-    get '/'
+    ['/', '/projects/ecookbook', '/my/page'].each do |path|
+      pin_queries.clear
+      get path
 
-    assert_response :success
-    assert_empty pin_queries
+      assert_response :success
+      assert_select '.pin-preview-item', count: 0
+      assert_empty pin_queries, "Initial GET #{path} must not query pin content"
+    end
   ensure
     ActiveSupport::Notifications.unsubscribe(subscriber) if subscriber
   end
