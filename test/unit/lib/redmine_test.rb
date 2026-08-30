@@ -55,6 +55,12 @@ class RedmineTest < ActiveSupport::TestCase
     assert_menu_contains_item_named :account_menu, :logout
   end
 
+  def test_top_menu_places_pinned_items_immediately_after_my_page
+    names = Redmine::MenuManager.items(:top_menu).root.children.map(&:name)
+
+    assert_equal :pinned_items, names[names.index(:my_page) + 1]
+  end
+
   def test_application_menu
     assert_number_of_items_in_menu :application_menu, 0
   end
