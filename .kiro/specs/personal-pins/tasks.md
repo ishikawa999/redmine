@@ -138,3 +138,4 @@
 - 5.4の関連7 system suite合同実行でChrome renderer切断と無効session再利用による連鎖エラーを観測した。初発原因は未確定。全7ファイルを独立プロセスで実行すると61 tests / 633 assertionsが成功した。合同実行の安定性や環境障害の根治を示す結果ではない。
 - 関連非system回帰1123 tests / 5514 assertionsは成功、既存skip4件（SQLite日付集計3件、ImageMagick未導入1件）。Pin固有の検証skipなし。
 - 全タスクの個別レビューは承認済み。機能全体のGOは別途kiro-validate-implの全体テスト・起動確認に依存する。
+- 最終検証で通常HTML解除、preview CSS、Query fixture、キーボード入力、SVGボタン表示、mobileテストのviewport漏れを是正。最終是正round 3はChrome inspectorエラー2件が残り独立レビューREJECTED。機能全体はNO-GOであり、チェック済みタスクを最終承認と解釈しない。詳細はvalidation.md。

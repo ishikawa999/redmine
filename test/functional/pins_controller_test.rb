@@ -70,6 +70,8 @@ class PinsControllerTest < Redmine::ControllerTest
 
     assert_response :success
     assert_select 'table.pinned-items tbody tr', count: 3
+    assert_select 'table.pinned-items button svg.icon-svg', count: 3
+    assert_select 'table.pinned-items button', text: 'Unpin', count: 3
     assert_select "a[href='#{issue_path(pins[0].pinnable)}']", text: /<script>issue<\/script>/
     assert_select "a[href='#{project_wiki_page_path(pins[1].pinnable.project, pins[1].pinnable.title)}']"
     assert_select "a[href='#{version_path(pins[2].pinnable)}']"
