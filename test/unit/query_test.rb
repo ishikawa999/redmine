@@ -3450,6 +3450,7 @@ class QueryTest < ActiveSupport::TestCase
   end
 
   def test_assigned_to_values_should_be_sorted_by_status_and_name
+    Pin.delete_all
     User.delete_all
     20.times do |i|
       str = format('%03d', i)

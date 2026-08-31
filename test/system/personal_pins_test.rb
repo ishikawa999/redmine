@@ -105,7 +105,7 @@ class PersonalPinsTest < ApplicationSystemTestCase
 end
 
 class PersonalPinsNoJavascriptTest < ActionDispatch::SystemTestCase
-  driven_by :rack_test
+  driven_by :rack_test, options: {respect_data_method: false}
 
   setup do
     Pin.delete_all
@@ -125,7 +125,7 @@ class PersonalPinsNoJavascriptTest < ActionDispatch::SystemTestCase
     assert_current_path '/pins'
     assert_link '#2 Add ingredients categories', href: '/issues/2'
 
-    click_link 'Unpin'
+    click_button 'Unpin'
     assert_current_path '/pins'
     assert_text 'You have not pinned anything yet.'
   end
