@@ -11,13 +11,15 @@ module PinsHelper
     }
 
     if pin
-      button_to sprite_icon('bookmark-delete', l(:button_unpin)), pins_path,
-                method: :delete, params: identity, remote: true,
-                class: 'icon icon-bookmark pin-toggle', form: {class: 'pin-toggle-form inline-block'}
+      button_to pins_path, method: :delete, params: identity, remote: true,
+                class: 'icon icon-bookmark pin-toggle', form: {class: 'pin-toggle-form inline-block'} do
+        sprite_icon('bookmark-delete', l(:button_unpin))
+      end
     else
-      button_to sprite_icon('bookmark-add', l(:button_pin)), pins_path,
-                method: :post, params: identity, remote: true,
-                class: 'icon icon-bookmark-off pin-toggle', form: {class: 'pin-toggle-form inline-block'}
+      button_to pins_path, method: :post, params: identity, remote: true,
+                class: 'icon icon-bookmark-off pin-toggle', form: {class: 'pin-toggle-form inline-block'} do
+        sprite_icon('bookmark-add', l(:button_pin))
+      end
     end
   end
 

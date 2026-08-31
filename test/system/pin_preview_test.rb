@@ -9,6 +9,10 @@ class PinPreviewTest < ApplicationSystemTestCase
     visit '/projects/ecookbook'
   end
 
+  teardown do
+    page.current_window.resize_to(1024, 900)
+  end
+
   [:pointer, :keyboard].each do |input|
     [:loaded, :empty, :error].each do |state|
       define_method("test_#{input}_loading_transitions_to_#{state}") do
