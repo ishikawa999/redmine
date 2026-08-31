@@ -31,10 +31,24 @@
   color: var(--oc-red-8);
 }
 
-.pin-preview-items {
+.top-menu__links .pin-preview-items {
+  display: block;
   margin: 0;
   padding: 0;
   list-style: none;
+}
+
+.top-menu__links .pin-preview a,
+.top-menu__links .pin-preview a:link,
+.top-menu__links .pin-preview a:visited {
+  color: var(--oc-blue-8);
+}
+
+.top-menu__links .pin-preview a:hover,
+.top-menu__links .pin-preview a:focus {
+  color: var(--oc-blue-9);
+  background-color: var(--oc-gray-1);
+  text-decoration: underline;
 }
 
 .pin-preview-item + .pin-preview-item {

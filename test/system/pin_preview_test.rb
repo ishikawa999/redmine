@@ -93,13 +93,27 @@ class PinPreviewTest < ApplicationSystemTestCase
     assert_selector '.pin-preview:not(.is-open)', visible: :all
 
     # Shift-Tab returns from the second item to the parent after the hidden preview.
-    page.send_keys([:shift, :tab])
+    page.driver.browser.action.key_down(:shift).send_keys(:tab).key_up(:shift).perform
     assert_selector 'a.pinned-items:focus'
     assert_selector '.pin-preview.is-open[data-state="loaded"]'
     assert_equal 1, fetch_count
     4.times { page.send_keys(:tab) }
     assert_no_selector 'li.pinned-items-menu a:focus'
     assert_selector '.pin-preview:not(.is-open)', visible: :all
+  end
+
+  def test_preview_styles_do_not_inherit_top_navigation_layout_and_colors
+    preview_menu.hover
+    assert_selector '.pin-preview-item', count: 3
+    list = find('.pin-preview-items')
+    link = find('.pin-preview-item a', match: :first)
+
+    assert_equal 'block', list.style('display')['display']
+    assert_equal 'rgba(25, 113, 194, 1)', link.style('color')['color']
+    items = all('.pin-preview-item')
+    assert_operator items[1].native.rect.y, :>=, items[0].native.rect.y + items[0].native.rect.height
+    link.hover
+    assert_selector '.pin-preview-item a:hover', style: {color: 'rgba(24, 100, 171, 1)'}
   end
 
   def test_keyboard_preview_links_navigate_directly_to_each_target_type
