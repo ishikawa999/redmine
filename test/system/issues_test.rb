@@ -128,6 +128,7 @@ class IssuesSystemTest < ApplicationSystemTestCase
     end
     assert_difference 'Issue.count' do
       find('input[name=commit]').click
+      assert_current_path %r{\A/issues/\d+\z}, :ignore_query => true
       assert_text /Issue #\d+ created./
     end
 
@@ -186,7 +187,10 @@ class IssuesSystemTest < ApplicationSystemTestCase
           fill_in 'Name', :with => '4.0'
           click_on 'Create'
         end
-        click_on 'Create'
+        assert_no_selector '#ajax-modal', :visible => true
+        assert_selector :select, 'Target version', :selected => '4.0'
+        within('#issue-form') { click_on 'Create' }
+        assert_current_path %r{\A/issues/\d+\z}, :ignore_query => true
         assert_text /Issue #\d+ created./
       end
     end

@@ -2253,6 +2253,7 @@ class IssuesControllerTest < Redmine::ControllerTest
     get(:show, :params => {:id => 1})
     assert_select 'a', :text => /Quote/
     assert_select '#content>.contextual:first-child' do
+      assert_select '#pin-toggle-issue-1 form[action="/pins"][method="post"]', :count => 1
       assert_select 'a', {:count => 1, :text => 'Edit'}
       assert_select 'a', {:count => 1, :text => 'Log time'}
       assert_select 'a', {:count => 1, :text => 'Watch'}

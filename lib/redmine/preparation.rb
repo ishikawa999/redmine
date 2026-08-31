@@ -170,6 +170,9 @@ module Redmine
         menu.push :home, :home_path
         menu.push :my_page, {:controller => 'my', :action => 'page'},
                   :if => Proc.new {User.current.logged?}
+        menu.push :pinned_items, :pins_path,
+                  :if => Proc.new {User.current.logged?},
+                  :caption => :label_pinned_items
         menu.push :projects, {:controller => 'projects', :action => 'index'},
                   :caption => :label_project_plural
         menu.push :administration, {:controller => 'admin', :action => 'index'},

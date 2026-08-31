@@ -1,0 +1,13 @@
+<% if @pins.any? %>
+  <ul class="pin-preview-items">
+    <% @pins.each do |pin| %>
+      <li class="pin-preview-item" data-pin-id="<%= pin.id %>">
+        <%= pin_target_link(pin.pinnable) %>
+        <span class="pin-preview-type"><%= pin_type_label(pin.pinnable) %></span>
+        <span class="pin-preview-project"><%= pin_project(pin.pinnable).name %></span>
+      </li>
+    <% end %>
+  </ul>
+<% else %>
+  <p class="nodata"><%= l(:label_no_pinned_items) %></p>
+<% end %>

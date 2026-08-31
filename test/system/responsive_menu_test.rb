@@ -44,6 +44,10 @@ class ResponsiveMenuTest < ApplicationSystemTestCase
     # 5. Verify elements are detached, appended to flyout slots, and visible
     assert_selector '.flyout-menu .js-project-menu ul'
     assert_selector '.flyout-menu .js-general-menu ul'
+    assert_selector '.flyout-menu .js-general-menu ul > li.pinned-items-menu' do
+      assert_selector 'a.pinned-items[href="/pins"]'
+      assert_selector '.pin-preview[data-pin-preview-target="preview"]', visible: :all
+    end
     assert_selector '.flyout-menu .js-profile-menu ul'
 
     # 6. Click outside (#main) to close the flyout
