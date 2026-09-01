@@ -391,6 +391,11 @@
       <path d="M3 16l5 -5c.928 -.893 2.072 -.893 3 0l5 5"/>
       <path d="M14 14l1 -1c.928 -.893 2.072 -.893 3 0l3 3"/>
     </symbol>
+    <symbol viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round" id="icon--pin">
+      <path d="M15 4.5l-4 4l-4 1.5l-1.5 1.5l7 7l1.5 -1.5l1.5 -4l4 -4"/>
+      <path d="M9 15l-4.5 4.5"/>
+      <path d="M14.5 4l5.5 5.5"/>
+    </symbol>
     <symbol viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round" id="icon--plugins">
       <path d="M4 7h3a1 1 0 0 0 1 -1v-1a2 2 0 0 1 4 0v1a1 1 0 0 0 1 1h3a1 1 0 0 1 1 1v3a1 1 0 0 0 1 1h1a2 2 0 0 1 0 4h-1a1 1 0 0 0 -1 1v3a1 1 0 0 1 -1 1h-3a1 1 0 0 1 -1 -1v-1a2 2 0 0 0 -4 0v1a1 1 0 0 1 -1 1h-3a1 1 0 0 1 -1 -1v-3a1 1 0 0 1 1 -1h1a2 2 0 0 0 0 -4h-1a1 1 0 0 1 -1 -1v-3a1 1 0 0 1 1 -1"/>
     </symbol>
@@ -577,6 +582,12 @@
       <path d="M5 13a2 2 0 0 1 2 -2h10a2 2 0 0 1 2 2v6a2 2 0 0 1 -2 2h-10a2 2 0 0 1 -2 -2l0 -6"/>
       <path d="M11 16a1 1 0 1 0 2 0a1 1 0 1 0 -2 0"/>
       <path d="M8 11v-5a4 4 0 0 1 8 0"/>
+    </symbol>
+    <symbol viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round" id="icon--unpin">
+      <path d="M3 3l18 18"/>
+      <path d="M15 4.5l-3.249 3.249m-2.57 1.433l-2.181 .818l-1.5 1.5l7 7l1.5 -1.5l.82 -2.186m1.43 -2.563l3.25 -3.251"/>
+      <path d="M9 15l-4.5 4.5"/>
+      <path d="M14.5 4l5.5 5.5"/>
     </symbol>
     <symbol viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round" id="icon--unwatch">
       <path d="M10.585 10.587a2 2 0 0 0 2.829 2.828"/>

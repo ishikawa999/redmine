@@ -77,6 +77,10 @@
   svg: bookmark-off
 - name: bookmark-add
   svg: bookmark-plus
+- name: pin
+  svg: pin
+- name: unpin
+  svg: pinned-off
 - name: import
   svg: database-export
 - name: summary
