@@ -27,12 +27,36 @@ button.pin-toggle:hover .icon-svg {
   stroke: var(--oc-red-9);
 }
 
-.pinned-items-menu > a.pinned-items {
-  display: inline-flex;
+/* Inside the "..." actions dropdown, the pin toggle sits in an id'd
+   <span> wrapper (kept stable so the AJAX response can swap its
+   contents), not a plain <a>, so it misses the row styling that
+   `.contextual .drdn-items > a` gets in application.css. Mirror it here. */
+.contextual .drdn-items > span[id^="pin-toggle-"] {
+  display: flex;
   align-items: center;
-  padding-block: 0.4rem;
-  padding-inline: 0.375rem;
-  margin-inline: -0.375rem;
+  padding-block: 5px;
+  padding-inline: 8px;
+}
+
+.contextual .drdn-items > span[id^="pin-toggle-"]:hover {
+  color: var(--oc-blue-9);
+  border: 1px solid var(--oc-blue-7);
+  background-color: var(--oc-blue-0);
+  border-radius: 3px;
+}
+
+/* button_to always wraps the <button> in a <form>; that form, not the
+   button itself, is the span's direct (and only) flex item, so it has
+   to be the one stretched to fill the row before the button can fill it. */
+.contextual .drdn-items > span[id^="pin-toggle-"] .pin-toggle-form {
+  display: flex;
+  flex: 1;
+}
+
+.contextual .drdn-items > span[id^="pin-toggle-"] button.pin-toggle {
+  flex: 1;
+  inline-size: 100%;
+  text-align: start;
 }
 
 .pin-preview {
@@ -64,12 +88,14 @@ button.pin-toggle:hover .icon-svg {
   color: var(--oc-red-8);
 }
 
-/* No pins yet: a light text hint rather than a bordered, boxed panel. */
+/* No pins yet: a light text hint rather than a bordered, boxed panel.
+   Still needs an opaque background, otherwise the text is unreadable
+   against whatever page content sits underneath it. */
 .pin-preview.is-empty {
   min-inline-size: 12rem;
   padding-block: 0.25rem;
-  padding-inline: 0;
-  background: none;
+  padding-inline: 0.5rem;
+  background: var(--oc-white);
   border: none;
   box-shadow: none;
   white-space: nowrap;
@@ -105,10 +131,27 @@ button.pin-toggle:hover .icon-svg {
   text-decoration: underline;
 }
 
+.pin-preview-item {
+  position: relative;
+}
+
 .pin-preview-item + .pin-preview-item {
   margin-block-start: 0.5rem;
   padding-block-start: 0.5rem;
   border-block-start: 1px solid var(--oc-gray-3);
+}
+
+/* Stretch the target link over the whole row so the type/project text
+   underneath it is clickable too, not just the link's own label. */
+.pin-preview-item > a::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+}
+
+.pin-preview-item:has(> a:hover),
+.pin-preview-item:has(> a:focus) {
+  background-color: var(--oc-gray-1);
 }
 
 .pin-preview-item > span {

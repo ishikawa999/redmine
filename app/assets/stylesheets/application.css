@@ -95,10 +95,15 @@ nav.top-menu {
 }
 
 .top-menu__links a, .top-menu__links a:link, .top-menu__links a:visited {
+  display: inline-flex;
+  align-items: center;
   color: var(--oc-gray-1);
   text-decoration: none;
   transition: background-color 0.18s ease, color 0.18s ease;
   transform-origin: center;
+  padding-block: 0.4rem;
+  padding-inline: 0.375rem;
+  margin-inline: -0.375rem;
 }
 
 .top-menu__links a:hover {
