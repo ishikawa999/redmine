@@ -10,7 +10,6 @@
   inset-inline-start: 0;
   min-inline-size: 20rem;
   max-inline-size: 28rem;
-  padding: 0.75rem;
   color: var(--oc-gray-9);
   background: var(--oc-white);
   border: 1px solid var(--oc-gray-4);
@@ -21,6 +20,15 @@
   display: block;
 }
 
+/* The list state gets its padding from each .pin-preview-item instead (see
+   below), so its hoverable/clickable row includes that padding. Loading and
+   error just set textContent directly on .pin-preview with no item wrapper,
+   so they still need it applied here. */
+.pin-preview.is-loading,
+.pin-preview.is-error {
+  padding: 0.75rem;
+}
+
 .pin-preview.is-loading,
 .pin-preview.is-empty,
 .pin-preview.is-error {
@@ -29,6 +37,29 @@
 
 .pin-preview.is-error {
   color: var(--oc-red-8);
+}
+
+/* No pins yet: a light text hint rather than a bordered, boxed panel.
+   Still needs an opaque background, otherwise the text is unreadable
+   against whatever page content sits underneath it. */
+.pin-preview.is-empty {
+  min-inline-size: 12rem;
+  padding-block: 0.25rem;
+  padding-inline: 0.5rem;
+  background: var(--oc-white);
+  border: none;
+  box-shadow: none;
+  white-space: nowrap;
+}
+
+.pin-preview.is-empty .nodata {
+  padding: 0;
+  margin: 0;
+  border: none;
+  background: none;
+  color: inherit;
+  text-align: start;
+  font-size: 1em;
 }
 
 .top-menu__links .pin-preview-items {
@@ -51,10 +82,29 @@
   text-decoration: underline;
 }
 
+/* Padding lives on each row (not on .pin-preview) so a row's hoverable and
+   clickable box includes it, rather than leaving a padding-wide strip of
+   the panel that belongs to no particular item. */
+.pin-preview-item {
+  position: relative;
+  padding: 0.75rem;
+}
+
 .pin-preview-item + .pin-preview-item {
-  margin-block-start: 0.5rem;
-  padding-block-start: 0.5rem;
   border-block-start: 1px solid var(--oc-gray-3);
+}
+
+/* Stretch the target link over the whole row so the type/project text
+   underneath it is clickable too, not just the link's own label. */
+.pin-preview-item > a::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+}
+
+.pin-preview-item:has(> a:hover),
+.pin-preview-item:has(> a:focus) {
+  background-color: var(--oc-gray-1);
 }
 
 .pin-preview-item > span {

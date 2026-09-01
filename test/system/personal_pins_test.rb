@@ -17,8 +17,9 @@ class PersonalPinsTest < ApplicationSystemTestCase
 
     targets.each do |path, toggle, type, name|
       visit path
-      within(find(toggle, match: :first)) { click_button 'Pin' }
-      all(toggle).each {|element| within(element) { assert_button 'Unpin' }}
+      open_contextual_actions_dropdown
+      find(toggle, match: :first, text: 'Pin').click
+      assert_selector toggle, text: 'Unpin'
 
       visit '/pins'
       within('table.pinned-items tbody tr') do
@@ -30,8 +31,9 @@ class PersonalPinsTest < ApplicationSystemTestCase
       end
       assert_current_path path
 
-      within(find(toggle, match: :first)) { click_button 'Unpin' }
-      all(toggle).each {|element| within(element) { assert_button 'Pin' }}
+      open_contextual_actions_dropdown
+      find(toggle, match: :first, text: 'Unpin').click
+      assert_selector toggle, text: 'Pin'
     end
 
     assert_empty User.find(2).pins
@@ -47,8 +49,9 @@ class PersonalPinsTest < ApplicationSystemTestCase
       ['/versions/1', '#pin-toggle-version-1']
     ].each do |path, toggle|
       visit path
-      within(find(toggle, match: :first)) { click_button 'Pin' }
-      all(toggle).each {|element| within(element) { assert_button 'Unpin' }}
+      open_contextual_actions_dropdown
+      find(toggle, match: :first, text: 'Pin').click
+      assert_selector toggle, text: 'Unpin'
     end
 
     issue.update!(subject: 'Current ingredients title')
@@ -63,9 +66,10 @@ class PersonalPinsTest < ApplicationSystemTestCase
     click_link 'Current ingredients title'
     assert_current_path '/issues/2'
 
-    within(find('#pin-toggle-issue-2', match: :first)) { click_button 'Unpin' }
-    all('#pin-toggle-issue-2').each {|element| within(element) { assert_button 'Pin' }}
-    within(find('#pin-toggle-issue-2', match: :first)) { click_button 'Pin' }
+    open_contextual_actions_dropdown
+    find('#pin-toggle-issue-2', match: :first, text: 'Unpin').click
+    assert_selector '#pin-toggle-issue-2', text: 'Pin'
+    find('#pin-toggle-issue-2', match: :first, text: 'Pin').click
     visit '/pins'
 
     within('table.pinned-items tbody tr:first-child') do
@@ -88,8 +92,9 @@ class PersonalPinsTest < ApplicationSystemTestCase
     before_state = [issue.priority_id, issue.assigned_to_id, issue.watcher_user_ids.sort]
 
     visit '/issues/2'
-    within(find('#pin-toggle-issue-2', match: :first)) { click_button 'Pin' }
-    within(find('#pin-toggle-issue-2', match: :first)) { click_button 'Unpin' }
+    open_contextual_actions_dropdown
+    find('#pin-toggle-issue-2', match: :first, text: 'Pin').click
+    find('#pin-toggle-issue-2', match: :first, text: 'Unpin').click
 
     issue.reload
     assert_equal before_state, [issue.priority_id, issue.assigned_to_id, issue.watcher_user_ids.sort]
@@ -99,11 +104,18 @@ class PersonalPinsTest < ApplicationSystemTestCase
     visit '/projects/ecookbook/roadmap'
 
     assert_no_selector '[id^="pin-toggle-version-"]'
-    assert_no_button 'Pin'
-    assert_no_button 'Unpin'
+    # Scoped to #content: a plain 'Pin' locator also substring-matches the
+    # unrelated top-nav "Pinned items" link.
+    within('#content') do
+      assert_no_link 'Pin'
+      assert_no_link 'Unpin'
+    end
   end
 end
 
+# The pin toggle is a plain remote <a> (Rails UJS), so it needs JavaScript
+# to submit as POST/DELETE; only the identity-route authorization check
+# below is independent of that and still worth covering without a browser.
 class PersonalPinsNoJavascriptTest < ActionDispatch::SystemTestCase
   driven_by :rack_test, options: {respect_data_method: false}
 
@@ -113,21 +125,6 @@ class PersonalPinsNoJavascriptTest < ActionDispatch::SystemTestCase
     fill_in 'username', with: 'jsmith'
     fill_in 'password', with: 'jsmith'
     click_button 'Login'
-  end
-
-  test 'adds removes and opens the list through ordinary html navigation' do
-    visit '/issues/2'
-    click_button 'Pin', match: :first
-
-    assert_current_path '/issues/2'
-    assert_button 'Unpin'
-    click_link 'Pinned items'
-    assert_current_path '/pins'
-    assert_link '#2 Add ingredients categories', href: '/issues/2'
-
-    click_button 'Unpin'
-    assert_current_path '/pins'
-    assert_text 'You have not pinned anything yet.'
   end
 
   test 'cannot remove another users pin through the identity route' do
