@@ -1,5 +1,4 @@
 <div class="contextual">
-<span id="pin-toggle-issue-<%= @issue.id %>"><%= pin_link(@issue) %></span>
 <%= link_to sprite_icon('edit', l(:button_edit)), edit_issue_path(@issue),
             :onclick => 'showAndScrollTo("update", "issue_notes"); return false;',
             :class => 'icon icon-edit ', :accesskey => accesskey(:edit) if @issue.editable? %>
@@ -9,6 +8,7 @@
 <%= link_to sprite_icon('copy', l(:button_copy)), project_copy_issue_path(@project, @issue),
             :class => 'icon icon-copy ' if User.current.allowed_to?(:copy_issues, @project) && Issue.allowed_target_projects.any? %>
 <%= actions_dropdown do %>
+  <span id="pin-toggle-issue-<%= @issue.id %>"><%= pin_link(@issue) %></span>
   <%= copy_object_url_link(issue_url(@issue, only_path: false)) %>
   <%= link_to sprite_icon('del', l(:button_delete_object, object_name: l(:label_issue)).capitalize), issue_path(@issue),
               :data => {:confirm => issues_destroy_confirmation_message(@issue)},

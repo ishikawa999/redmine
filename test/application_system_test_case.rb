@@ -87,6 +87,18 @@ class ApplicationSystemTestCase < ActionDispatch::SystemTestCase
     click_link 'Sign out'
   end
 
+  # Opens the "..." actions dropdown in a .contextual toolbar, when present
+  # and not already expanded. Some pages (eg. issues, wiki pages) tuck the
+  # pin toggle inside it; others (eg. versions) expose it as a plain button
+  # with no dropdown to open.
+  def open_contextual_actions_dropdown
+    drdn = first('.contextual span.drdn', minimum: 0)
+    return unless drdn
+    return if drdn[:class].to_s.split(' ').include?('expanded')
+
+    drdn.first('.drdn-trigger').click
+  end
+
   def wait_for_ajax
     Timeout.timeout(Capybara.default_max_wait_time) do
       loop until page.evaluate_script("jQuery.active").zero?

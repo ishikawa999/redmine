@@ -17,6 +17,7 @@ class PersonalPinsTest < ApplicationSystemTestCase
 
     targets.each do |path, toggle, type, name|
       visit path
+      open_contextual_actions_dropdown
       within(find(toggle, match: :first)) { click_button 'Pin' }
       all(toggle).each {|element| within(element) { assert_button 'Unpin' }}
 
@@ -30,6 +31,7 @@ class PersonalPinsTest < ApplicationSystemTestCase
       end
       assert_current_path path
 
+      open_contextual_actions_dropdown
       within(find(toggle, match: :first)) { click_button 'Unpin' }
       all(toggle).each {|element| within(element) { assert_button 'Pin' }}
     end
@@ -47,6 +49,7 @@ class PersonalPinsTest < ApplicationSystemTestCase
       ['/versions/1', '#pin-toggle-version-1']
     ].each do |path, toggle|
       visit path
+      open_contextual_actions_dropdown
       within(find(toggle, match: :first)) { click_button 'Pin' }
       all(toggle).each {|element| within(element) { assert_button 'Unpin' }}
     end
@@ -63,6 +66,7 @@ class PersonalPinsTest < ApplicationSystemTestCase
     click_link 'Current ingredients title'
     assert_current_path '/issues/2'
 
+    open_contextual_actions_dropdown
     within(find('#pin-toggle-issue-2', match: :first)) { click_button 'Unpin' }
     all('#pin-toggle-issue-2').each {|element| within(element) { assert_button 'Pin' }}
     within(find('#pin-toggle-issue-2', match: :first)) { click_button 'Pin' }
@@ -88,6 +92,7 @@ class PersonalPinsTest < ApplicationSystemTestCase
     before_state = [issue.priority_id, issue.assigned_to_id, issue.watcher_user_ids.sort]
 
     visit '/issues/2'
+    open_contextual_actions_dropdown
     within(find('#pin-toggle-issue-2', match: :first)) { click_button 'Pin' }
     within(find('#pin-toggle-issue-2', match: :first)) { click_button 'Unpin' }
 
