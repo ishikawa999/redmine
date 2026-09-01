@@ -77,6 +77,12 @@ pre, code {font-family: Consolas, Menlo, "Liberation Mono", Courier, monospace;}
 }
 
 nav.top-menu {
+  /* Establishes a stacking context with an explicit z-index so dropdowns
+     rendered inside it (eg. the pinned-items preview) reliably paint
+     above #header below it, which is also `position: relative` and would
+     otherwise win that overlap by DOM order under the default z-index. */
+  position: relative;
+  z-index: 1;
   background: #234761; /* no match in Open Color, using hex code */
   color: var(--oc-gray-2);
   font-size: 0.75rem;
