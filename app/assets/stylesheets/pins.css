@@ -2,6 +2,39 @@
   position: relative;
 }
 
+/* The pin toggle is a real <button> (inside a real <form>) so it keeps
+   working without JavaScript, but it should look like the plain icon
+   links (edit, watch, copy...) that sit next to it, not a native button. */
+button.pin-toggle {
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  border: 0;
+  margin: 0;
+  padding: 0;
+  background: none;
+  font: inherit;
+  color: inherit;
+  cursor: pointer;
+}
+
+button.pin-toggle .icon-svg {
+  stroke: var(--oc-blue-9);
+  fill: none;
+}
+
+button.pin-toggle:hover .icon-svg {
+  stroke: var(--oc-red-9);
+}
+
+.pinned-items-menu > a.pinned-items {
+  display: inline-flex;
+  align-items: center;
+  padding-block: 0.4rem;
+  padding-inline: 0.375rem;
+  margin-inline: -0.375rem;
+}
+
 .pin-preview {
   display: none;
   position: absolute;
@@ -29,6 +62,27 @@
 
 .pin-preview.is-error {
   color: var(--oc-red-8);
+}
+
+/* No pins yet: a light text hint rather than a bordered, boxed panel. */
+.pin-preview.is-empty {
+  min-inline-size: 12rem;
+  padding-block: 0.25rem;
+  padding-inline: 0;
+  background: none;
+  border: none;
+  box-shadow: none;
+  white-space: nowrap;
+}
+
+.pin-preview.is-empty .nodata {
+  padding: 0;
+  margin: 0;
+  border: none;
+  background: none;
+  color: inherit;
+  text-align: start;
+  font-size: 1em;
 }
 
 .top-menu__links .pin-preview-items {
