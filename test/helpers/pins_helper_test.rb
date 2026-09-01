@@ -20,7 +20,7 @@ class PinsHelperTest < Redmine::HelperTest
       assert_select_in pin_link(target), "form[action='#{pins_path}'][method='post'][data-remote='true']" do
         assert_select "input[name='pinnable_type'][value='#{type}']"
         assert_select "input[name='pinnable_id'][value='#{target.id}']"
-        assert_select '.pin-toggle.icon-bookmark-off'
+        assert_select '.pin-toggle.icon-pin-off'
         assert_select 'button.pin-toggle svg.icon-svg'
         assert_select 'button.pin-toggle', text: 'Pin'
       end
@@ -30,7 +30,7 @@ class PinsHelperTest < Redmine::HelperTest
         assert_select "input[name='_method'][value='delete']"
         assert_select "input[name='pinnable_type'][value='#{type}']"
         assert_select "input[name='pinnable_id'][value='#{target.id}']"
-        assert_select '.pin-toggle.icon-bookmark'
+        assert_select '.pin-toggle.icon-pin'
         assert_select 'button.pin-toggle svg.icon-svg'
         assert_select 'button.pin-toggle', text: 'Unpin'
       end

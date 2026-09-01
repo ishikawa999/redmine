@@ -11,8 +11,8 @@
           <td><%= pin_target_link(pin.pinnable) %></td>
           <td><%= link_to_project(pin_project(pin.pinnable)) %></td>
           <td class="buttons">
-            <%= button_to pins_path, method: :delete, params: {pinnable_type: pin.pinnable_type, pinnable_id: pin.pinnable_id}, class: 'icon icon-bookmark' do %>
-              <%= sprite_icon('bookmark-delete', l(:button_unpin)) %>
+            <%= button_to pins_path, method: :delete, params: {pinnable_type: pin.pinnable_type, pinnable_id: pin.pinnable_id}, class: 'icon icon-pin' do %>
+              <%= sprite_icon('unpin', l(:button_unpin)) %>
             <% end %>
           </td>
         </tr>
