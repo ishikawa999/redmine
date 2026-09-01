@@ -1,4 +1,4 @@
 <% if @pinnable %>
-$('[id="pin-toggle-<%= @pinnable.class.base_class.name.underscore.dasherize %>-<%= @pinnable.id %>"]').html('<%= j pin_link(@pinnable) %>');
+$('[id="pin-toggle-<%= @pinnable.class.base_class.name.underscore.dasherize %>-<%= @pinnable.id %>"]').replaceWith('<%= j pin_link(@pinnable) %>');
 <% end %>
 document.dispatchEvent(new CustomEvent('pin-preview:invalidate'));

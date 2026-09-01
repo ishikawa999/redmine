@@ -149,8 +149,8 @@ class PinPreviewTest < ApplicationSystemTestCase
     ['Unpin', 'Pin'].each_with_index do |action, index|
       find('#content').hover
       open_contextual_actions_dropdown
-      within(find('#pin-toggle-issue-2', match: :first)) { click_button action }
-      assert_button(action == 'Unpin' ? 'Pin' : 'Unpin')
+      find('#pin-toggle-issue-2', match: :first, text: action).click
+      assert_link(action == 'Unpin' ? 'Pin' : 'Unpin')
       assert_selector '.pin-preview[data-state="idle"]', visible: :all
       assert_equal index + 1, fetch_count
       assert_current_path '/issues/2'

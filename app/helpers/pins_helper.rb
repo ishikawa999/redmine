@@ -9,17 +9,14 @@ module PinsHelper
       pinnable_type: pinnable.class.base_class.name,
       pinnable_id: pinnable.id
     }
+    dom_id = "pin-toggle-#{pinnable.class.base_class.name.underscore.dasherize}-#{pinnable.id}"
 
     if pin
-      button_to pins_path, method: :delete, params: identity, remote: true,
-                class: 'icon icon-pin pin-toggle', form: {class: 'pin-toggle-form inline-block'} do
-        sprite_icon('unpin', l(:button_unpin))
-      end
+      link_to sprite_icon('unpin', l(:button_unpin)), pins_path(identity),
+              remote: true, method: :delete, id: dom_id, class: 'icon icon-pin pin-toggle'
     else
-      button_to pins_path, method: :post, params: identity, remote: true,
-                class: 'icon icon-pin-off pin-toggle', form: {class: 'pin-toggle-form inline-block'} do
-        sprite_icon('pin', l(:button_pin))
-      end
+      link_to sprite_icon('pin', l(:button_pin)), pins_path(identity),
+              remote: true, method: :post, id: dom_id, class: 'icon icon-pin-off pin-toggle'
     end
   end
 

@@ -9,30 +9,29 @@ class PinsHelperTest < Redmine::HelperTest
            :trackers, :issue_statuses, :enumerations,
            :wikis, :wiki_pages, :versions
 
-  test 'renders progressively enhanced create and identity delete forms for every target type' do
+  test 'renders a create or delete link with a stable dom id for every target type' do
     User.current = users(:users_002)
     targets = [issues(:issues_001), wiki_pages(:wiki_pages_001), versions(:versions_001)]
 
     targets.each do |target|
       type = target.class.base_class.name
+      dom_id = "pin-toggle-#{type.underscore.dasherize}-#{target.id}"
+      href = pins_path(pinnable_type: type, pinnable_id: target.id)
       User.current.pins.where(pinnable: target).delete_all
 
-      assert_select_in pin_link(target), "form[action='#{pins_path}'][method='post'][data-remote='true']" do
-        assert_select "input[name='pinnable_type'][value='#{type}']"
-        assert_select "input[name='pinnable_id'][value='#{target.id}']"
+      assert_select_in pin_link(target),
+                        "a##{dom_id}[href='#{href}'][data-remote='true'][data-method='post']" do
         assert_select '.pin-toggle.icon-pin-off'
-        assert_select 'button.pin-toggle svg.icon-svg'
-        assert_select 'button.pin-toggle', text: 'Pin'
+        assert_select 'a.pin-toggle svg.icon-svg'
+        assert_select 'a.pin-toggle', text: 'Pin'
       end
 
       User.current.pins.create!(pinnable: target)
-      assert_select_in pin_link(target), "form[action='#{pins_path}'][method='post'][data-remote='true']" do
-        assert_select "input[name='_method'][value='delete']"
-        assert_select "input[name='pinnable_type'][value='#{type}']"
-        assert_select "input[name='pinnable_id'][value='#{target.id}']"
+      assert_select_in pin_link(target),
+                        "a##{dom_id}[href='#{href}'][data-remote='true'][data-method='delete']" do
         assert_select '.pin-toggle.icon-pin'
-        assert_select 'button.pin-toggle svg.icon-svg'
-        assert_select 'button.pin-toggle', text: 'Unpin'
+        assert_select 'a.pin-toggle svg.icon-svg'
+        assert_select 'a.pin-toggle', text: 'Unpin'
       end
     end
   ensure

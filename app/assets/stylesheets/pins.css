@@ -2,63 +2,6 @@
   position: relative;
 }
 
-/* The pin toggle is a real <button> (inside a real <form>) so it keeps
-   working without JavaScript, but it should look like the plain icon
-   links (edit, watch, copy...) that sit next to it, not a native button. */
-button.pin-toggle {
-  appearance: none;
-  -webkit-appearance: none;
-  -moz-appearance: none;
-  border: 0;
-  margin: 0;
-  padding: 0;
-  background: none;
-  font: inherit;
-  color: inherit;
-  cursor: pointer;
-}
-
-button.pin-toggle .icon-svg {
-  stroke: var(--oc-blue-9);
-  fill: none;
-}
-
-button.pin-toggle:hover .icon-svg {
-  stroke: var(--oc-red-9);
-}
-
-/* Inside the "..." actions dropdown, the pin toggle sits in an id'd
-   <span> wrapper (kept stable so the AJAX response can swap its
-   contents), not a plain <a>, so it misses the row styling that
-   `.contextual .drdn-items > a` gets in application.css. Mirror it here. */
-.contextual .drdn-items > span[id^="pin-toggle-"] {
-  display: flex;
-  align-items: center;
-  padding-block: 5px;
-  padding-inline: 8px;
-}
-
-.contextual .drdn-items > span[id^="pin-toggle-"]:hover {
-  color: var(--oc-blue-9);
-  border: 1px solid var(--oc-blue-7);
-  background-color: var(--oc-blue-0);
-  border-radius: 3px;
-}
-
-/* button_to always wraps the <button> in a <form>; that form, not the
-   button itself, is the span's direct (and only) flex item, so it has
-   to be the one stretched to fill the row before the button can fill it. */
-.contextual .drdn-items > span[id^="pin-toggle-"] .pin-toggle-form {
-  display: flex;
-  flex: 1;
-}
-
-.contextual .drdn-items > span[id^="pin-toggle-"] button.pin-toggle {
-  flex: 1;
-  inline-size: 100%;
-  text-align: start;
-}
-
 .pin-preview {
   display: none;
   position: absolute;
@@ -67,7 +10,6 @@ button.pin-toggle:hover .icon-svg {
   inset-inline-start: 0;
   min-inline-size: 20rem;
   max-inline-size: 28rem;
-  padding: 0.75rem;
   color: var(--oc-gray-9);
   background: var(--oc-white);
   border: 1px solid var(--oc-gray-4);
@@ -76,6 +18,15 @@ button.pin-toggle:hover .icon-svg {
 
 .pin-preview.is-open {
   display: block;
+}
+
+/* The list state gets its padding from each .pin-preview-item instead (see
+   below), so its hoverable/clickable row includes that padding. Loading and
+   error just set textContent directly on .pin-preview with no item wrapper,
+   so they still need it applied here. */
+.pin-preview.is-loading,
+.pin-preview.is-error {
+  padding: 0.75rem;
 }
 
 .pin-preview.is-loading,
@@ -131,13 +82,15 @@ button.pin-toggle:hover .icon-svg {
   text-decoration: underline;
 }
 
+/* Padding lives on each row (not on .pin-preview) so a row's hoverable and
+   clickable box includes it, rather than leaving a padding-wide strip of
+   the panel that belongs to no particular item. */
 .pin-preview-item {
   position: relative;
+  padding: 0.75rem;
 }
 
 .pin-preview-item + .pin-preview-item {
-  margin-block-start: 0.5rem;
-  padding-block-start: 0.5rem;
   border-block-start: 1px solid var(--oc-gray-3);
 }
 
