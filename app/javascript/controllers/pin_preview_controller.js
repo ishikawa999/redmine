@@ -1,5 +1,12 @@
 import { Controller } from "@hotwired/stimulus"
 
+// How long to wait after the pointer leaves before actually closing the
+// preview. The trigger link is much narrower than the panel below it, so a
+// fast diagonal move toward the panel's far side briefly crosses space that
+// belongs to neither element; without this grace period that momentary
+// pointerleave closes the preview before the pointer arrives.
+const CLOSE_DELAY_MS = 250
+
 // Manages the lazy, desktop-only preview attached to the pinned-items menu.
 export default class extends Controller {
   static targets = ["preview"]
@@ -13,6 +20,7 @@ export default class extends Controller {
     this.state = "idle"
     this.cachedHTML = null
     this.abortController = null
+    this.closeTimeout = null
 
     this.open = this.open.bind(this)
     this.closeWhenOutside = this.closeWhenOutside.bind(this)
@@ -36,12 +44,14 @@ export default class extends Controller {
     this.element.removeEventListener("focusout", this.closeWhenOutside)
     document.removeEventListener("keydown", this.closeOnEscape)
     document.removeEventListener("pin-preview:invalidate", this.invalidate)
+    this.cancelScheduledClose()
     this.abortRequest()
   }
 
   open() {
     if (this.mobileNavigationVisible()) return
 
+    this.cancelScheduledClose()
     this.previewTarget.classList.add("is-open")
 
     if (this.cachedHTML !== null) {
@@ -55,20 +65,35 @@ export default class extends Controller {
   closeWhenOutside(event) {
     if (event.relatedTarget && this.element.contains(event.relatedTarget)) return
 
-    this.close()
+    this.scheduleClose()
   }
 
   closeOnEscape(event) {
     if (event.key !== "Escape" || !this.previewTarget.classList.contains("is-open")) return
 
+    this.cancelScheduledClose()
     this.close()
   }
 
+  scheduleClose() {
+    this.cancelScheduledClose()
+    this.closeTimeout = setTimeout(() => this.close(), CLOSE_DELAY_MS)
+  }
+
+  cancelScheduledClose() {
+    if (this.closeTimeout === null) return
+
+    clearTimeout(this.closeTimeout)
+    this.closeTimeout = null
+  }
+
   close() {
+    this.cancelScheduledClose()
     this.previewTarget.classList.remove("is-open")
   }
 
   invalidate() {
+    this.cancelScheduledClose()
     this.abortRequest()
     this.cachedHTML = null
     this.previewTarget.replaceChildren()
