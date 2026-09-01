@@ -8,7 +8,7 @@
 <% end %>
 
   <%= actions_dropdown do %>
-    <span id="pin-toggle-wiki-page-<%= @page.id %>"><%= pin_link(@page) %></span>
+    <%= pin_link(@page) %>
     <%= link_to_if_authorized(sprite_icon('history', l(:label_history)), { :action => 'history', :id => @page.title}, :class => 'icon icon-history') %>
 
     <% if @editable %>
