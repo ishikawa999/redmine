@@ -33,6 +33,11 @@ class QuickAccessPreviewTest < ApplicationSystemTestCase
         assert_selector '.quick-access-preview-item', count: 3
       when :empty
         assert_selector '.quick-access-preview .nodata', text: 'You have not added anything to quick access yet.'
+        # The panel keeps its border here too, otherwise the line of text sits
+        # on whatever page content happens to be behind it.
+        panel = find('.quick-access-preview')
+        assert_equal 'solid', panel.style('border-style')['border-style']
+        assert_not_equal 'none', panel.style('box-shadow')['box-shadow']
       when :error
         assert_selector '.quick-access-preview', text: 'Could not load quick access items.'
         assert_current_path '/projects/ecookbook'
@@ -230,6 +235,26 @@ class QuickAccessPreviewTest < ApplicationSystemTestCase
     quick_access_link.click
     assert_current_path '/quick_access'
     assert_selector '#content h2', text: 'Quick access'
+  end
+
+  def test_shrinking_to_a_small_screen_hides_an_open_submenu
+    open_preview
+    assert_selector '.quick-access-preview.is-open'
+
+    page.current_window.resize_to(500, 800)
+
+    # The panel keeps its is-open class, so the responsive rule has to win on
+    # its own rather than relying on the class being removed.
+    assert_no_selector '.quick-access-preview'
+    assert_selector '.quick-access-preview.is-open', visible: :all
+  end
+
+  def test_submenu_outranks_the_context_menu_it_can_overlap
+    open_preview
+    assert_selector '.quick-access-preview.is-open'
+
+    menu = find('#account .dropdown-content')
+    assert_operator menu.style('z-index')['z-index'].to_i, :>, 1000
   end
 
   # On a small screen the account menu is folded into the flyout navigation,

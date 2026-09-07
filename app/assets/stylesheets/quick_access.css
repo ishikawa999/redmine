@@ -11,9 +11,16 @@
 }
 
 /* The submenu is positioned out of the flow, so it no longer contributes to
-   the menu's own width. Hold a floor that keeps the name header on one line. */
+   the menu's own width. Hold a floor that keeps the name header on one line.
+
+   The menu also shares z-index 1000 with #context-menu, which is appended to
+   the end of the body and so wins that tie on DOM order, putting the submenu
+   behind it. The submenu's own z-index cannot decide this, since it only
+   orders children inside this menu's stacking context, so the menu itself is
+   lifted above the context menu here. */
 #account .dropdown-content {
   min-inline-size: 12rem;
+  z-index: 1001;
 }
 
 .quick-access-submenu-marker {
@@ -60,14 +67,10 @@
    item wrapper, so they need the item padding applied here. The loaded list
    gets it per row instead (see below). */
 .quick-access-preview.is-loading,
+.quick-access-preview.is-empty,
 .quick-access-preview.is-error {
   padding-block: var(--dropdown-item-padding-block);
   padding-inline: var(--dropdown-item-padding-inline);
-}
-
-.quick-access-preview.is-loading,
-.quick-access-preview.is-empty,
-.quick-access-preview.is-error {
   font-size: 0.9em;
   color: var(--oc-gray-7);
 }
@@ -76,13 +79,10 @@
   color: var(--oc-red-8);
 }
 
-/* Nothing added yet: a light text hint rather than a full submenu panel. */
+/* Nothing added yet. The panel keeps its border and shadow here too: a bare
+   line of text would sit on whatever page content happens to be behind it. */
 .quick-access-preview.is-empty {
   min-inline-size: 12rem;
-  padding-block: var(--dropdown-item-padding-block);
-  padding-inline: var(--dropdown-item-padding-inline);
-  border: none;
-  box-shadow: none;
   white-space: nowrap;
 }
 
@@ -210,9 +210,13 @@ table.quick-access .quick-access-status {
 }
 
 /* The flyout navigation takes over below this width and folds the account
-   menu into a plain list, where a hover-opened submenu has no place. */
+   menu into a plain list, where a hover-opened submenu has no place. The
+   is-open rule has to be matched here as well: a media query carries no extra
+   specificity, so a panel left open before the resize would otherwise keep
+   winning with its own class. */
 @media screen and (max-width: 899px) {
-  .quick-access-preview {
+  .quick-access-preview,
+  .quick-access-preview.is-open {
     display: none;
   }
 
