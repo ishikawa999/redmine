@@ -12,11 +12,11 @@ module QuickAccessItemsHelper
     dom_id = "quick-access-toggle-#{target.class.base_class.name.underscore.dasherize}-#{target.id}"
 
     if item
-      link_to sprite_icon('unpin', l(:button_remove_from_quick_access)), quick_access_items_path(identity),
-              remote: true, method: :delete, id: dom_id, class: 'icon icon-pin quick-access-toggle'
+      link_to sprite_icon('link-break', l(:button_remove_from_quick_access)), quick_access_items_path(identity),
+              remote: true, method: :delete, id: dom_id, class: 'icon icon-link-break quick-access-toggle'
     else
-      link_to sprite_icon('pin', l(:button_add_to_quick_access)), quick_access_items_path(identity),
-              remote: true, method: :post, id: dom_id, class: 'icon icon-pin-off quick-access-toggle'
+      link_to sprite_icon('link-add', l(:button_add_to_quick_access)), quick_access_items_path(identity),
+              remote: true, method: :post, id: dom_id, class: 'icon icon-link-add quick-access-toggle'
     end
   end
 

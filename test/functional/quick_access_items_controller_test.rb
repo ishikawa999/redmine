@@ -125,6 +125,9 @@ class QuickAccessItemsControllerTest < Redmine::ControllerTest
     assert_not response.body.include?('<html')
     assert_select 'ul.quick-access-preview-items' do
       assert_select 'li.quick-access-preview-item', count: 3
+      assert_select 'li:last-child.quick-access-preview-more' do
+        assert_select 'a[href=?]', '/quick_access', text: I18n.t(:label_view_all_quick_access_items)
+      end
     end
     rendered_items = css_select('li.quick-access-preview-item')
     rendered_ids = rendered_items.map {|element| element['data-quick-access-id'].to_i}

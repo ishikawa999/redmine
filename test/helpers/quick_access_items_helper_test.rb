@@ -21,7 +21,7 @@ class QuickAccessItemsHelperTest < Redmine::HelperTest
 
       assert_select_in quick_access_link(target),
                         "a##{dom_id}[href='#{href}'][data-remote='true'][data-method='post']" do
-        assert_select '.quick-access-toggle.icon-pin-off'
+        assert_select '.quick-access-toggle.icon-link-add'
         assert_select 'a.quick-access-toggle svg.icon-svg'
         assert_select 'a.quick-access-toggle', text: 'Add to quick access'
       end
@@ -29,7 +29,7 @@ class QuickAccessItemsHelperTest < Redmine::HelperTest
       User.current.quick_access_items.create!(target: target)
       assert_select_in quick_access_link(target),
                         "a##{dom_id}[href='#{href}'][data-remote='true'][data-method='delete']" do
-        assert_select '.quick-access-toggle.icon-pin'
+        assert_select '.quick-access-toggle.icon-link-break'
         assert_select 'a.quick-access-toggle svg.icon-svg'
         assert_select 'a.quick-access-toggle', text: 'Remove from quick access'
       end

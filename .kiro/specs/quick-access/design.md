@@ -4,14 +4,14 @@
 
 本機能は、ログインユーザーがチケット、Wikiページ、バージョンを個人用にクイックアクセスへ追加し、最近使った対象へ一覧またはアカウントメニューのサブメニュープレビューから再訪できるようにする。既存の`QuickAccessItem`ポリモーフィックモデルとRedmineの認可を拡張し、通知・Watcherとは独立したナビゲーション機能として維持する。
 
-通常画面の初期描画ではピン対象を読み込まない。デスクトップのhoverまたはfocus後に専用HTMLエンドポイントを一度だけ取得し、小画面では既存flyout内の通常リンクとして一覧へ遷移する。
+通常画面の初期描画では対象を読み込まない。デスクトップのhoverまたはfocus後に専用HTMLエンドポイントを一度だけ取得し、小画面では既存flyout内の通常リンクとして一覧へ遷移する。
 
 ### Goals
 
-- 3種類の対象を詳細画面から追加・削除し、現在の権限に従って表示する
+- 3種類の対象を詳細画面から追加・解除し、現在の権限に従って表示する
 - 一覧と最大5件の遅延プレビューを最近追加した順に提供する
 - 重複追加・反復解除・JavaScript不使用時にも安全な操作契約を提供する
-- 通常画面の初期描画へピン取得コストや障害を持ち込まない
+- 通常画面の初期描画へプレビュー取得コストや障害を持ち込まない
 
 ### Non-Goals
 
@@ -25,8 +25,8 @@
 ### This Spec Owns
 
 - `quick_access_items`レコードの所有権、一意性、最近順、および3種類の許可対象
-- 対象identityによる追加・削除の冪等なHTML/JS操作契約
-- 閲覧可能なピンだけを返す一覧・プレビュー読み取り境界
+- 対象identityによる追加・解除の冪等なHTML/JS操作契約
+- 閲覧可能な項目だけを返す一覧・プレビュー読み取り境界
 - 詳細画面の操作、アカウントメニュー導線、プレビュー状態と英日文言
 
 ### Out of Boundary
@@ -123,7 +123,7 @@ test/
 - `app/views/quick_access_items/create.js.erb`、`destroy.js.erb` — toggle更新とpreviewキャッシュ失効通知
 - `app/views/issues/show.html.erb`、`app/views/wiki/show.html.erb`、`app/views/versions/show.html.erb` — 詳細画面だけに操作を配置
 - `app/views/layouts/base.html.erb` — top menuの専用レンダリング入口とstylesheet
-- `lib/redmine/preparation.rb` — account menuから削除しMy page直後へ登録
+- `lib/redmine/preparation.rb` — account menuの個人設定直後へ登録
 - `config/routes.rb` — previewと対象identity destroy route
 - `config/locales/en.yml`、`config/locales/ja.yml` — Version、loading、empty、error文言
 - `test/fixtures/quick_access_items.yml`、`test/unit/quick_access_item_test.rb`、`test/functional/quick_access_items_controller_test.rb`、`test/unit/lib/redmine_test.rb` — domain/controller/menu回帰
@@ -313,7 +313,7 @@ erDiagram
 - base layoutはQuickAccessItem relation、preview partial、対象を問い合わせない。preview fetchはdesktop hover/focus後だけ開始する。
 - previewはキーセット・バッチ走査により全件materializeを避け、可視5件に達した時点で停止する。不可視QuickAccessItemが連続する場合は正確性を優先して次batchを読む。
 - 型別preloadでtarget/projectのN+1を防止する。system/integration testで初期GETにpreview requestがないこと、reader testでbatch境界を検証する。
-- 同一ページの再openは追加requestなし。追加・削除後だけcacheを失効する。
+- 同一ページの再openは追加requestなし。追加・解除後だけcacheを失効する。
 
 ## Testing Strategy
 
@@ -336,7 +336,7 @@ erDiagram
 - roadmapにVersion操作がないこと（2.6）
 - hover/focusのloading→success、direct navigation、Escape/leave、再open時no refetch、失敗表示（4.8, 4.9, 4.10, 4.11, 4.12, 4.13）
 - small viewportでflyoutの導線clickがpreviewなしで一覧へ遷移（6.5）
-- JavaScript無効相当のHTML requestで追加・削除・一覧が成立（6.3）
+- JavaScript無効相当のHTML requestで追加・解除・一覧が成立（6.3）
 - 通常ページ初期表示にpreview requestが発生せず、preview障害でも画面操作可能（6.6, 6.7）
 
 ## Migration and Rollout

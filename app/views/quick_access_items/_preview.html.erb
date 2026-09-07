@@ -7,6 +7,9 @@
         <span class="quick-access-preview-project"><%= quick_access_project(item.target).name %></span>
       </li>
     <% end %>
+    <li class="quick-access-preview-more">
+      <%= link_to l(:label_view_all_quick_access_items), quick_access_items_path %>
+    </li>
   </ul>
 <% else %>
   <p class="nodata"><%= l(:label_no_quick_access_items) %></p>

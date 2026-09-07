@@ -15,9 +15,9 @@
 
 - `QuickAccessItem`モデルはユーザー所有、ポリモーフィック対象、一意性検証、作成日時降順、対象の`visible?`への委譲を持つ
 - `quick_access_items`テーブルはユーザー・対象種別・対象IDとtimestampsを持ち、3列の複合一意制約がある
-- User、Issue、WikiPageには関連ピンの削除連動がある
-- `QuickAccessItemsController`はログイン必須で、一覧・追加・削除、所有者スコープ、許可対象種別チェック、HTML/JS応答を持つ
-- IssueとWikiPageの詳細画面に追加・削除操作がある
+- User、Issue、WikiPageには関連するクイックアクセス項目の削除連動がある
+- `QuickAccessItemsController`はログイン必須で、一覧・追加・解除、所有者スコープ、許可対象種別チェック、HTML/JS応答を持つ
+- IssueとWikiPageの詳細画面に追加・解除操作がある
 - 一覧画面には種別、現在の名称、プロジェクト、対象リンク、削除操作、空状態がある
 - 英語・日本語の基本文言と、モデル・コントローラ・メニューの初期テストがある
 
@@ -35,7 +35,7 @@
 |---|---|---|---|
 | 1. 利用者と所有権 | Mostly Existing | `before_action :require_login`、`User.current.quick_access_items`起点の一覧・解除、独立したQuickAccessItem関連 | 他ユーザーのQuickAccessItem解除を404にする専用テストがない |
 | 2. クイックアクセスへの追加 | Partial | Issue/Wiki詳細の操作、対象`visible?`確認、許可種別チェック、JS/HTML応答 | Versionが許可対象・関連・詳細UI・helper分岐にない。並行追加時の競合を確実に成功扱いにする処理とテストが不足 |
-| 3. クイックアクセスからの削除 | Partial | 詳細/一覧からのDELETE、成功後のトグル再描画 | 削除済みQuickAccessItemの再解除は現在404。逐次・並行解除を成功扱いにする設計とテストが不足 |
+| 3. クイックアクセスからの解除 | Partial | 詳細/一覧からのDELETE、成功後のトグル再描画 | 削除済みQuickAccessItemの再解除は現在404。逐次・並行解除を成功扱いにする設計とテストが不足 |
 | 4. 一覧と再訪 | Partial | 全件一覧、最近順、Issue/Wikiの現在情報、空状態 | Version表示・リンクなし。導線がaccount menuにありtop menuではない。最新5件プレビュー、loading/empty/error、focus、同一ページ再表示が未実装 |
 | 5. 権限変更と対象変化 | Mostly Existing / Partial | 一覧時の現在権限評価、不可視QuickAccessItem保持、権限回復時再表示、孤児除外、現在情報参照 | Version未対応。closed/locked/shared Version、closed/archive projectの専用テストが不足 |
 | 6. 重複操作と利用環境 | Partial | DB一意制約、逐次重複追加テスト、HTML redirect、英日基本文言 | 真の並行競合、冪等解除、top/general mobile導線、preview遅延取得・失敗隔離、preview文言、性能テストが不足 |
@@ -46,7 +46,7 @@
 
 1. **Version対象の欠落 — Missing**
    - 許可対象はIssueとWikiPageだけ
-   - Versionに関連ピンの削除連動がない
+   - Versionに関連するクイックアクセス項目の削除連動がない
    - helperはVersionのpath、label、typeを解決できない
    - Version fixtureおよびquick access item fixtureがない
 
@@ -110,7 +110,7 @@
 
 3. **同一ページ内の再表示 — Missing**
    - 取得済みpreviewを保持する仕組みがない
-   - QuickAccessItemの追加・削除後には保持内容を失効または更新する必要がある
+   - QuickAccessItemの追加・解除後には保持内容を失効または更新する必要がある
 
 4. **性能検証 — Missing**
    - 通常ページ初期表示でpreview request/queryが発生しないことを検証するテストがない
@@ -119,14 +119,14 @@
 ### 4.5 Progressive enhancement
 
 - ControllerはHTML redirectを持つが、現在の`remote`かつmethod付きlinkがクライアント機能なしで確実にPOST/DELETEになるかは要確認
-- 通常ページ遷移だけで追加・削除できるフォームまたはリンクの方式を設計段階で確認する必要がある
+- 通常ページ遷移だけで追加・解除できるフォームまたはリンクの方式を設計段階で確認する必要がある
 
 ### 4.6 Test gaps
 
-- Versionの追加・削除・一覧・権限・共有・locked/closed・削除
+- Versionの追加・解除・一覧・権限・共有・locked/closed・削除
 - 不可視対象の追加拒否、権限喪失/回復、他人のQuickAccessItem解除非開示
 - 削除済み再解除、再QuickAccessItem時の先頭移動、並行追加・並行解除
-- 通常ページ遷移による追加・削除
+- 通常ページ遷移による追加・解除
 - top menuの位置と順序、account menuからの削除
 - previewの最大5件、最近順、不可視除外、対象リンク、loading/empty/error、同一ページ再表示
 - keyboard focus、Escape、pointer/focus離脱
@@ -215,7 +215,7 @@
 5. **Responsive behavior**: 既存breakpointと同じ条件でpreviewを無効化する方法
 6. **Idempotent destroy**: 他人のQuickAccessItemを非開示にしつつ、削除済み対象を成功扱いにする入力契約
 7. **Progressive enhancement**: クライアント機能なしでもPOST/DELETEを成立させる操作表現
-8. **Cache invalidation**: 同一ページでQuickAccessItem追加・削除後にpreview内容を更新または失効する方法
+8. **Cache invalidation**: 同一ページでQuickAccessItem追加・解除後にpreview内容を更新または失効する方法
 9. **Performance budget**: 初期ページはQuickAccessItem queryゼロ、previewはbounded query/scanとするかを設計で明文化
 
 ## 8. Research Needed

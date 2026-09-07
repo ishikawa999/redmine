@@ -148,6 +148,26 @@
   color: var(--oc-gray-7);
 }
 
+/* Closing row of the submenu, leading to the full list. */
+.dropdown-content li.quick-access-preview-more {
+  display: block;
+  box-sizing: border-box;
+  margin-block-start: 4px;
+  border-block-start: 1px solid var(--oc-gray-2);
+}
+
+.dropdown-content li.quick-access-preview-more a {
+  display: block;
+  padding-block: 6px;
+  padding-inline: var(--dropdown-item-padding-inline);
+  font-size: 0.9em;
+}
+
+.quick-access-preview-more:has(> a:hover),
+.quick-access-preview-more:has(> a:focus) {
+  background-color: var(--dropdown-hover-bg);
+}
+
 /* The flyout navigation takes over below this width and folds the account
    menu into a plain list, where a hover-opened submenu has no place. */
 @media screen and (max-width: 899px) {

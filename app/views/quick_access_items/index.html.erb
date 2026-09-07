@@ -11,9 +11,9 @@
           <td class="name"><%= quick_access_target_link(item.target) %></td>
           <td class="name"><%= link_to_project(quick_access_project(item.target)) %></td>
           <td class="buttons">
-            <%= link_to sprite_icon('unpin', l(:button_remove_from_quick_access)),
+            <%= link_to sprite_icon('link-break', l(:button_remove_from_quick_access)),
                         quick_access_items_path(target_type: item.target_type, target_id: item.target_id),
-                        method: :delete, class: 'icon icon-pin' %>
+                        method: :delete, class: 'icon icon-link-break' %>
           </td>
         </tr>
       <% end %>

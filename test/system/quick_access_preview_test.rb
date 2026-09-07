@@ -101,6 +101,40 @@ class QuickAccessPreviewTest < ApplicationSystemTestCase
     end
   end
 
+  def test_submenu_closes_with_a_row_leading_to_the_full_list
+    open_preview
+    assert_selector '.quick-access-preview-item', count: 3
+
+    # The row sits after the listed targets, inside the same list.
+    assert_selector '.quick-access-preview-items > li:last-child.quick-access-preview-more'
+    within('.quick-access-preview-more') do
+      assert_link 'View all quick access items', href: '/quick_access'
+    end
+
+    click_link 'View all quick access items'
+    assert_current_path '/quick_access'
+    assert_selector '#content h2', text: 'Quick access'
+  end
+
+  def test_keyboard_reaches_the_full_list_row_after_the_targets
+    open_preview
+    assert_selector '.quick-access-preview-item', count: 3
+
+    quick_access_link.send_keys(:tab)
+    3.times { page.send_keys(:tab) }
+    assert_selector '.quick-access-preview-more a:focus'
+    page.send_keys(:enter)
+    assert_current_path '/quick_access'
+  end
+
+  def test_empty_submenu_offers_no_full_list_row
+    User.find(2).quick_access_items.delete_all
+    open_preview
+
+    assert_selector '.quick-access-preview .nodata'
+    assert_no_selector '.quick-access-preview-more'
+  end
+
   def test_keyboard_reaches_every_preview_link_once_the_menu_is_open
     ['/issues/2', '/projects/ecookbook/wiki/CookBook_documentation', '/versions/1'].each_with_index do |path, index|
       visit '/projects/ecookbook'

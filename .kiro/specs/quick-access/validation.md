@@ -44,7 +44,7 @@
 - 実行コマンドのPATHは`/Users/ishikawa/.rbenv/versions/3.4.8/bin`を優先。ブラウザーは`GOOGLE_CHROME_OPTS_ARGS=headless CAPYBARA_SERVER_HOST=127.0.0.1`。DNS・localhostを必要とするテストはsandbox外実行を使用。
 - 通常全体テストのskipにはSQLite非対応の日付集計、未導入のImageMagick・GhostScript・pandoc、未構成LDAPなどが含まれる。SCM用リポジトリ未構成によるsuite未ロードもある。これらを検証済みとは扱わない。
 - MySQL/PostgreSQL、他RubyバージョンのCI matrixはローカル未実行。
-- 是正前の全systemではOAuth再ログインの遷移競合、Chrome inspectorのNode idエラーも観測した。ピン固有の製品不具合と断定せず、共通基盤へ回避処理を追加していない。
+- 是正前の全systemではOAuth再ログインの遷移競合、Chrome inspectorのNode idエラーも観測した。クイックアクセス固有の製品不具合と断定せず、共通基盤へ回避処理を追加していない。
 - round 3再実行ではOAuth、Gantts、sidebar関連の失敗は出ず、Chrome inspectorエラー2件が残った。以前の是正前結果は159 tests / 1083 assertions、失敗2、エラー6。
 - 上記2件は追加承認後の同期修正を経て同じseedの全system再実行で発生しなかった。単一seed・ローカル環境での成功であり、すべての環境や将来のブラウザー不安定性の根絶は保証しない。
 - 過去の関連systemを個別プロセスで実行した成功結果は、合同実行の成功やブラウザー不安定性の解消の代わりにはしない。
