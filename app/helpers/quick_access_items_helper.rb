@@ -34,11 +34,36 @@ module QuickAccessItemsHelper
   def quick_access_label(target)
     case target
     when Issue
-      "##{target.id} #{target.subject}"
+      "#{target.tracker} ##{target.id} #{target.subject}"
     when WikiPage
       target.pretty_title
     when Version
       target.name
+    end
+  end
+
+  # Current state name for the targets that carry one, as the list column shows
+  # it. Wiki pages have no state, so they get nothing.
+  def quick_access_status_label(target)
+    case target
+    when Issue
+      target.status.name
+    when Version
+      l("version_status_#{target.status}")
+    end
+  end
+
+  # Coarser open/closed state, as the preview badge shows it.
+  def quick_access_status_badge(target)
+    case target
+    when Issue
+      issue_status_type_badge(target.status)
+    when Version
+      content_tag(
+        'span',
+        l("version_status_#{target.status}"),
+        :class => "badge badge-status-#{target.status}"
+      )
     end
   end
 

@@ -3,8 +3,13 @@
     <% @quick_access_items.each do |item| %>
       <li class="quick-access-preview-item" data-quick-access-id="<%= item.id %>">
         <%= quick_access_target_link(item.target) %>
-        <span class="quick-access-preview-type"><%= quick_access_type_label(item.target) %></span>
-        <span class="quick-access-preview-project"><%= quick_access_project(item.target).name %></span>
+        <span class="quick-access-preview-meta">
+          <%= "#{quick_access_project(item.target).name} - #{quick_access_type_label(item.target)}" %>
+        </span>
+        <% badge = quick_access_status_badge(item.target) %>
+        <% if badge %>
+          <span class="quick-access-preview-status"><%= badge %></span>
+        <% end %>
       </li>
     <% end %>
     <li class="quick-access-preview-more">

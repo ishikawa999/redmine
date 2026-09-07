@@ -115,6 +115,12 @@
   padding-inline: var(--dropdown-item-padding-inline);
 }
 
+/* Each row carries three lines, so a rule between them keeps the rows from
+   reading as one block. Same divider the dropdown uses elsewhere. */
+.quick-access-preview-item + .quick-access-preview-item {
+  border-block-start: 1px solid var(--oc-gray-2);
+}
+
 /* The dropdown gives its own links a flex box and padding; the submenu rows
    supply both themselves. */
 .dropdown-content li.quick-access-preview-item a {
@@ -122,15 +128,35 @@
   padding: 0;
 }
 
-.quick-access-preview-item > a,
+/* A row reads as name, then where it lives, then its state. */
 .quick-access-preview-item > span {
+  display: block;
+}
+
+.quick-access-preview-meta {
+  font-size: 0.85em;
+  color: var(--oc-gray-7);
+}
+
+.quick-access-preview-item > a,
+.quick-access-preview-meta {
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
 
-/* Stretch the target link over the whole row so the type/project text
-   underneath it is clickable too, not just the link's own label. */
+/* The shared badge is sized in rem and lifted off the baseline for headings.
+   In a menu row it should read as part of the text instead, so it scales with
+   the surrounding size and sits on the same baseline. */
+.quick-access-preview-status > .badge {
+  inset-block-end: 0;
+  margin-inline: 0;
+  font-size: 0.7em;
+  line-height: 1.5;
+}
+
+/* Stretch the target link over the whole row so the text underneath it is
+   clickable too, not just the link's own label. */
 .quick-access-preview-item > a::after {
   content: '';
   position: absolute;
@@ -142,10 +168,12 @@
   background-color: var(--dropdown-hover-bg);
 }
 
-.quick-access-preview-item > span {
-  display: block;
-  font-size: 0.85em;
-  color: var(--oc-gray-7);
+/* List view: project, type and status identify the row, so they stay on one
+   line and the name column absorbs the wrapping. */
+table.quick-access .quick-access-project,
+table.quick-access .quick-access-type,
+table.quick-access .quick-access-status {
+  white-space: nowrap;
 }
 
 /* Closing row of the submenu, leading to the full list. */

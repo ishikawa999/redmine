@@ -7,6 +7,8 @@ class QuickAccessItemsController < ApplicationController
     "Version" => Version
   }.freeze
 
+  helper :issue_statuses
+
   before_action :require_login
   before_action :set_target_identity, only: [:create, :destroy]
   before_action :find_target, only: :create

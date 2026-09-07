@@ -39,6 +39,37 @@ class QuickAccessItemsControllerTest < Redmine::ControllerTest
     assert_equal visible_items, @controller.instance_variable_get(:@quick_access_items)
   end
 
+  test 'index lists project, type, name and status in that order' do
+    item = quick_access_items(:issue_item)
+    QuickAccessItem::VisibleReader.any_instance.expects(:call).with(limit: nil).returns([item])
+
+    get :index
+
+    assert_response :success
+    assert_select 'table.quick-access thead th' do |headers|
+      assert_equal [I18n.t(:label_project), I18n.t(:field_type), I18n.t(:field_name), I18n.t(:field_status), ''],
+                   headers.map {|header| header.text.strip}
+    end
+    assert_select 'table.quick-access tbody tr' do
+      assert_select 'td.quick-access-project a', text: item.target.project.name
+      assert_select 'td.quick-access-type', text: I18n.t(:label_issue)
+      assert_select 'td.quick-access-name a', text: @controller.helpers.quick_access_label(item.target)
+      # The list spells the state out rather than reducing it to open/closed.
+      assert_select 'td.quick-access-status', text: item.target.status.name
+      assert_select 'td.quick-access-name .badge', count: 0
+    end
+  end
+
+  test 'index leaves the status cell empty for a wiki page' do
+    item = quick_access_items(:wiki_page_item)
+    QuickAccessItem::VisibleReader.any_instance.expects(:call).with(limit: nil).returns([item])
+
+    get :index
+
+    assert_response :success
+    assert_select 'table.quick-access tbody tr td.quick-access-status', text: ''
+  end
+
   test 'index assigns an empty collection when no item is visible' do
     QuickAccessItem::VisibleReader.any_instance.expects(:call).with(limit: nil).returns([])
 
@@ -128,6 +159,21 @@ class QuickAccessItemsControllerTest < Redmine::ControllerTest
       assert_select 'li:last-child.quick-access-preview-more' do
         assert_select 'a[href=?]', '/quick_access', text: I18n.t(:label_view_all_quick_access_items)
       end
+    end
+
+    # A row reads as name, then project and type together, then its state.
+    issue_item = quick_access_items(:issue_item)
+    within_row = "li.quick-access-preview-item[data-quick-access-id=?]"
+    assert_select within_row, issue_item.id.to_s do
+      assert_select '> a', text: @controller.helpers.quick_access_label(issue_item.target)
+      assert_select '> span.quick-access-preview-meta',
+                    text: "#{issue_item.target.project.name} - #{I18n.t(:label_issue)}"
+      assert_select '> span.quick-access-preview-status span.badge.badge-status-open',
+                    text: I18n.t(:label_open_issues)
+    end
+    # Wiki pages have no state, so they carry no status line.
+    assert_select within_row, quick_access_items(:wiki_page_item).id.to_s do
+      assert_select '> span.quick-access-preview-status', count: 0
     end
     rendered_items = css_select('li.quick-access-preview-item')
     rendered_ids = rendered_items.map {|element| element['data-quick-access-id'].to_i}
