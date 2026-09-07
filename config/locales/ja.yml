@@ -1278,6 +1278,7 @@ ja:
   button_remove_from_quick_access: クイックアクセスから解除
   label_quick_access: クイックアクセス
   label_view_all_quick_access_items: クイックアクセスをすべて表示
+  label_latest_quick_access_items: "最新の%{count}件を表示"
   label_no_quick_access_items: クイックアクセスに登録した項目はありません。
   label_loading_quick_access_items: クイックアクセスを読み込み中…
   label_quick_access_load_error: クイックアクセスを取得できませんでした。

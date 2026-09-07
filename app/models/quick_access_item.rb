@@ -3,6 +3,9 @@
 class QuickAccessItem < ApplicationRecord
   TARGET_TYPES = %w[Issue WikiPage Version].freeze
 
+  # How many of the most recent visible items the menu preview lists.
+  PREVIEW_LIMIT = 5
+
   belongs_to :user
   belongs_to :target, polymorphic: true
 

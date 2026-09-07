@@ -80,7 +80,7 @@ class QuickAccessItemsControllerTest < Redmine::ControllerTest
   end
 
   test 'preview renders the localized empty state in English and Japanese' do
-    QuickAccessItem::VisibleReader.any_instance.expects(:call).with(limit: 5).twice.returns([])
+    QuickAccessItem::VisibleReader.any_instance.expects(:call).with(limit: QuickAccessItem::PREVIEW_LIMIT).twice.returns([])
 
     [:en, :ja].each do |locale|
       I18n.with_locale(locale) do
@@ -115,7 +115,7 @@ class QuickAccessItemsControllerTest < Redmine::ControllerTest
   test 'preview renders direct escaped links for all target types' do
     quick_access_items = [quick_access_items(:issue_item), quick_access_items(:wiki_page_item), quick_access_items(:version_item)]
     quick_access_items[1].target.title = '<script>wiki</script>'
-    QuickAccessItem::VisibleReader.any_instance.expects(:call).with(limit: 5).returns(quick_access_items)
+    QuickAccessItem::VisibleReader.any_instance.expects(:call).with(limit: QuickAccessItem::PREVIEW_LIMIT).returns(quick_access_items)
 
     get :preview
 
@@ -146,7 +146,7 @@ class QuickAccessItemsControllerTest < Redmine::ControllerTest
 
   test 'preview assigns at most five quick_access_items in reader order and returns an html fragment' do
     ordered_items = [quick_access_items(:issue_item), quick_access_items(:wiki_page_item), quick_access_items(:version_item)]
-    QuickAccessItem::VisibleReader.any_instance.expects(:call).with(limit: 5).returns(ordered_items)
+    QuickAccessItem::VisibleReader.any_instance.expects(:call).with(limit: QuickAccessItem::PREVIEW_LIMIT).returns(ordered_items)
 
     get :preview
 
@@ -161,21 +161,31 @@ class QuickAccessItemsControllerTest < Redmine::ControllerTest
       end
     end
 
-    # A row reads as name, then project and type together, then its state.
+    # The heading says how many of the most recent items the submenu lists.
+    assert_select 'p.quick-access-preview-heading',
+                  text: I18n.t(:label_latest_quick_access_items, count: QuickAccessItem::PREVIEW_LIMIT)
+
+    # A row reads as name, then project, then type, with an issue's state
+    # trailing the type.
     issue_item = quick_access_items(:issue_item)
     within_row = "li.quick-access-preview-item[data-quick-access-id=?]"
     assert_select within_row, issue_item.id.to_s do
       assert_select '> a', text: @controller.helpers.quick_access_label(issue_item.target)
-      assert_select '> span.quick-access-preview-meta',
-                    text: "#{issue_item.target.project.name} - #{I18n.t(:label_issue)}"
-      assert_select '> span.quick-access-preview-status span.badge.badge-status-open',
-                    text: I18n.t(:label_open_issues)
+      assert_select '> span.quick-access-preview-project', text: issue_item.target.project.name
+      assert_select '> span.quick-access-preview-type' do
+        assert_select 'span.badge.badge-status-open', text: I18n.t(:label_open_issues)
+      end
+      assert_select '> span.quick-access-preview-type', text: /\A#{I18n.t(:label_issue)}\s/
     end
     # Only issues carry a badge; a version's state is left to the status column
     # of the list, and wiki pages have no state at all.
-    [quick_access_items(:version_item), quick_access_items(:wiki_page_item)].each do |other|
+    {
+      quick_access_items(:version_item) => I18n.t(:label_version),
+      quick_access_items(:wiki_page_item) => I18n.t(:label_wiki_page)
+    }.each do |other, type_label|
       assert_select within_row, other.id.to_s do
-        assert_select '> span.quick-access-preview-status', count: 0
+        assert_select '> span.quick-access-preview-type', text: type_label
+        assert_select '> span.quick-access-preview-type .badge', count: 0
       end
     end
     rendered_items = css_select('li.quick-access-preview-item')
@@ -186,7 +196,7 @@ class QuickAccessItemsControllerTest < Redmine::ControllerTest
   end
 
   test 'a preview reader failure is isolated from the full page endpoint' do
-    QuickAccessItem::VisibleReader.any_instance.stubs(:call).with(limit: 5).raises('preview failed')
+    QuickAccessItem::VisibleReader.any_instance.stubs(:call).with(limit: QuickAccessItem::PREVIEW_LIMIT).raises('preview failed')
     QuickAccessItem::VisibleReader.any_instance.stubs(:call).with(limit: nil).returns([])
 
     assert_raises(RuntimeError) { get :preview }

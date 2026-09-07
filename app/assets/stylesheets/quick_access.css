@@ -96,6 +96,17 @@
   font-size: 1em;
 }
 
+/* Says what the submenu is showing, so the five rows do not read as the whole
+   list. */
+.quick-access-preview-heading {
+  margin: 0;
+  padding-block: 2px 4px;
+  padding-inline: var(--dropdown-item-padding-inline);
+  border-block-end: 1px solid var(--oc-gray-2);
+  font-size: 0.85em;
+  color: var(--oc-gray-6);
+}
+
 .quick-access-preview-items {
   display: block;
   margin: 0;
@@ -128,31 +139,33 @@
   padding: 0;
 }
 
-/* A row reads as name, then where it lives, then its state. */
+/* A row reads as name, then project, then type, with an issue's state trailing
+   the type. */
 .quick-access-preview-item > span {
   display: block;
 }
 
-.quick-access-preview-meta {
+.quick-access-preview-project,
+.quick-access-preview-type {
   font-size: 0.85em;
   color: var(--oc-gray-7);
 }
 
 .quick-access-preview-item > a,
-.quick-access-preview-meta {
+.quick-access-preview-project {
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
 
 /* The shared badge is sized in rem and lifted off the baseline for headings.
-   In a menu row it should read as part of the text instead, so it scales with
+   In a menu row it should read as part of the line instead, so it scales with
    the surrounding size and sits on the same baseline. */
-.quick-access-preview-status > .badge {
+.quick-access-preview-type > .badge {
   inset-block-end: 0;
-  margin-inline: 0;
-  font-size: 0.7em;
-  line-height: 1.5;
+  margin-inline: 0.35rem 0;
+  font-size: 0.8em;
+  line-height: 1.4;
 }
 
 /* Stretch the target link over the whole row so the text underneath it is

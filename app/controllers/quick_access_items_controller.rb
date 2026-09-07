@@ -18,7 +18,7 @@ class QuickAccessItemsController < ApplicationController
   end
 
   def preview
-    @quick_access_items = visible_items(limit: 5)
+    @quick_access_items = visible_items(limit: QuickAccessItem::PREVIEW_LIMIT)
     render partial: "preview", layout: false
   end
 
