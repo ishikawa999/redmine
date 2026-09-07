@@ -53,18 +53,10 @@ module QuickAccessItemsHelper
     end
   end
 
-  # Coarser open/closed state, as the preview badge shows it.
+  # Coarser open/closed state, as the preview badge shows it. Only issues carry
+  # one; a version's state is left to the status column of the list.
   def quick_access_status_badge(target)
-    case target
-    when Issue
-      issue_status_type_badge(target.status)
-    when Version
-      content_tag(
-        'span',
-        l("version_status_#{target.status}"),
-        :class => "badge badge-status-#{target.status}"
-      )
-    end
+    issue_status_type_badge(target.status) if target.is_a?(Issue)
   end
 
   def quick_access_type_label(target)

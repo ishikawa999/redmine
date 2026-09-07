@@ -62,7 +62,7 @@ class QuickAccessItemsHelperTest < Redmine::HelperTest
     assert_nil quick_access_status_label(wiki_pages(:wiki_pages_001))
   end
 
-  test 'status badge reports open and closed state and wiki pages carry none' do
+  test 'status badge reports open and closed state for issues only' do
     open_issue = issues(:issues_001)
     closed_issue = issues(:issues_008)
     assert_not open_issue.closed?
@@ -73,10 +73,9 @@ class QuickAccessItemsHelperTest < Redmine::HelperTest
     assert_select_in quick_access_status_badge(closed_issue),
                      'span.badge.badge-status-closed', text: l(:label_closed_issues)
 
-    version = versions(:versions_001)
-    assert_select_in quick_access_status_badge(version),
-                     "span.badge.badge-status-#{version.status}", text: l("version_status_#{version.status}")
-
+    # Versions and wiki pages carry no badge; a version's state is left to the
+    # status column of the list.
+    assert_nil quick_access_status_badge(versions(:versions_001))
     assert_nil quick_access_status_badge(wiki_pages(:wiki_pages_001))
   end
 

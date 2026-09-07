@@ -171,9 +171,12 @@ class QuickAccessItemsControllerTest < Redmine::ControllerTest
       assert_select '> span.quick-access-preview-status span.badge.badge-status-open',
                     text: I18n.t(:label_open_issues)
     end
-    # Wiki pages have no state, so they carry no status line.
-    assert_select within_row, quick_access_items(:wiki_page_item).id.to_s do
-      assert_select '> span.quick-access-preview-status', count: 0
+    # Only issues carry a badge; a version's state is left to the status column
+    # of the list, and wiki pages have no state at all.
+    [quick_access_items(:version_item), quick_access_items(:wiki_page_item)].each do |other|
+      assert_select within_row, other.id.to_s do
+        assert_select '> span.quick-access-preview-status', count: 0
+      end
     end
     rendered_items = css_select('li.quick-access-preview-item')
     rendered_ids = rendered_items.map {|element| element['data-quick-access-id'].to_i}
