@@ -69,7 +69,7 @@ Rails.application.routes.draw do
   end
 
   resources :reactions, only: [:create, :destroy]
-  resources :pins, only: [:index, :create] do
+  resources :quick_access_items, path: 'quick_access', only: [:index, :create] do
     collection do
       get :preview
       delete :destroy, path: ''

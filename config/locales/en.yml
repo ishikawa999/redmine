@@ -1260,13 +1260,13 @@ en:
   button_import: Import
   button_project_bookmark: Add bookmark
   button_project_bookmark_delete: Remove bookmark
-  button_pin: Pin
-  button_unpin: Unpin
-  label_pinned_items: Pinned items
-  label_view_all_pinned_items: View all pinned items
-  label_no_pinned_items: You have not pinned anything yet.
-  label_loading_pinned_items: Loading pinned items…
-  label_pinned_items_load_error: Could not load pinned items.
+  button_add_to_quick_access: Add to quick access
+  button_remove_from_quick_access: Remove from quick access
+  label_quick_access: Quick access
+  label_view_all_quick_access_items: View all quick access items
+  label_no_quick_access_items: You have not added anything to quick access yet.
+  label_loading_quick_access_items: Loading quick access items…
+  label_quick_access_load_error: Could not load quick access items.
   button_filter: Filter
   button_actions: Actions
   button_add_subtask: Add subtask

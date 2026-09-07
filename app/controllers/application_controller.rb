@@ -33,7 +33,7 @@ class ApplicationController < ActionController::Base
   helper :routes
   helper :avatars
   helper :icons
-  helper :pins
+  helper :quick_access_items
 
   class_attribute :accept_api_auth_actions
   class_attribute :accept_atom_auth_actions

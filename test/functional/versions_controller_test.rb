@@ -136,7 +136,7 @@ class VersionsControllerTest < Redmine::ControllerTest
 
       assert_select 'h2', :text => /1.0/
       assert_select 'span[class=?]', 'badge badge-status-locked', :text => 'locked'
-      assert_select 'a#pin-toggle-version-2[href^="/pins"]', :count => 1
+      assert_select 'a#quick-access-toggle-version-2[href^="/quick_access"]', :count => 1
 
       # no issue avatar when gravatar is disabled
       assert_select 'img.gravatar', :count => 0
@@ -148,7 +148,7 @@ class VersionsControllerTest < Redmine::ControllerTest
     get :index, :params => {:project_id => 1}
 
     assert_response :success
-    assert_select '[id^="pin-toggle-version-"]', :count => 0
+    assert_select '[id^="quick-access-toggle-version-"]', :count => 0
   end
 
   def test_show_should_show_issue_assignee

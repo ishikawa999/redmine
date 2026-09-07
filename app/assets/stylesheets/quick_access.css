@@ -1,0 +1,120 @@
+.quick-access-menu {
+  position: relative;
+}
+
+.quick-access-preview {
+  display: none;
+  position: absolute;
+  z-index: 30;
+  inset-block-start: 100%;
+  inset-inline-start: 0;
+  min-inline-size: 20rem;
+  max-inline-size: 28rem;
+  color: var(--oc-gray-9);
+  background: var(--oc-white);
+  border: 1px solid var(--oc-gray-4);
+  box-shadow: 0 0.25rem 0.75rem rgb(0 0 0 / 20%);
+}
+
+.quick-access-preview.is-open {
+  display: block;
+}
+
+/* The list state gets its padding from each .quick-access-preview-item instead (see
+   below), so its hoverable/clickable row includes that padding. Loading and
+   error just set textContent directly on .quick-access-preview with no item wrapper,
+   so they still need it applied here. */
+.quick-access-preview.is-loading,
+.quick-access-preview.is-error {
+  padding: 0.75rem;
+}
+
+.quick-access-preview.is-loading,
+.quick-access-preview.is-empty,
+.quick-access-preview.is-error {
+  color: var(--oc-gray-7);
+}
+
+.quick-access-preview.is-error {
+  color: var(--oc-red-8);
+}
+
+/* No quick_access_items yet: a light text hint rather than a bordered, boxed panel.
+   Still needs an opaque background, otherwise the text is unreadable
+   against whatever page content sits underneath it. */
+.quick-access-preview.is-empty {
+  min-inline-size: 12rem;
+  padding-block: 0.25rem;
+  padding-inline: 0.5rem;
+  background: var(--oc-white);
+  border: none;
+  box-shadow: none;
+  white-space: nowrap;
+}
+
+.quick-access-preview.is-empty .nodata {
+  padding: 0;
+  margin: 0;
+  border: none;
+  background: none;
+  color: inherit;
+  text-align: start;
+  font-size: 1em;
+}
+
+.top-menu__links .quick-access-preview-items {
+  display: block;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.top-menu__links .quick-access-preview a,
+.top-menu__links .quick-access-preview a:link,
+.top-menu__links .quick-access-preview a:visited {
+  color: var(--oc-blue-8);
+}
+
+.top-menu__links .quick-access-preview a:hover,
+.top-menu__links .quick-access-preview a:focus {
+  color: var(--oc-blue-9);
+  background-color: var(--oc-gray-1);
+  text-decoration: underline;
+}
+
+/* Padding lives on each row (not on .quick-access-preview) so a row's hoverable and
+   clickable box includes it, rather than leaving a padding-wide strip of
+   the panel that belongs to no particular item. */
+.quick-access-preview-item {
+  position: relative;
+  padding: 0.75rem;
+}
+
+.quick-access-preview-item + .quick-access-preview-item {
+  border-block-start: 1px solid var(--oc-gray-3);
+}
+
+/* Stretch the target link over the whole row so the type/project text
+   underneath it is clickable too, not just the link's own label. */
+.quick-access-preview-item > a::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+}
+
+.quick-access-preview-item:has(> a:hover),
+.quick-access-preview-item:has(> a:focus) {
+  background-color: var(--oc-gray-1);
+}
+
+.quick-access-preview-item > span {
+  display: block;
+  font-size: 0.85em;
+  color: var(--oc-gray-7);
+}
+
+@media screen and (max-width: 899px) {
+  .quick-access-preview {
+    display: none;
+  }
+}

@@ -1,0 +1,27 @@
+<h2><%= l(:label_quick_access) %></h2>
+
+<% if @quick_access_items.any? %>
+  <div class="autoscroll">
+    <table class="list quick-access">
+      <thead><tr><th><%= l(:field_type) %></th><th><%= l(:field_name) %></th><th><%= l(:label_project) %></th><th></th></tr></thead>
+      <tbody>
+      <% @quick_access_items.each do |item| %>
+        <tr>
+          <td><%= quick_access_type_label(item.target) %></td>
+          <td class="name"><%= quick_access_target_link(item.target) %></td>
+          <td class="name"><%= link_to_project(quick_access_project(item.target)) %></td>
+          <td class="buttons">
+            <%= link_to sprite_icon('unpin', l(:button_remove_from_quick_access)),
+                        quick_access_items_path(target_type: item.target_type, target_id: item.target_id),
+                        method: :delete, class: 'icon icon-pin' %>
+          </td>
+        </tr>
+      <% end %>
+      </tbody>
+    </table>
+  </div>
+<% else %>
+  <p class="nodata"><%= l(:label_no_quick_access_items) %></p>
+<% end %>
+
+<% html_title l(:label_quick_access) %>

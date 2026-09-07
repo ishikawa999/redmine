@@ -1,0 +1,13 @@
+<% if @quick_access_items.any? %>
+  <ul class="quick-access-preview-items">
+    <% @quick_access_items.each do |item| %>
+      <li class="quick-access-preview-item" data-quick-access-id="<%= item.id %>">
+        <%= quick_access_target_link(item.target) %>
+        <span class="quick-access-preview-type"><%= quick_access_type_label(item.target) %></span>
+        <span class="quick-access-preview-project"><%= quick_access_project(item.target).name %></span>
+      </li>
+    <% end %>
+  </ul>
+<% else %>
+  <p class="nodata"><%= l(:label_no_quick_access_items) %></p>
+<% end %>

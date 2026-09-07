@@ -91,14 +91,17 @@ class ApplicationSystemTestCase < ActionDispatch::SystemTestCase
 
   # Opens the "..." actions dropdown in a .contextual toolbar, when present
   # and not already expanded. Some pages (eg. issues, wiki pages) tuck the
-  # pin toggle inside it; others (eg. versions) expose it as a plain button
+  # item toggle inside it; others (eg. versions) expose it as a plain button
   # with no dropdown to open.
   def open_contextual_actions_dropdown
-    drdn = first('.contextual span.drdn', minimum: 0)
-    return unless drdn
-    return if drdn[:class].to_s.split(' ').include?('expanded')
+    dropdown = first('#content .contextual span.dropdown', minimum: 0)
+    return unless dropdown
 
-    drdn.first('.drdn-trigger').click
+    content = dropdown.first('.dropdown-content', minimum: 0, visible: :all)
+    return if content&.visible?
+
+    dropdown.first('.dropdown-trigger').click
+    assert_selector '#content .contextual span.dropdown .dropdown-content'
   end
 
   def wait_for_ajax

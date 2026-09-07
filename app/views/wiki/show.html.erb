@@ -8,7 +8,7 @@
 <% end %>
 
   <%= actions_dropdown do %>
-    <%= pin_link(@page) %>
+    <%= quick_access_link(@page) %>
     <%= link_to_if_authorized(sprite_icon('history', l(:label_history)), { :action => 'history', :id => @page.title}, :class => 'icon icon-history') %>
 
     <% if @editable %>

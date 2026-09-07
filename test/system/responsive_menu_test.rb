@@ -44,9 +44,9 @@ class ResponsiveMenuTest < ApplicationSystemTestCase
     # 5. Verify elements are detached, appended to flyout slots, and visible
     assert_selector '.flyout-menu .js-project-menu ul'
     assert_selector '.flyout-menu .js-general-menu ul'
-    assert_selector '.flyout-menu .js-general-menu ul > li.pinned-items-menu' do
-      assert_selector 'a.pinned-items[href="/pins"]'
-      assert_selector '.pin-preview[data-pin-preview-target="preview"]', visible: :all
+    assert_selector '.flyout-menu .js-general-menu ul > li.quick-access-menu' do
+      assert_selector 'a.quick-access[href="/quick_access"]'
+      assert_selector '.quick-access-preview[data-quick-access-preview-target="preview"]', visible: :all
     end
     assert_selector '.flyout-menu .js-profile-menu ul'
 

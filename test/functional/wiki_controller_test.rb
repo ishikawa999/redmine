@@ -68,7 +68,7 @@ class WikiControllerTest < Redmine::ControllerTest
     get :show, :params => {:project_id => 1, :id => 'Another_page'}
 
     assert_response :success
-    assert_select 'a[id^="pin-toggle-wiki-page-"][href^="/pins"]', :count => 1
+    assert_select 'a[id^="quick-access-toggle-wiki-page-"][href^="/quick_access"]', :count => 1
   end
 
   def test_show_old_version
