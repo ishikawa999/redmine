@@ -1,37 +1,74 @@
-.quick-access-menu {
+/* The quick access node in the account menu owns a nested submenu, so it
+   anchors it and opts out of the flex row every other dropdown item uses. */
+.dropdown-content li.quick-access-menu {
   position: relative;
+  display: block;
 }
 
+.dropdown-content li.quick-access-menu > a {
+  justify-content: flex-start;
+  gap: 0.25rem;
+}
+
+/* The submenu is positioned out of the flow, so it no longer contributes to
+   the menu's own width. Hold a floor that keeps the name header on one line. */
+#account .dropdown-content {
+  min-inline-size: 12rem;
+}
+
+.quick-access-submenu-marker {
+  flex: none;
+  color: var(--oc-gray-6);
+}
+
+/* The account menu sits against the trailing edge of the window, so the
+   submenu opens towards the leading edge instead of overflowing off screen.
+   It overlaps the parent by a hair so a pointer crossing between the two
+   never passes over the page underneath. */
 .quick-access-preview {
   display: none;
   position: absolute;
   z-index: 30;
-  inset-block-start: 100%;
-  inset-inline-start: 0;
-  min-inline-size: 20rem;
-  max-inline-size: 28rem;
+  inset-inline-end: calc(100% - 1px);
+  inset-block-start: 0;
+  min-inline-size: 16rem;
+  max-inline-size: 24rem;
   color: var(--oc-gray-9);
-  background: var(--oc-white);
-  border: 1px solid var(--oc-gray-4);
-  box-shadow: 0 0.25rem 0.75rem rgb(0 0 0 / 20%);
+  /* Same panel treatment the dropdown gives its own nested submenus. */
+  background-color: var(--dropdown-bg);
+  border: 1px solid var(--dropdown-border);
+  border-radius: 4px;
+  box-shadow: 0 4px 6px var(--dropdown-shadow);
+  padding-block: 4px;
+}
+
+/* The panel above already carries the submenu treatment, so the list inside
+   it must not draw a second one. */
+.dropdown-content .quick-access-preview ul {
+  background: none;
+  border: none;
+  border-radius: 0;
+  box-shadow: none;
+  padding-block: 0;
 }
 
 .quick-access-preview.is-open {
   display: block;
 }
 
-/* The list state gets its padding from each .quick-access-preview-item instead (see
-   below), so its hoverable/clickable row includes that padding. Loading and
-   error just set textContent directly on .quick-access-preview with no item wrapper,
-   so they still need it applied here. */
+/* Loading and error set textContent directly on .quick-access-preview with no
+   item wrapper, so they need the item padding applied here. The loaded list
+   gets it per row instead (see below). */
 .quick-access-preview.is-loading,
 .quick-access-preview.is-error {
-  padding: 0.75rem;
+  padding-block: var(--dropdown-item-padding-block);
+  padding-inline: var(--dropdown-item-padding-inline);
 }
 
 .quick-access-preview.is-loading,
 .quick-access-preview.is-empty,
 .quick-access-preview.is-error {
+  font-size: 0.9em;
   color: var(--oc-gray-7);
 }
 
@@ -39,14 +76,11 @@
   color: var(--oc-red-8);
 }
 
-/* No quick_access_items yet: a light text hint rather than a bordered, boxed panel.
-   Still needs an opaque background, otherwise the text is unreadable
-   against whatever page content sits underneath it. */
+/* Nothing added yet: a light text hint rather than a full submenu panel. */
 .quick-access-preview.is-empty {
   min-inline-size: 12rem;
-  padding-block: 0.25rem;
-  padding-inline: 0.5rem;
-  background: var(--oc-white);
+  padding-block: var(--dropdown-item-padding-block);
+  padding-inline: var(--dropdown-item-padding-inline);
   border: none;
   box-shadow: none;
   white-space: nowrap;
@@ -62,36 +96,37 @@
   font-size: 1em;
 }
 
-.top-menu__links .quick-access-preview-items {
+.quick-access-preview-items {
   display: block;
   margin: 0;
   padding: 0;
   list-style: none;
 }
 
-.top-menu__links .quick-access-preview a,
-.top-menu__links .quick-access-preview a:link,
-.top-menu__links .quick-access-preview a:visited {
-  color: var(--oc-blue-8);
-}
-
-.top-menu__links .quick-access-preview a:hover,
-.top-menu__links .quick-access-preview a:focus {
-  color: var(--oc-blue-9);
-  background-color: var(--oc-gray-1);
-  text-decoration: underline;
-}
-
-/* Padding lives on each row (not on .quick-access-preview) so a row's hoverable and
-   clickable box includes it, rather than leaving a padding-wide strip of
-   the panel that belongs to no particular item. */
-.quick-access-preview-item {
+/* Padding lives on each row so a row's hoverable and clickable box includes
+   it, rather than leaving a padding-wide strip that belongs to no item. */
+/* The dropdown sets its items to width:100%, so the row needs border-box or
+   its own inline padding pushes the hover and focus box past the panel. */
+.dropdown-content li.quick-access-preview-item {
   position: relative;
-  padding: 0.75rem;
+  display: block;
+  box-sizing: border-box;
+  padding-block: 4px;
+  padding-inline: var(--dropdown-item-padding-inline);
 }
 
-.quick-access-preview-item + .quick-access-preview-item {
-  border-block-start: 1px solid var(--oc-gray-3);
+/* The dropdown gives its own links a flex box and padding; the submenu rows
+   supply both themselves. */
+.dropdown-content li.quick-access-preview-item a {
+  display: block;
+  padding: 0;
+}
+
+.quick-access-preview-item > a,
+.quick-access-preview-item > span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 /* Stretch the target link over the whole row so the type/project text
@@ -104,7 +139,7 @@
 
 .quick-access-preview-item:has(> a:hover),
 .quick-access-preview-item:has(> a:focus) {
-  background-color: var(--oc-gray-1);
+  background-color: var(--dropdown-hover-bg);
 }
 
 .quick-access-preview-item > span {
@@ -113,8 +148,14 @@
   color: var(--oc-gray-7);
 }
 
+/* The flyout navigation takes over below this width and folds the account
+   menu into a plain list, where a hover-opened submenu has no place. */
 @media screen and (max-width: 899px) {
   .quick-access-preview {
+    display: none;
+  }
+
+  .quick-access-submenu-marker {
     display: none;
   }
 }

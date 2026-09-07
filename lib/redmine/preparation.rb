@@ -170,9 +170,6 @@ module Redmine
         menu.push :home, :home_path
         menu.push :my_page, {:controller => 'my', :action => 'page'},
                   :if => Proc.new {User.current.logged?}
-        menu.push :quick_access, :quick_access_items_path,
-                  :if => Proc.new {User.current.logged?},
-                  :caption => :label_quick_access
         menu.push :projects, {:controller => 'projects', :action => 'index'},
                   :caption => :label_project_plural
         menu.push :administration, {:controller => 'admin', :action => 'index'},
@@ -190,6 +187,9 @@ module Redmine
                   :first => true
         menu.push :my_account, {:controller => 'my', :action => 'account'},
                   :if => Proc.new {User.current.logged?}
+        menu.push :quick_access, :quick_access_items_path,
+                  :if => Proc.new {User.current.logged?},
+                  :caption => :label_quick_access
         menu.push :logout, :signout_path, :html => {:method => 'post'},
                   :if => Proc.new {User.current.logged?}
       end

@@ -53,40 +53,43 @@ class LayoutTest < Redmine::IntegrationTest
     end
   end
 
-  def test_logged_in_top_menu_contains_quick_access_after_my_page_but_account_menu_does_not
+  def test_logged_in_account_menu_contains_quick_access_after_my_account_but_top_menu_does_not
     log_user('jsmith', 'jsmith')
     get '/'
 
-    assert_select '#top-menu .general-menu > .top-menu__links > ul' do
-      assert_select 'li:has(> a.my-page) + li.quick-access-menu[data-quick-access-preview-url-value="/quick_access/preview"]' do
+    assert_select '#account .dropdown-content > ul' do
+      selector = 'li:has(> a.my-account) + li.quick-access-menu' \
+                 '[data-quick-access-preview-url-value="/quick_access/preview"]'
+      assert_select selector do
         assert_select 'a.quick-access[href="/quick_access"]', count: 1
         assert_select '.quick-access-preview', count: 1
       end
     end
-    assert_select '#account a.quick-access', count: 0
+    assert_select '#top-menu .general-menu a.quick-access', count: 0
   end
 
-  def test_guest_top_menu_does_not_contain_quick_access
+  def test_guest_layout_does_not_contain_quick_access
     with_settings login_required: '0' do
       get '/'
-      assert_select '#top-menu a.quick-access', count: 0
+      assert_select 'a.quick-access', count: 0
+      assert_select '.quick-access-preview', count: 0
     end
   end
 
-  def test_initial_layout_does_not_query_pin_content
+  def test_initial_layout_does_not_query_quick_access_content
     log_user('jsmith', 'jsmith')
-    pin_queries = []
+    quick_access_queries = []
     subscriber = ActiveSupport::Notifications.subscribe('sql.active_record') do |*, payload|
-      pin_queries << payload[:sql] if payload[:sql].match?(/\b(?:FROM|JOIN)\s+["`]?quick_access_items["`]?\b/i)
+      quick_access_queries << payload[:sql] if payload[:sql].match?(/\b(?:FROM|JOIN)\s+["`]?quick_access_items["`]?\b/i)
     end
 
     ['/', '/projects/ecookbook', '/my/page'].each do |path|
-      pin_queries.clear
+      quick_access_queries.clear
       get path
 
       assert_response :success
       assert_select '.quick-access-preview-item', count: 0
-      assert_empty pin_queries, "Initial GET #{path} must not query item content"
+      assert_empty quick_access_queries, "Initial GET #{path} must not query item content"
     end
   ensure
     ActiveSupport::Notifications.unsubscribe(subscriber) if subscriber

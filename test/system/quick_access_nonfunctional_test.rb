@@ -38,8 +38,8 @@ class QuickAccessNonfunctionalTest < ApplicationSystemTestCase
   test 'deleted targets including orphaned references do not break the rendered list' do
     deleted = Version.create!(project: Project.find(1), name: 'Deleted target version')
     orphan = Version.create!(project: Project.find(1), name: 'Orphaned target version')
-    deleted_pin = @user.quick_access_items.create!(target: deleted)
-    orphan_pin = @user.quick_access_items.create!(target: orphan)
+    deleted_item = @user.quick_access_items.create!(target: deleted)
+    orphan_item = @user.quick_access_items.create!(target: orphan)
     @user.quick_access_items.create!(target: Issue.find(2))
     deleted.destroy!
     orphan.delete
@@ -52,11 +52,11 @@ class QuickAccessNonfunctionalTest < ApplicationSystemTestCase
       assert_no_text target.name
       assert_no_selector "#content a[href='/versions/#{target.id}']"
     end
-    assert_not QuickAccessItem.exists?(deleted_pin.id)
-    assert QuickAccessItem.exists?(orphan_pin.id)
+    assert_not QuickAccessItem.exists?(deleted_item.id)
+    assert QuickAccessItem.exists?(orphan_item.id)
   end
 
-  test 'current names and moved project are rendered after pinning' do
+  test 'current names and moved project are rendered after adding' do
     issue = Issue.find(2)
     wiki = WikiPage.find(1)
     version = Version.find(1)
@@ -131,17 +131,19 @@ class QuickAccessNonfunctionalTest < ApplicationSystemTestCase
 
   test 'initial page makes no preview request and failed preview leaves normal search usable' do
     script = page.driver.browser.execute_cdp('Page.addScriptToEvaluateOnNewDocument', source: <<~JS)
-      window.pinPreviewRequests = 0;
+      window.quickAccessPreviewRequests = 0;
       const originalFetch = window.fetch.bind(window);
       window.fetch = function(url, options) {
         if (!String(url).includes('/quick_access/preview')) return originalFetch(url, options);
-        window.pinPreviewRequests += 1;
+        window.quickAccessPreviewRequests += 1;
         return Promise.resolve(new Response('', {status: 503}));
       };
     JS
     visit '/projects/ecookbook'
     assert_selector '#content h2', text: 'Overview'
-    assert_selector 'li.quick-access-menu[data-controller="quick-access-preview"]'
+    # The node lives inside the closed account menu, so it is present but not
+    # yet on screen.
+    assert_selector 'li.quick-access-menu[data-controller="quick-access-preview"]', visible: :all
     Selenium::WebDriver::Wait.new(timeout: Capybara.default_max_wait_time).until do
       page.evaluate_script(<<~JS)
         !!window.Stimulus?.getControllerForElementAndIdentifier(
@@ -149,13 +151,16 @@ class QuickAccessNonfunctionalTest < ApplicationSystemTestCase
         )
       JS
     end
-    assert_equal 0, page.evaluate_script('window.pinPreviewRequests')
+    assert_equal 0, page.evaluate_script('window.quickAccessPreviewRequests')
     assert_selector '.quick-access-preview[data-state="idle"]', visible: :all
 
-    find('li.quick-access-menu').hover
+    find('#account .dropdown-trigger').click
+    assert_selector '#account .dropdown-content:not(.hidden)'
+    find('#account li.quick-access-menu').hover
     assert_selector '.quick-access-preview[data-state="error"]', text: 'Could not load quick access items.'
-    assert_equal 1, page.evaluate_script('window.pinPreviewRequests')
+    assert_equal 1, page.evaluate_script('window.quickAccessPreviewRequests')
     assert_current_path '/projects/ecookbook'
+    page.send_keys(:escape)
     fill_in 'q', with: 'ingredients'
     find('#q').send_keys(:enter)
     assert_current_path '/projects/ecookbook/search', ignore_query: true
