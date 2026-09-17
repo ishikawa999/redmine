@@ -1273,6 +1273,13 @@ ja:
   label_optgroup_recents: 最近使用したもの
   button_project_bookmark: ブックマークに追加
   button_project_bookmark_delete: ブックマークから削除
+  button_add_to_quick_access: クイックアクセスに追加
+  button_remove_from_quick_access: クイックアクセスから外す
+  label_quick_access: クイックアクセス
+  label_view_all_quick_access_items: すべて表示
+  label_latest_quick_access_items: "最新の%{count}件を表示"
+  label_no_quick_access_items: クイックアクセスに追加されたページはありません。
+  label_quick_access_load_error: クイックアクセスを取得できませんでした。
   field_history_default_tab: チケットの履歴のデフォルトタブ
   label_issue_history_properties: プロパティ更新履歴
   label_issue_history_notes: コメント

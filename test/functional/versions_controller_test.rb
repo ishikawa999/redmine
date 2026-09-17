@@ -129,16 +129,50 @@ class VersionsControllerTest < Redmine::ControllerTest
   end
 
   def test_show
+    @request.session[:user_id] = 2
     with_settings :gravatar_enabled => '0' do
       get :show, :params => {:id => 2}
       assert_response :success
 
       assert_select 'h2', :text => /1.0/
       assert_select 'span[class=?]', 'badge badge-status-locked', :text => 'locked'
+      assert_select 'a#quick-access-toggle-version-2[href^="/quick_access"]', :count => 1
 
       # no issue avatar when gravatar is disabled
       assert_select 'img.gravatar', :count => 0
     end
+  end
+
+  def test_show_should_place_quick_access_toggle_between_wiki_page_edit_and_delete
+    @request.session[:user_id] = 2
+    version = Version.find(2)
+    version.update_column(:wiki_page_title, 'CookBook documentation')
+
+    get :show, :params => {:id => version.id}
+
+    assert_response :success
+    assert_select '#content > .contextual' do
+      assert_select 'a' do |links|
+        hrefs = links.pluck('href')
+        wiki_edit = hrefs.index {|href| href.include?('/wiki/CookBook_documentation/edit')}
+        toggle = hrefs.index {|href| href.start_with?('/quick_access')}
+        delete = hrefs.index {|href| href == "/versions/#{version.id}?back_url=%2Fprojects%2Fecookbook%2Froadmap"}
+
+        assert wiki_edit, "Expected the associated wiki page edit link, got #{hrefs.inspect}"
+        assert toggle, "Expected the quick access toggle, got #{hrefs.inspect}"
+        assert delete, "Expected the delete link, got #{hrefs.inspect}"
+        assert_operator wiki_edit, :<, toggle
+        assert_operator toggle, :<, delete
+      end
+    end
+  end
+
+  def test_roadmap_does_not_show_version_quick_access_controls
+    @request.session[:user_id] = 2
+    get :index, :params => {:project_id => 1}
+
+    assert_response :success
+    assert_select '[id^="quick-access-toggle-version-"]', :count => 0
   end
 
   def test_show_should_show_issue_assignee
