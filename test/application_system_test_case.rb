@@ -89,6 +89,21 @@ class ApplicationSystemTestCase < ActionDispatch::SystemTestCase
     assert_current_path '/', :ignore_query => true
   end
 
+  # Opens the "..." actions dropdown in a .contextual toolbar, when present
+  # and not already expanded. Some pages (eg. issues, wiki pages) tuck the
+  # item toggle inside it; others (eg. versions) expose it as a plain button
+  # with no dropdown to open.
+  def open_contextual_actions_dropdown
+    dropdown = first('#content .contextual span.dropdown', minimum: 0)
+    return unless dropdown
+
+    content = dropdown.first('.dropdown-content', minimum: 0, visible: :all)
+    return if content&.visible?
+
+    dropdown.first('.dropdown-trigger').click
+    assert_selector '#content .contextual span.dropdown .dropdown-content'
+  end
+
   def wait_for_ajax
     Timeout.timeout(Capybara.default_max_wait_time) do
       loop until page.evaluate_script("jQuery.active").zero?
