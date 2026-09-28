@@ -1,0 +1,4 @@
+<% if @target %>
+$('[id="quick-access-toggle-<%= @target.class.base_class.name.underscore.dasherize %>-<%= @target.id %>"]').replaceWith('<%= j quick_access_link(@target) %>');
+<% end %>
+document.dispatchEvent(new CustomEvent('quick-access-preview:invalidate'));

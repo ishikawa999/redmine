@@ -55,7 +55,7 @@ function setupFlyout() {
         $('#main-menu > ul').detach().appendTo('.js-project-menu');
         $('#top-menu .general-menu .top-menu__links > ul').detach().appendTo('.js-general-menu');
         $('#sidebar > *').detach().appendTo('.js-sidebar');
-        $('#account ul').detach().appendTo('.js-profile-menu');
+        $('#account ul').first().detach().appendTo('.js-profile-menu');
 
         mobileInit = true;
         desktopInit = false;

@@ -129,16 +129,43 @@ class VersionsControllerTest < Redmine::ControllerTest
   end
 
   def test_show
+    @request.session[:user_id] = 2
     with_settings :gravatar_enabled => '0' do
       get :show, :params => {:id => 2}
       assert_response :success
 
       assert_select 'h2', :text => /1.0/
       assert_select 'span[class=?]', 'badge badge-status-locked', :text => 'locked'
+      assert_select 'a#quick-access-toggle-version-2[href^="/quick_access"]', :count => 1
 
       # no issue avatar when gravatar is disabled
       assert_select 'img.gravatar', :count => 0
     end
+  end
+
+  def test_show_should_place_quick_access_toggle_in_actions_dropdown
+    @request.session[:user_id] = 2
+    get :show, :params => {:id => 2}
+
+    assert_response :success
+    assert_select '#content > .contextual > .dropdown .dropdown-items' do
+      assert_select 'a#quick-access-toggle-version-2[href^="/quick_access"]', :count => 1
+    end
+  end
+
+  def test_show_should_not_show_actions_dropdown_for_anonymous
+    get :show, :params => {:id => 2}
+
+    assert_response :success
+    assert_select '#content > .contextual .dropdown', :count => 0
+  end
+
+  def test_roadmap_does_not_show_version_quick_access_controls
+    @request.session[:user_id] = 2
+    get :index, :params => {:project_id => 1}
+
+    assert_response :success
+    assert_select '[id^="quick-access-toggle-version-"]', :count => 0
   end
 
   def test_show_should_show_issue_assignee

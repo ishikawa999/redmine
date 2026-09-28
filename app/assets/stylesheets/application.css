@@ -147,6 +147,49 @@ nav.top-menu {
   border-block-start: 1px solid var(--oc-gray-2);
 }
 
+/* Lifted above #context-menu, which shares z-index 1000 and comes later in the DOM */
+#account .dropdown-content {min-inline-size: 12rem; z-index: 1001;}
+#account .dropdown-content li.quick-access-menu {display: block;}
+.quick-access-submenu-marker {color: var(--oc-gray-6);}
+.quick-access-preview {
+  display: none;
+  position: absolute;
+  inset-inline-end: calc(100% - 1px);
+  inset-block-start: 0;
+  min-inline-size: 16rem;
+  max-inline-size: 24rem;
+  background-color: var(--dropdown-bg);
+  border: 1px solid var(--dropdown-border);
+  border-radius: 4px;
+  box-shadow: 0 4px 6px var(--dropdown-shadow);
+  padding-block: 4px;
+}
+.quick-access-preview.is-open {display: block;}
+.dropdown-content .quick-access-preview ul {border: 0; box-shadow: none; padding: 0;}
+.quick-access-preview p.nodata {
+  margin: 0;
+  padding-block: var(--dropdown-item-padding-block);
+  padding-inline: var(--dropdown-item-padding-inline);
+  border: 0;
+  background: none;
+  text-align: start;
+  white-space: nowrap;
+}
+.dropdown-content li.quick-access-preview-item {
+  display: block;
+  box-sizing: border-box;
+  padding-block: 4px;
+  padding-inline: var(--dropdown-item-padding-inline);
+}
+#account .quick-access-preview li.quick-access-preview-item a {display: block; padding: 0;}
+/* Make the whole row clickable */
+.quick-access-preview-item > a::after {content: ''; position: absolute; inset: 0;}
+#account .quick-access-preview li.quick-access-preview-more a {padding-inline-start: var(--dropdown-item-padding-inline);}
+.quick-access-preview-item + .quick-access-preview-item {border-block-start: 1px solid var(--oc-gray-2);}
+.quick-access-preview-item > span {display: block; font-size: 0.85em; color: var(--oc-gray-7);}
+.quick-access-preview-item .badge {position: static; font-size: 0.8em;}
+.dropdown-content li.quick-access-preview-more {border-block-start: 1px solid var(--oc-gray-2);}
+
 #header {
   margin: 0;
   background: var(--color-header-background);

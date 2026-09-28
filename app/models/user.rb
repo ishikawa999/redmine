@@ -20,6 +20,7 @@
 require "digest/sha1"
 
 class User < Principal
+  has_many :quick_access_items, :dependent => :delete_all
   include Redmine::Ciphering
   include Redmine::SafeAttributes
 

@@ -53,6 +53,29 @@ class LayoutTest < Redmine::IntegrationTest
     end
   end
 
+  def test_logged_in_account_menu_contains_quick_access_after_my_account_but_top_menu_does_not
+    log_user('jsmith', 'jsmith')
+    get '/'
+
+    assert_select '#account .dropdown-content > ul' do
+      selector = 'li:has(> a.my-account) + li.quick-access-menu' \
+                 '[data-quick-access-preview-url-value="/quick_access/preview"]'
+      assert_select selector do
+        assert_select 'a.quick-access[href="/quick_access"]', count: 1
+        assert_select '.quick-access-preview', count: 1
+      end
+    end
+    assert_select '#top-menu .general-menu a.quick-access', count: 0
+  end
+
+  def test_guest_layout_does_not_contain_quick_access
+    with_settings login_required: '0' do
+      get '/'
+      assert_select 'a.quick-access', count: 0
+      assert_select '.quick-access-preview', count: 0
+    end
+  end
+
   def test_wiki_formatter_header_tags
     Role.anonymous.add_permission! :add_issues
 
