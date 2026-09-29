@@ -29,7 +29,7 @@ module QuickAccessMenuHelper
       end
     end
 
-    content_tag(:ul, safe_join(links)) if links.any?
+    tag.ul(safe_join(links)) if links.any?
   end
 
   private
@@ -40,16 +40,13 @@ module QuickAccessMenuHelper
     # submenu opens towards the leading edge and its marker points that way.
     marker = sprite_icon('angle-left', size: 12, css_class: 'quick-access-submenu-marker')
     link = render_single_menu_node(node, safe_join([marker, caption]), url, selected)
-    preview = content_tag(
-      :div,
-      nil,
+    preview = tag.div(
       :class => 'quick-access-preview',
       :data => {'quick-access-preview-target' => 'preview', :state => 'idle'},
       :aria => {:live => 'polite'}
     )
 
-    content_tag(
-      :li,
+    tag.li(
       safe_join([link, preview]),
       :class => 'quick-access-menu',
       :data => {
