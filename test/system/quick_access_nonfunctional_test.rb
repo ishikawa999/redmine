@@ -1,5 +1,22 @@
 # frozen_string_literal: true
 
+# Redmine - project management software
+# Copyright (C) 2006-  Jean-Philippe Lang
+#
+# This program is free software; you can redistribute it and/or
+# modify it under the terms of the GNU General Public License
+# as published by the Free Software Foundation; either version 2
+# of the License, or (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program; if not, write to the Free Software
+# Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+
 require_relative '../application_system_test_case'
 
 class QuickAccessNonfunctionalTest < ApplicationSystemTestCase
@@ -10,7 +27,7 @@ class QuickAccessNonfunctionalTest < ApplicationSystemTestCase
     @user = User.find(2)
   end
 
-  test 'permission loss hides all target metadata and recovery restores the same quick_access_items' do
+  def test_permission_loss_hides_all_target_metadata_and_recovery_restores_the_same_quick_access_items
     project = Project.find(1)
     targets = [Issue.find(2), WikiPage.find(1), Version.find(1)]
     quick_access_items = targets.map {|target| @user.quick_access_items.create!(target: target)}
@@ -35,7 +52,7 @@ class QuickAccessNonfunctionalTest < ApplicationSystemTestCase
     assert_equal quick_access_items.map(&:id).sort, @user.quick_access_items.order(:id).pluck(:id)
   end
 
-  test 'deleted targets including orphaned references do not break the rendered list' do
+  def test_deleted_targets_including_orphaned_references_do_not_break_the_rendered_list
     deleted = Version.create!(project: Project.find(1), name: 'Deleted target version')
     orphan = Version.create!(project: Project.find(1), name: 'Orphaned target version')
     deleted_item = @user.quick_access_items.create!(target: deleted)
@@ -56,7 +73,7 @@ class QuickAccessNonfunctionalTest < ApplicationSystemTestCase
     assert QuickAccessItem.exists?(orphan_item.id)
   end
 
-  test 'current names and moved project are rendered after adding' do
+  def test_current_names_and_moved_project_are_rendered_after_adding
     issue = Issue.find(2)
     wiki = WikiPage.find(1)
     version = Version.find(1)
@@ -86,7 +103,7 @@ class QuickAccessNonfunctionalTest < ApplicationSystemTestCase
     assert_no_link 'CookBook documentation'
   end
 
-  test 'closed issues locked and closed versions and wiki remain listed in a closed project' do
+  def test_closed_issues_locked_and_closed_versions_and_wiki_remain_listed_in_a_closed_project
     issue = Issue.find(2)
     issue.update!(status: IssueStatus.where(is_closed: true).first!)
     versions = %w[locked closed].map do |status|
@@ -106,7 +123,7 @@ class QuickAccessNonfunctionalTest < ApplicationSystemTestCase
     versions.each {|version| assert_link version.name, href: "/versions/#{version.id}"}
   end
 
-  test 'a shared version cannot leak from an invisible owner through an accessible destination' do
+  def test_a_shared_version_cannot_leak_from_an_invisible_owner_through_an_accessible_destination
     owner = Project.find(2)
     owner.members.destroy_all
     version = Version.create!(project: owner, name: 'Secret shared release', sharing: 'system')
@@ -129,7 +146,7 @@ class QuickAccessNonfunctionalTest < ApplicationSystemTestCase
     assert QuickAccessItem.exists?(item.id)
   end
 
-  test 'initial page makes no preview request and failed preview leaves normal search usable' do
+  def test_initial_page_makes_no_preview_request_and_failed_preview_leaves_normal_search_usable
     script = page.driver.browser.execute_cdp('Page.addScriptToEvaluateOnNewDocument', source: <<~JS)
       window.quickAccessPreviewRequests = 0;
       const originalFetch = window.fetch.bind(window);

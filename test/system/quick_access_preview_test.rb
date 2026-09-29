@@ -1,5 +1,22 @@
 # frozen_string_literal: true
 
+# Redmine - project management software
+# Copyright (C) 2006-  Jean-Philippe Lang
+#
+# This program is free software; you can redistribute it and/or
+# modify it under the terms of the GNU General Public License
+# as published by the Free Software Foundation; either version 2
+# of the License, or (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program; if not, write to the Free Software
+# Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+
 require_relative '../application_system_test_case'
 
 class QuickAccessPreviewTest < ApplicationSystemTestCase
@@ -23,7 +40,7 @@ class QuickAccessPreviewTest < ApplicationSystemTestCase
       assert_equal 0, fetch_count
 
       open_preview
-      assert_selector '.quick-access-preview[data-state="loading"]', text: 'Loading quick access items…'
+      assert_selector '.quick-access-preview[data-state="loading"]', text: 'Loading quick access items...'
       assert_equal 1, fetch_count
       page.execute_script('window.releaseQuickAccessPreviewFetch()')
 
@@ -44,11 +61,18 @@ class QuickAccessPreviewTest < ApplicationSystemTestCase
         assert_selector '#content h2', text: 'Overview'
       end
 
-      # Reopening serves the same state without asking the server again.
+      # Reopening serves the same state without asking the server again,
+      # except after a failure, which is retried.
       close_preview
       open_preview
+      if state == :error
+        assert_selector '.quick-access-preview[data-state="loading"]'
+        assert_equal 2, fetch_count
+        page.execute_script('window.releaseQuickAccessPreviewFetch()')
+      else
+        assert_equal 1, fetch_count
+      end
       assert_selector ".quick-access-preview[data-state='#{state}']"
-      assert_equal 1, fetch_count
 
       quick_access_link.click
       assert_current_path '/quick_access'
@@ -56,21 +80,30 @@ class QuickAccessPreviewTest < ApplicationSystemTestCase
     end
   end
 
-  def test_latest_five_are_ordered_and_all_target_types_navigate_directly
+  def test_latest_items_are_ordered_and_all_target_types_navigate_directly
     user = User.find(2)
     user.quick_access_items.delete_all
-    targets = [Issue.find(1), Issue.find(3), Issue.find(2), WikiPage.find(1), Version.find(1)]
+    limit = QuickAccessItem::PREVIEW_LIMIT
+    # The rows clicked below come last so they are among the latest, and one
+    # more item than the limit goes first so it is the one left out.
+    fillers = Issue.visible(user).where(project_id: 1).where.not(id: 2).order(:id).to_a +
+              WikiPage.where(wiki_id: 1).where.not(id: 1).order(:id).to_a
+    assert_operator fillers.size, :>=, limit - 3
+    targets = fillers.first(limit - 3) + [Issue.find(2), WikiPage.find(1), Version.find(1)]
     targets.unshift(Version.find(2))
+    assert_equal limit + 1, targets.size
     quick_access_items = targets.each_with_index.map do |target, index|
-      user.quick_access_items.create!(target: target, created_at: (10 - index).minutes.ago)
+      user.quick_access_items.create!(target: target, created_at: (targets.size - index).minutes.ago)
     end
-    expected_ids = quick_access_items.last(5).reverse.map {|item| item.id.to_s}
+    expected_ids = quick_access_items.last(limit).reverse.map {|item| item.id.to_s}
 
     ['/versions/1', '/projects/ecookbook/wiki/CookBook_documentation', '/issues/2'].each do |path|
       visit '/projects/ecookbook'
       open_preview
-      assert_selector '.quick-access-preview-item', count: 5
+      assert_selector '.quick-access-preview-item', count: limit
+      assert_selector '.quick-access-preview-heading', text: "Showing the latest #{limit} items"
       assert_equal expected_ids, all('.quick-access-preview-item').map {|item| item['data-quick-access-id']}
+      assert_no_selector ".quick-access-preview-item[data-quick-access-id='#{quick_access_items.first.id}']"
       find(".quick-access-preview-item a[href='#{path}']").click
       assert_current_path path
       assert_no_current_path '/quick_access'
@@ -253,8 +286,24 @@ class QuickAccessPreviewTest < ApplicationSystemTestCase
     open_preview
     assert_selector '.quick-access-preview.is-open'
 
-    menu = find('#account .dropdown-content')
-    assert_operator menu.style('z-index')['z-index'].to_i, :>, 1000
+    # Lay a stand-in for #context-menu over the submenu, the way the real one
+    # is appended to the end of the body, and check which one is painted on top.
+    page.execute_script(<<~JS)
+      const rect = document.querySelector('.quick-access-preview').getBoundingClientRect();
+      const menu = document.createElement('div');
+      menu.id = 'context-menu';
+      Object.assign(menu.style, {position: 'fixed', zIndex: '1000', left: rect.left + 'px', top: rect.top + 'px',
+                                 width: rect.width + 'px', height: rect.height + 'px'});
+      document.body.appendChild(menu);
+    JS
+    on_top = page.evaluate_script(<<~JS)
+      (() => {
+        const rect = document.querySelector('.quick-access-preview').getBoundingClientRect();
+        const element = document.elementFromPoint(rect.left + rect.width / 2, rect.top + rect.height / 2);
+        return element.closest('.quick-access-preview') !== null;
+      })()
+    JS
+    assert on_top
   end
 
   # On a small screen the account menu is folded into the flyout navigation,

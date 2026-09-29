@@ -1,16 +1,29 @@
 # frozen_string_literal: true
 
+# Redmine - project management software
+# Copyright (C) 2006-  Jean-Philippe Lang
+#
+# This program is free software; you can redistribute it and/or
+# modify it under the terms of the GNU General Public License
+# as published by the Free Software Foundation; either version 2
+# of the License, or (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program; if not, write to the Free Software
+# Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+
 require_relative '../test_helper'
 
 class QuickAccessItemsHelperTest < Redmine::HelperTest
   include QuickAccessItemsHelper
   include IssueStatusesHelper
 
-  fixtures :quick_access_items, :users, :issues, :projects, :members, :member_roles, :roles,
-           :trackers, :issue_statuses, :enumerations,
-           :wikis, :wiki_pages, :versions
-
-  test 'renders a create or delete link with a stable dom id for every target type' do
+  def test_renders_a_create_or_delete_link_with_a_stable_dom_id_for_every_target_type
     User.current = users(:users_002)
     targets = [issues(:issues_001), wiki_pages(:wiki_pages_001), versions(:versions_001)]
 
@@ -39,7 +52,7 @@ class QuickAccessItemsHelperTest < Redmine::HelperTest
     User.current = nil
   end
 
-  test 'resolves current display information for every supported target type' do
+  def test_resolves_current_display_information_for_every_supported_target_type
     issue = issues(:issues_001)
     wiki_page = wiki_pages(:wiki_pages_001)
     version = versions(:versions_001)
@@ -53,7 +66,7 @@ class QuickAccessItemsHelperTest < Redmine::HelperTest
                  [quick_access_label(version), quick_access_project(version), quick_access_path_for(version), quick_access_type_label(version)]
   end
 
-  test 'status label carries the current state name and wiki pages carry none' do
+  def test_status_label_carries_the_current_state_name_and_wiki_pages_carry_none
     issue = issues(:issues_001)
     version = versions(:versions_001)
 
@@ -62,7 +75,7 @@ class QuickAccessItemsHelperTest < Redmine::HelperTest
     assert_nil quick_access_status_label(wiki_pages(:wiki_pages_001))
   end
 
-  test 'status badge reports open and closed state for issues only' do
+  def test_status_badge_reports_open_and_closed_state_for_issues_only
     open_issue = issues(:issues_001)
     closed_issue = issues(:issues_008)
     assert_not open_issue.closed?
@@ -79,7 +92,7 @@ class QuickAccessItemsHelperTest < Redmine::HelperTest
     assert_nil quick_access_status_badge(wiki_pages(:wiki_pages_001))
   end
 
-  test 'item target link escapes the current target name' do
+  def test_item_target_link_escapes_the_current_target_name
     issue = issues(:issues_001)
     issue.subject = '<script>alert("quick_access_items")</script>'
 
@@ -90,10 +103,10 @@ class QuickAccessItemsHelperTest < Redmine::HelperTest
     assert_select_in link, "a[href='#{issue_path(issue)}']", count: 1
   end
 
-  test 'state labels are available in English and Japanese' do
+  def test_state_labels_are_available_in_english_and_japanese
     expected = {
-      en: ['Loading quick access items…', 'You have not added anything to quick access yet.', 'Could not load quick access items.'],
-      ja: ['クイックアクセスを読み込み中…', 'クイックアクセスに登録した項目はありません。', 'クイックアクセスを取得できませんでした。']
+      en: ['Loading quick access items...', 'You have not added anything to quick access yet.', 'Could not load quick access items.'],
+      ja: ['クイックアクセスを読み込み中...', 'クイックアクセスに登録した項目はありません。', 'クイックアクセスを取得できませんでした。']
     }
 
     expected.each do |locale, labels|

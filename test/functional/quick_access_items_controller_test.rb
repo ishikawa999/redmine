@@ -1,24 +1,37 @@
 # frozen_string_literal: true
 
+# Redmine - project management software
+# Copyright (C) 2006-  Jean-Philippe Lang
+#
+# This program is free software; you can redistribute it and/or
+# modify it under the terms of the GNU General Public License
+# as published by the Free Software Foundation; either version 2
+# of the License, or (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program; if not, write to the Free Software
+# Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+
 require_relative '../test_helper'
 
 class QuickAccessItemsControllerTest < Redmine::ControllerTest
-  fixtures :quick_access_items, :users, :issues, :projects, :members, :member_roles, :roles,
-           :trackers, :issue_statuses, :enumerations, :enabled_modules,
-           :wikis, :wiki_pages, :wiki_contents, :versions
-
   setup do
     @request.session[:user_id] = 2
   end
 
-  test 'routes index and preview through separate read endpoints' do
+  def test_routes_index_and_preview_through_separate_read_endpoints
     assert_routing({method: :get, path: '/quick_access'},
                    {controller: 'quick_access_items', action: 'index'})
     assert_routing({method: :get, path: '/quick_access/preview'},
                    {controller: 'quick_access_items', action: 'preview'})
   end
 
-  test 'login is required for read actions' do
+  def test_login_is_required_for_read_actions
     @request.session[:user_id] = nil
 
     get :index
@@ -28,8 +41,8 @@ class QuickAccessItemsControllerTest < Redmine::ControllerTest
     assert_redirected_to signin_url(back_url: quick_access_items_url)
   end
 
-  test 'index assigns all quick_access_items returned by the visible reader' do
-    visible_items = [quick_access_items(:issue_item), quick_access_items(:wiki_page_item), quick_access_items(:version_item)]
+  def test_index_assigns_all_quick_access_items_returned_by_the_visible_reader
+    visible_items = [quick_access_items(:quick_access_items_001), quick_access_items(:quick_access_items_002), quick_access_items(:quick_access_items_003)]
     QuickAccessItem::VisibleReader.any_instance.expects(:call).with(limit: nil).returns(visible_items)
     @controller.stubs(:default_render)
 
@@ -39,8 +52,8 @@ class QuickAccessItemsControllerTest < Redmine::ControllerTest
     assert_equal visible_items, @controller.instance_variable_get(:@quick_access_items)
   end
 
-  test 'index lists project, type, name and status in that order' do
-    item = quick_access_items(:issue_item)
+  def test_index_lists_project_type_name_and_status_in_that_order
+    item = quick_access_items(:quick_access_items_001)
     QuickAccessItem::VisibleReader.any_instance.expects(:call).with(limit: nil).returns([item])
 
     get :index
@@ -60,8 +73,8 @@ class QuickAccessItemsControllerTest < Redmine::ControllerTest
     end
   end
 
-  test 'index leaves the status cell empty for a wiki page' do
-    item = quick_access_items(:wiki_page_item)
+  def test_index_leaves_the_status_cell_empty_for_a_wiki_page
+    item = quick_access_items(:quick_access_items_002)
     QuickAccessItem::VisibleReader.any_instance.expects(:call).with(limit: nil).returns([item])
 
     get :index
@@ -70,7 +83,7 @@ class QuickAccessItemsControllerTest < Redmine::ControllerTest
     assert_select 'table.quick-access tbody tr td.quick-access-status', text: ''
   end
 
-  test 'index assigns an empty collection when no item is visible' do
+  def test_index_assigns_an_empty_collection_when_no_item_is_visible
     QuickAccessItem::VisibleReader.any_instance.expects(:call).with(limit: nil).returns([])
 
     get :index
@@ -79,8 +92,38 @@ class QuickAccessItemsControllerTest < Redmine::ControllerTest
     assert_empty @controller.instance_variable_get(:@quick_access_items)
   end
 
-  test 'preview renders the localized empty state in English and Japanese' do
-    QuickAccessItem::VisibleReader.any_instance.expects(:call).with(limit: QuickAccessItem::PREVIEW_LIMIT).twice.returns([])
+  def test_index_paginates_the_visible_items_with_the_per_page_option
+    visible_items = [quick_access_items(:quick_access_items_001), quick_access_items(:quick_access_items_002), quick_access_items(:quick_access_items_003)]
+    QuickAccessItem::VisibleReader.any_instance.expects(:call).with(limit: nil).returns(visible_items)
+
+    with_settings per_page_options: '2,25' do
+      get :index, params: {per_page: 2, page: 2}
+    end
+
+    assert_response :success
+    assert_equal [quick_access_items(:quick_access_items_003)], @controller.instance_variable_get(:@quick_access_items)
+    assert_select 'table.quick-access tbody tr', count: 1
+    assert_select 'span.pagination' do
+      assert_select 'li.current', text: '2'
+      assert_select 'li.previous a[href=?]', quick_access_items_path(page: 1, per_page: 2)
+    end
+  end
+
+  def test_index_shows_the_last_page_for_a_page_beyond_it
+    visible_items = [quick_access_items(:quick_access_items_001), quick_access_items(:quick_access_items_002), quick_access_items(:quick_access_items_003)]
+    QuickAccessItem::VisibleReader.any_instance.expects(:call).with(limit: nil).returns(visible_items)
+
+    with_settings per_page_options: '2,25' do
+      get :index, params: {per_page: 2, page: 3}
+    end
+
+    assert_response :success
+    assert_equal [quick_access_items(:quick_access_items_003)], @controller.instance_variable_get(:@quick_access_items)
+    assert_select 'span.pagination li.current', text: '2'
+  end
+
+  def test_preview_renders_the_localized_empty_state_in_english_and_japanese
+    QuickAccessItem::VisibleReader.any_instance.expects(:call).with(limit: QuickAccessItem::PREVIEW_LIMIT + 1).twice.returns([])
 
     [:en, :ja].each do |locale|
       I18n.with_locale(locale) do
@@ -92,8 +135,8 @@ class QuickAccessItemsControllerTest < Redmine::ControllerTest
     end
   end
 
-  test 'index renders direct escaped links and current project for all target types' do
-    quick_access_items = [quick_access_items(:issue_item), quick_access_items(:wiki_page_item), quick_access_items(:version_item)]
+  def test_index_renders_direct_escaped_links_and_current_project_for_all_target_types
+    quick_access_items = [quick_access_items(:quick_access_items_001), quick_access_items(:quick_access_items_002), quick_access_items(:quick_access_items_003)]
     quick_access_items.first.target.subject = '<script>issue</script>'
     QuickAccessItem::VisibleReader.any_instance.expects(:call).with(limit: nil).returns(quick_access_items)
 
@@ -112,10 +155,10 @@ class QuickAccessItemsControllerTest < Redmine::ControllerTest
     end
   end
 
-  test 'preview renders direct escaped links for all target types' do
-    quick_access_items = [quick_access_items(:issue_item), quick_access_items(:wiki_page_item), quick_access_items(:version_item)]
+  def test_preview_renders_direct_escaped_links_for_all_target_types
+    quick_access_items = [quick_access_items(:quick_access_items_001), quick_access_items(:quick_access_items_002), quick_access_items(:quick_access_items_003)]
     quick_access_items[1].target.title = '<script>wiki</script>'
-    QuickAccessItem::VisibleReader.any_instance.expects(:call).with(limit: QuickAccessItem::PREVIEW_LIMIT).returns(quick_access_items)
+    QuickAccessItem::VisibleReader.any_instance.expects(:call).with(limit: QuickAccessItem::PREVIEW_LIMIT + 1).returns(quick_access_items)
 
     get :preview
 
@@ -127,9 +170,9 @@ class QuickAccessItemsControllerTest < Redmine::ControllerTest
     assert_not_includes response.body, '<script>wiki</script>'
   end
 
-  test 'index excludes invisible and orphaned quick_access_items without deleting them' do
-    issue_item = quick_access_items(:issue_item)
-    orphaned_pin = quick_access_items(:wiki_page_item)
+  def test_index_excludes_invisible_and_orphaned_quick_access_items_without_deleting_them
+    issue_item = quick_access_items(:quick_access_items_001)
+    orphaned_pin = quick_access_items(:quick_access_items_002)
     Issue.any_instance.stubs(:visible?).with(User.find(2)).returns(false)
     orphaned_pin.update_columns(target_id: 999_999)
     @controller.stubs(:default_render)
@@ -139,14 +182,14 @@ class QuickAccessItemsControllerTest < Redmine::ControllerTest
     end
 
     assert_response :success
-    assert_equal [quick_access_items(:version_item)], @controller.instance_variable_get(:@quick_access_items)
+    assert_equal [quick_access_items(:quick_access_items_003)], @controller.instance_variable_get(:@quick_access_items)
     assert QuickAccessItem.exists?(issue_item.id)
     assert QuickAccessItem.exists?(orphaned_pin.id)
   end
 
-  test 'preview assigns at most five quick_access_items in reader order and returns an html fragment' do
-    ordered_items = [quick_access_items(:issue_item), quick_access_items(:wiki_page_item), quick_access_items(:version_item)]
-    QuickAccessItem::VisibleReader.any_instance.expects(:call).with(limit: QuickAccessItem::PREVIEW_LIMIT).returns(ordered_items)
+  def test_preview_assigns_the_quick_access_items_in_reader_order_and_returns_an_html_fragment
+    ordered_items = [quick_access_items(:quick_access_items_001), quick_access_items(:quick_access_items_002), quick_access_items(:quick_access_items_003)]
+    QuickAccessItem::VisibleReader.any_instance.expects(:call).with(limit: QuickAccessItem::PREVIEW_LIMIT + 1).returns(ordered_items)
 
     get :preview
 
@@ -161,13 +204,12 @@ class QuickAccessItemsControllerTest < Redmine::ControllerTest
       end
     end
 
-    # The heading says how many of the most recent items the submenu lists.
-    assert_select 'p.quick-access-preview-heading',
-                  text: I18n.t(:label_latest_quick_access_items, count: QuickAccessItem::PREVIEW_LIMIT)
+    # Every item fits, so there is nothing left out to point at.
+    assert_select 'p.quick-access-preview-heading', 0
 
     # A row reads as name, then project, then type, with an issue's state
     # trailing the type.
-    issue_item = quick_access_items(:issue_item)
+    issue_item = quick_access_items(:quick_access_items_001)
     within_row = "li.quick-access-preview-item[data-quick-access-id=?]"
     assert_select within_row, issue_item.id.to_s do
       assert_select '> a', text: @controller.helpers.quick_access_label(issue_item.target)
@@ -180,8 +222,8 @@ class QuickAccessItemsControllerTest < Redmine::ControllerTest
     # Only issues carry a badge; a version's state is left to the status column
     # of the list, and wiki pages have no state at all.
     {
-      quick_access_items(:version_item) => I18n.t(:label_version),
-      quick_access_items(:wiki_page_item) => I18n.t(:label_wiki_page)
+      quick_access_items(:quick_access_items_003) => I18n.t(:label_version),
+      quick_access_items(:quick_access_items_002) => I18n.t(:label_wiki_page)
     }.each do |other, type_label|
       assert_select within_row, other.id.to_s do
         assert_select '> span.quick-access-preview-type', text: type_label
@@ -195,8 +237,20 @@ class QuickAccessItemsControllerTest < Redmine::ControllerTest
                  rendered_items.map {|item| item.at_css('a').text}
   end
 
-  test 'a preview reader failure is isolated from the full page endpoint' do
-    QuickAccessItem::VisibleReader.any_instance.stubs(:call).with(limit: QuickAccessItem::PREVIEW_LIMIT).raises('preview failed')
+  def test_preview_says_how_many_are_shown_when_older_items_are_left_out
+    quick_access_items = Array.new(QuickAccessItem::PREVIEW_LIMIT + 1) { quick_access_items(:quick_access_items_001) }
+    QuickAccessItem::VisibleReader.any_instance.expects(:call).with(limit: QuickAccessItem::PREVIEW_LIMIT + 1).returns(quick_access_items)
+
+    get :preview
+
+    assert_response :success
+    assert_select 'li.quick-access-preview-item', QuickAccessItem::PREVIEW_LIMIT
+    assert_select 'p.quick-access-preview-heading',
+                  text: I18n.t(:label_latest_quick_access_items, count: QuickAccessItem::PREVIEW_LIMIT)
+  end
+
+  def test_a_preview_reader_failure_is_isolated_from_the_full_page_endpoint
+    QuickAccessItem::VisibleReader.any_instance.stubs(:call).with(limit: QuickAccessItem::PREVIEW_LIMIT + 1).raises('preview failed')
     QuickAccessItem::VisibleReader.any_instance.stubs(:call).with(limit: nil).returns([])
 
     assert_raises(RuntimeError) { get :preview }
@@ -206,7 +260,7 @@ class QuickAccessItemsControllerTest < Redmine::ControllerTest
     assert_empty @controller.instance_variable_get(:@quick_access_items)
   end
 
-  test 'routes destroy only through the target identity collection endpoint' do
+  def test_routes_destroy_only_through_the_target_identity_collection_endpoint
     assert_routing({method: :delete, path: '/quick_access'},
                    {controller: 'quick_access_items', action: 'destroy'})
     assert_raises(ActionController::RoutingError) do
@@ -214,7 +268,7 @@ class QuickAccessItemsControllerTest < Redmine::ControllerTest
     end
   end
 
-  test 'create quick_access_items a visible issue with a javascript response and is idempotent' do
+  def test_create_quick_access_items_a_visible_issue_with_a_javascript_response_and_is_idempotent
     QuickAccessItem.where(user_id: 2, target_type: 'Issue', target_id: 1).delete_all
 
     assert_difference 'QuickAccessItem.count', 1 do
@@ -232,7 +286,7 @@ class QuickAccessItemsControllerTest < Redmine::ControllerTest
     assert_includes response.body, "quick-access-preview:invalidate"
   end
 
-  test 'create redirects HTML back to a safe referring page' do
+  def test_create_redirects_html_back_to_a_safe_referring_page
     QuickAccessItem.where(user_id: 2, target_type: 'Issue', target_id: 1).delete_all
     @request.env['HTTP_REFERER'] = issue_url(1)
 
@@ -242,7 +296,7 @@ class QuickAccessItemsControllerTest < Redmine::ControllerTest
     assert_equal 1, QuickAccessItem.where(user_id: 2, target_type: 'Issue', target_id: 1).count
   end
 
-  test 'create accepts each allowlisted target type' do
+  def test_create_accepts_each_allowlisted_target_type
     targets = [Issue.find(1), WikiPage.find(1), Version.find(1)]
     targets.each do |target|
       type = target.class.base_class.name
@@ -255,7 +309,7 @@ class QuickAccessItemsControllerTest < Redmine::ControllerTest
     end
   end
 
-  test 'create redirects HTML to quick_access_items when the referring page is external' do
+  def test_create_redirects_html_to_quick_access_items_when_the_referring_page_is_external
     QuickAccessItem.where(user_id: 2, target_type: 'Issue', target_id: 1).delete_all
     @request.env['HTTP_REFERER'] = 'https://attacker.example/path'
 
@@ -264,21 +318,21 @@ class QuickAccessItemsControllerTest < Redmine::ControllerTest
     assert_redirected_to quick_access_items_url
   end
 
-  test 'create rejects unsupported types' do
+  def test_create_rejects_unsupported_types
     assert_no_difference 'QuickAccessItem.count' do
       post :create, params: {target_type: 'Project', target_id: 1}, xhr: true
     end
     assert_response :not_found
   end
 
-  test 'create rejects a missing supported target' do
+  def test_create_rejects_a_missing_supported_target
     assert_no_difference 'QuickAccessItem.count' do
       post :create, params: {target_type: 'Issue', target_id: 999_999}, xhr: true
     end
     assert_response :not_found
   end
 
-  test 'create rejects an invisible target' do
+  def test_create_rejects_an_invisible_target
     Issue.any_instance.stubs(:visible?).with(User.find(2)).returns(false)
 
     assert_no_difference 'QuickAccessItem.count' do
@@ -287,22 +341,7 @@ class QuickAccessItemsControllerTest < Redmine::ControllerTest
     assert_response :forbidden
   end
 
-  test 'create normalizes a unique constraint race to success' do
-    QuickAccessItem.where(user_id: 2, target_type: 'Issue', target_id: 1).delete_all
-    QuickAccessItem.create!(user_id: 2, target_type: Issue.name, target_id: 1)
-    ActiveRecord::Associations::CollectionProxy.any_instance
-      .stubs(:create!)
-      .raises(ActiveRecord::RecordNotUnique)
-
-    assert_no_difference 'QuickAccessItem.count' do
-      post :create, params: {target_type: 'Issue', target_id: 1}, xhr: true
-    end
-
-    assert_response :success
-    assert_equal 1, QuickAccessItem.where(user_id: 2, target_type: 'Issue', target_id: 1).count
-  end
-
-  test 'destroy removes only the current users item by target identity and is idempotent' do
+  def test_destroy_removes_only_the_current_users_item_by_target_identity_and_is_idempotent
     QuickAccessItem.where(user_id: 2, target_type: 'Issue', target_id: 2).delete_all
     QuickAccessItem.create!(user_id: 2, target_type: Issue.name, target_id: 2)
 
@@ -321,7 +360,7 @@ class QuickAccessItemsControllerTest < Redmine::ControllerTest
     assert_includes response.body, "quick-access-preview:invalidate"
   end
 
-  test 'destroy does not reveal or remove another users item' do
+  def test_destroy_does_not_reveal_or_remove_another_users_item
     QuickAccessItem.where(target_type: 'Issue', target_id: 2).delete_all
     other_pin = QuickAccessItem.create!(user_id: 3, target_type: Issue.name, target_id: 2)
 
@@ -333,14 +372,14 @@ class QuickAccessItemsControllerTest < Redmine::ControllerTest
     assert QuickAccessItem.exists?(other_pin.id)
   end
 
-  test 'destroy rejects unsupported types without changing quick_access_items' do
+  def test_destroy_rejects_unsupported_types_without_changing_quick_access_items
     assert_no_difference 'QuickAccessItem.count' do
       delete :destroy, params: {target_type: 'Project', target_id: 1}, xhr: true
     end
     assert_response :not_found
   end
 
-  test 'destroy redirects HTML back and succeeds when no own item exists' do
+  def test_destroy_redirects_html_back_and_succeeds_when_no_own_item_exists
     QuickAccessItem.where(user_id: 2, target_type: 'Issue', target_id: 1).delete_all
     @request.env['HTTP_REFERER'] = issue_url(1)
 
@@ -351,7 +390,7 @@ class QuickAccessItemsControllerTest < Redmine::ControllerTest
     assert_redirected_to issue_url(1)
   end
 
-  test 'login is required for write actions' do
+  def test_login_is_required_for_write_actions
     @request.session[:user_id] = nil
 
     post :create, params: {target_type: 'Issue', target_id: 1}

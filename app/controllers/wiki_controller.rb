@@ -44,6 +44,7 @@ class WikiController < ApplicationController
   helper :attachments
   include AttachmentsHelper
   helper :watchers
+  helper :quick_access_items
   include Redmine::Export::PDF
 
   # List of pages, sorted alphabetically and by parent (hierarchy)

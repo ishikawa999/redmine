@@ -1,5 +1,22 @@
 # frozen_string_literal: true
 
+# Redmine - project management software
+# Copyright (C) 2006-  Jean-Philippe Lang
+#
+# This program is free software; you can redistribute it and/or
+# modify it under the terms of the GNU General Public License
+# as published by the Free Software Foundation; either version 2
+# of the License, or (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program; if not, write to the Free Software
+# Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+
 require_relative '../application_system_test_case'
 
 class QuickAccessTest < ApplicationSystemTestCase
@@ -8,7 +25,7 @@ class QuickAccessTest < ApplicationSystemTestCase
     log_user 'jsmith', 'jsmith'
   end
 
-  test 'quick_access_items lists revisits and unpins each supported target through its detail UI' do
+  def test_quick_access_items_lists_revisits_and_unpins_each_supported_target_through_its_detail_ui
     targets = [
       ['/issues/2', '#quick-access-toggle-issue-2', 'Issue', '#2 Add ingredients categories'],
       ['/projects/ecookbook/wiki/CookBook_documentation', '#quick-access-toggle-wiki-page-1', 'Wiki page', 'CookBook documentation'],
@@ -39,7 +56,7 @@ class QuickAccessTest < ApplicationSystemTestCase
     assert_empty User.find(2).quick_access_items
   end
 
-  test 'lists current metadata revisits targets and puts a repinned target first' do
+  def test_lists_current_metadata_revisits_targets_and_puts_a_repinned_target_first
     issue = Issue.find(2)
     wiki_page = WikiPage.find(1)
     version = Version.find(1)
@@ -77,7 +94,7 @@ class QuickAccessTest < ApplicationSystemTestCase
     end
   end
 
-  test 'does not display or remove another users item' do
+  def test_does_not_display_or_remove_another_users_item
     other_pin = User.find(3).quick_access_items.create!(target: Issue.find(2))
 
     visit '/quick_access'
@@ -87,7 +104,7 @@ class QuickAccessTest < ApplicationSystemTestCase
     assert QuickAccessItem.exists?(other_pin.id)
   end
 
-  test 'item operations do not change notifications priority or assignee' do
+  def test_item_operations_do_not_change_notifications_priority_or_assignee
     issue = Issue.find(2)
     before_state = [issue.priority_id, issue.assigned_to_id, issue.watcher_user_ids.sort]
 
@@ -100,7 +117,7 @@ class QuickAccessTest < ApplicationSystemTestCase
     assert_equal before_state, [issue.priority_id, issue.assigned_to_id, issue.watcher_user_ids.sort]
   end
 
-  test 'roadmap does not offer version item controls' do
+  def test_roadmap_does_not_offer_version_item_controls
     visit '/projects/ecookbook/roadmap'
 
     assert_no_selector '[id^="quick-access-toggle-version-"]'
@@ -127,7 +144,7 @@ class PersonalPinsNoJavascriptTest < ActionDispatch::SystemTestCase
     click_button 'Login'
   end
 
-  test 'cannot remove another users item through the identity route' do
+  def test_cannot_remove_another_users_item_through_the_identity_route
     other_pin = User.find(3).quick_access_items.create!(target: Issue.find(2))
 
     visit '/quick_access'

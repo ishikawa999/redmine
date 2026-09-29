@@ -1,12 +1,23 @@
 # frozen_string_literal: true
 
-class QuickAccessItemsController < ApplicationController
-  TARGET_CLASSES = {
-    "Issue" => Issue,
-    "WikiPage" => WikiPage,
-    "Version" => Version
-  }.freeze
+# Redmine - project management software
+# Copyright (C) 2006-  Jean-Philippe Lang
+#
+# This program is free software; you can redistribute it and/or
+# modify it under the terms of the GNU General Public License
+# as published by the Free Software Foundation; either version 2
+# of the License, or (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program; if not, write to the Free Software
+# Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
+class QuickAccessItemsController < ApplicationController
   helper :issue_statuses
 
   before_action :require_login
@@ -14,11 +25,22 @@ class QuickAccessItemsController < ApplicationController
   before_action :find_target, only: :create
 
   def index
-    @quick_access_items = visible_items(limit: nil)
+    quick_access_items = visible_items(limit: nil)
+    @quick_access_item_count = quick_access_items.size
+    per_page = per_page_option
+    # Removing the only row of the last page redirects back to that page, so
+    # fall back to the last one that still has rows.
+    last_page = [(@quick_access_item_count - 1) / per_page + 1, 1].max
+    page = params['page'].to_i.clamp(1, last_page)
+    @quick_access_item_pages = Paginator.new @quick_access_item_count, per_page, page
+    @quick_access_items = quick_access_items.slice(@quick_access_item_pages.offset, per_page)
   end
 
   def preview
-    @quick_access_items = visible_items(limit: QuickAccessItem::PREVIEW_LIMIT)
+    # Reading one more than is shown tells whether older items are left out
+    quick_access_items = visible_items(limit: QuickAccessItem::PREVIEW_LIMIT + 1)
+    @quick_access_items_truncated = quick_access_items.size > QuickAccessItem::PREVIEW_LIMIT
+    @quick_access_items = quick_access_items.first(QuickAccessItem::PREVIEW_LIMIT)
     render partial: "preview", layout: false
   end
 
@@ -31,9 +53,8 @@ class QuickAccessItemsController < ApplicationController
     begin
       User.current.quick_access_items.create!(target: @target)
     rescue ActiveRecord::RecordInvalid => e
-      raise unless duplicate_item?(e.record)
-    rescue ActiveRecord::RecordNotUnique
-      raise unless current_user_item.exists?
+      # Adding what is already there is not an error
+      raise unless e.record.errors.of_kind?(:target_id, :taken)
     end
 
     respond_after_write
@@ -52,12 +73,12 @@ class QuickAccessItemsController < ApplicationController
   end
 
   def set_target_identity
-    @target_class = TARGET_CLASSES[params[:target_type]]
-    unless @target_class
+    unless QuickAccessItem::TARGET_TYPES.include?(params[:target_type])
       render_404
       return
     end
 
+    @target_class = params[:target_type].constantize
     @target_id = params[:target_id]
   end
 
@@ -72,12 +93,6 @@ class QuickAccessItemsController < ApplicationController
       target_type: @target_class.base_class.name,
       target_id: @target_id
     )
-  end
-
-  def duplicate_item?(item)
-    item.target_type == @target_class.base_class.name &&
-      item.target_id.to_s == @target_id.to_s &&
-      current_user_item.exists?
   end
 
   def respond_after_write

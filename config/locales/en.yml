@@ -1260,14 +1260,6 @@ en:
   button_import: Import
   button_project_bookmark: Add bookmark
   button_project_bookmark_delete: Remove bookmark
-  button_add_to_quick_access: Add to quick access
-  button_remove_from_quick_access: Remove from quick access
-  label_quick_access: Quick access
-  label_view_all_quick_access_items: View all quick access items
-  label_latest_quick_access_items: "Showing the latest %{count} items"
-  label_no_quick_access_items: You have not added anything to quick access yet.
-  label_loading_quick_access_items: Loading quick access items…
-  label_quick_access_load_error: Could not load quick access items.
   button_filter: Filter
   button_actions: Actions
   button_add_subtask: Add subtask
@@ -1493,3 +1485,11 @@ en:
   reaction_text_x_other_users:
     one: "1 other"
     other: "%{count} others"
+  button_add_to_quick_access: Add to quick access
+  button_remove_from_quick_access: Remove from quick access
+  label_quick_access: Quick access
+  label_view_all_quick_access_items: View all quick access items
+  label_latest_quick_access_items: "Showing the latest %{count} items"
+  label_no_quick_access_items: You have not added anything to quick access yet.
+  label_loading_quick_access_items: Loading quick access items...
+  label_quick_access_load_error: Could not load quick access items.

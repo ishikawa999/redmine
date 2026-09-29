@@ -875,6 +875,18 @@
   .controller-issues.action-show #update {
     scroll-margin-block-start: 114px;
   }
+
+  /* The flyout folds the account menu into a plain list, where a hover-opened
+     quick access submenu has no place. The is-open rule is matched as well, so
+     a panel left open before the resize does not win with its own class. */
+  .quick-access-preview,
+  .quick-access-preview.is-open {
+    display: none;
+  }
+
+  .quick-access-submenu-marker {
+    display: none;
+  }
 }
 
 @media all and (max-width: 599px) {

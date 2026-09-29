@@ -1,5 +1,22 @@
 # frozen_string_literal: true
 
+# Redmine - project management software
+# Copyright (C) 2006-  Jean-Philippe Lang
+#
+# This program is free software; you can redistribute it and/or
+# modify it under the terms of the GNU General Public License
+# as published by the Free Software Foundation; either version 2
+# of the License, or (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program; if not, write to the Free Software
+# Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+
 module QuickAccessItemsHelper
   def quick_access_link(target)
     return ''.html_safe unless User.current.logged?
@@ -9,7 +26,7 @@ module QuickAccessItemsHelper
       target_type: target.class.base_class.name,
       target_id: target.id
     }
-    dom_id = "quick-access-toggle-#{target.class.base_class.name.underscore.dasherize}-#{target.id}"
+    dom_id = quick_access_toggle_id(target)
 
     if item
       link_to sprite_icon('link-break', l(:button_remove_from_quick_access)), quick_access_items_path(identity),
@@ -18,6 +35,10 @@ module QuickAccessItemsHelper
       link_to sprite_icon('link-add', l(:button_add_to_quick_access)), quick_access_items_path(identity),
               remote: true, method: :post, id: dom_id, class: 'icon icon-link-add quick-access-toggle'
     end
+  end
+
+  def quick_access_toggle_id(target)
+    "quick-access-toggle-#{target.class.base_class.name.underscore.dasherize}-#{target.id}"
   end
 
   def quick_access_path_for(target)

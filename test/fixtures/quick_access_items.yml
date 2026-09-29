@@ -1,18 +1,20 @@
-issue_item:
+---
+quick_access_items_001:
+  id: 1
   user_id: 2
   target_type: Issue
   target_id: 2
   created_at: <%= 1.day.ago.to_fs(:db) %>
   updated_at: <%= 1.day.ago.to_fs(:db) %>
-
-wiki_page_item:
+quick_access_items_002:
+  id: 2
   user_id: 2
   target_type: WikiPage
   target_id: 1
   created_at: <%= 2.days.ago.to_fs(:db) %>
   updated_at: <%= 2.days.ago.to_fs(:db) %>
-
-version_item:
+quick_access_items_003:
+  id: 3
   user_id: 2
   target_type: Version
   target_id: 1

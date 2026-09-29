@@ -31,6 +31,7 @@ class VersionsController < ApplicationController
   include VersionsHelper
   helper :custom_fields
   helper :projects
+  helper :quick_access_items
 
   def index
     respond_to do |format|

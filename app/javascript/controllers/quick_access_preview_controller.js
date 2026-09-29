@@ -57,7 +57,8 @@ export default class extends Controller {
     if (this.cachedHTML !== null) {
       // Keep existing links intact when focus moves inside the preview.
       this.renderState(this.cachedHTMLHasItems() ? "loaded" : "empty")
-    } else if (this.state === "idle") {
+    } else if (this.state === "idle" || this.state === "error") {
+      // A failed request is retried the next time the preview opens.
       this.load()
     }
   }

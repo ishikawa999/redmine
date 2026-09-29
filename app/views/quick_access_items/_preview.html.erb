@@ -1,7 +1,9 @@
 <% if @quick_access_items.any? %>
+  <% if @quick_access_items_truncated %>
   <p class="quick-access-preview-heading">
     <%= l(:label_latest_quick_access_items, count: QuickAccessItem::PREVIEW_LIMIT) %>
   </p>
+  <% end %>
   <ul class="quick-access-preview-items">
     <% @quick_access_items.each do |item| %>
       <li class="quick-access-preview-item" data-quick-access-id="<%= item.id %>">

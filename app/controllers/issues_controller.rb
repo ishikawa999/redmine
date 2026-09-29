@@ -36,6 +36,7 @@ class IssuesController < ApplicationController
   helper :custom_fields
   helper :issue_relations
   helper :watchers
+  helper :quick_access_items
   helper :attachments
   helper :queries
   include QueriesHelper

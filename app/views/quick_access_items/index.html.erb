@@ -21,6 +21,7 @@
       </tbody>
     </table>
   </div>
+  <span class="pagination"><%= pagination_links_full @quick_access_item_pages, @quick_access_item_count %></span>
 <% else %>
   <p class="nodata"><%= l(:label_no_quick_access_items) %></p>
 <% end %>
